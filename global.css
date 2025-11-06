@@ -1,3 +1,85 @@
+/**
+ * Jelty Global Styles
+ * Sistema de diseño base moderno
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   CONFIGURACIÓN BASE
+   ============================================ */
+
+@layer base {
+  /* Tipografía base con Roboto */
+  * {
+    font-family: 'Roboto_400Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  /* Smooth text rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================
+   COMPONENTES REUTILIZABLES
+   ============================================ */
+
+@layer components {
+  /* Glass Card Base */
+  .glass-card {
+    @apply rounded-2xl border border-white/20 shadow-md;
+  }
+
+  /* Glass Card Light */
+  .glass-card-light {
+    @apply glass-card glass-light;
+  }
+
+  /* Glass Card Dark */
+  .glass-card-dark {
+    @apply glass-card glass-dark;
+  }
+
+  /* Glass Card Primary */
+  .glass-card-primary {
+    @apply glass-card glass-primary border-primary/30;
+  }
+
+  /* Container con padding estándar */
+  .container-padding {
+    @apply px-6 py-4;
+  }
+
+  /* Nota: Para sombras personalizadas en React Native, usar los objetos
+     de constants/tokens/shadows.ts con StyleSheet.create() */
+}
+
+/* ============================================
+   UTILIDADES PERSONALIZADAS
+   ============================================ */
+
+@layer utilities {
+  /* Text shadow para títulos */
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Border gradient effect (simulado) */
+  .border-gradient {
+    border-width: 1px;
+    border-style: solid;
+    border-image: linear-gradient(135deg, rgba(224, 255, 44, 0.5), rgba(12, 218, 81, 0.5)) 1;
+  }
+}

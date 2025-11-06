@@ -3,6 +3,9 @@ import { useColorScheme as useNativewindColorScheme } from "nativewind";
 /**
  * Hook personalizado para manejo de color scheme (dark mode)
  * Envuelve el hook de NativeWind con una API más clara
+ *
+ * Nota: NativeWind v4 retorna 'light' | 'dark' | undefined
+ * El valor undefined significa que está usando el tema del sistema
  */
 export function useColorScheme() {
   const { colorScheme, setColorScheme, toggleColorScheme } =
@@ -10,7 +13,7 @@ export function useColorScheme() {
 
   return {
     /**
-     * Color scheme actual: 'light', 'dark', o 'system'
+     * Color scheme actual: 'light', 'dark', o undefined (sistema)
      */
     colorScheme,
     /**
@@ -24,10 +27,10 @@ export function useColorScheme() {
     /**
      * Determina si está usando el tema del sistema
      */
-    isSystem: colorScheme === "system",
+    isSystem: colorScheme === undefined,
     /**
      * Establece el color scheme
-     * @param scheme - 'light', 'dark', o 'system'
+     * @param scheme - 'light', 'dark', o undefined (para sistema)
      */
     setColorScheme,
     /**

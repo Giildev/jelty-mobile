@@ -1,5 +1,5 @@
 import * as SecureStore from "expo-secure-store";
-import { TokenCache } from "@clerk/clerk-expo/dist/cache";
+import type { TokenCache } from "@clerk/clerk-expo";
 
 /**
  * Token cache para Clerk usando expo-secure-store
