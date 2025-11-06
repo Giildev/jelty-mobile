@@ -1,31 +1,46 @@
-import { StyleSheet } from 'react-native';
+import { View, Text, ScrollView } from "react-native";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-
-export default function TabOneScreen() {
+/**
+ * Pantalla principal / Home
+ */
+export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView className="flex-1 bg-white dark:bg-gray-900">
+      <View className="p-6">
+        {/* Header */}
+        <View className="mb-10 items-center">
+          <Text className="text-6xl font-bold text-blue-600 dark:text-blue-400">
+            Jelty
+          </Text>
+        </View>
+
+        {/* Tech Stack List */}
+        <View>
+          <TechItem icon="⚛️" title="React Native + Expo SDK 52" />
+          <TechItem icon="📘" title="TypeScript" />
+          <TechItem icon="🗺️" title="Expo Router v4" />
+          <TechItem icon="🎨" title="NativeWind v4" />
+          <TechItem icon="🔐" title="Clerk Authentication" />
+          <TechItem icon="🐻" title="Zustand" />
+          <TechItem icon="📋" title="React Hook Form" />
+          <TechItem icon="✅" title="Zod" />
+          <TechItem icon="🎭" title="React Native Reanimated" />
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+/**
+ * Componente de item de tecnología
+ */
+function TechItem({ icon, title }: { icon: string; title: string }) {
+  return (
+    <View className="mb-4 flex-row items-center">
+      <Text className="mr-4 text-3xl">{icon}</Text>
+      <Text className="text-lg font-medium text-gray-900 dark:text-white">
+        {title}
+      </Text>
+    </View>
+  );
+}

@@ -1,0 +1,12 @@
+{
+  "name": "superclaude",
+  "version": "4.2.0",
+  "description": "SuperClaude Framework - Transform Claude Code into a Structured Development Platform",
+  "author": "SuperClaude Org",
+  "license": "MIT",
+  "homepage": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework.git"
+  }
+}

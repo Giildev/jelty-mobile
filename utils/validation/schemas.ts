@@ -1,0 +1,62 @@
+import { z } from "zod";
+
+/**
+ * Login schema
+ */
+export const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+/**
+ * Signup schema
+ */
+export const signupSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, "El nombre debe tener al menos 2 caracteres")
+      .max(50, "El nombre no puede exceder 50 caracteres"),
+    email: z.string().email("Email inválido"),
+    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+export type SignupFormData = z.infer<typeof signupSchema>;
+
+/**
+ * Profile update schema
+ */
+export const profileUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(50, "El nombre no puede exceder 50 caracteres"),
+  email: z.string().email("Email inválido"),
+  avatar: z.string().url("URL inválida").optional(),
+});
+
+export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>;
+
+/**
+ * Example: Post creation schema
+ */
+export const createPostSchema = z.object({
+  title: z
+    .string()
+    .min(1, "El título es requerido")
+    .max(100, "El título no puede exceder 100 caracteres"),
+  content: z
+    .string()
+    .min(1, "El contenido es requerido")
+    .max(1000, "El contenido no puede exceder 1000 caracteres"),
+  tags: z.array(z.string()).optional(),
+});
+
+export type CreatePostFormData = z.infer<typeof createPostSchema>;
