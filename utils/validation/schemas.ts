@@ -70,3 +70,33 @@ export const createPostSchema = z.object({
 });
 
 export type CreatePostFormData = z.infer<typeof createPostSchema>;
+
+/**
+ * Forgot password schema
+ */
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
+
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+
+/**
+ * Reset password schema
+ */
+export const resetPasswordSchema = z
+  .object({
+    code: z
+      .string()
+      .length(6, "El código debe tener 6 dígitos")
+      .regex(/^[0-9]{6}$/, "El código debe contener solo números"),
+    password: z
+      .string()
+      .min(8, "La contraseña debe tener al menos 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
