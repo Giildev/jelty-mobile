@@ -1,197 +1,82 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button } from "@/components/ui/Button";
 
 /**
- * Pantalla principal / Home
- * Demo del Sistema de Diseño Jelty
+ * Pantalla de bienvenida
  */
-export default function HomeScreen() {
+export default function WelcomeScreen() {
+  const handleSignUp = () => {
+    // TODO: Navegar a sign-up cuando implementemos Clerk
+    console.log("Sign Up pressed");
+  };
+
+  const handleSignIn = () => {
+    // TODO: Navegar a sign-in cuando implementemos Clerk
+    console.log("Sign In pressed");
+  };
+
   return (
-    <ScrollView className="flex-1 bg-base-white dark:bg-base-black">
-      <View className="p-6 gap-6">
-        {/* Header con tipografía Roboto */}
-        <View className="mb-4 items-center">
-          <Text className="text-5xl font-bold text-primary dark:text-primary-300">
-            Jelty
-          </Text>
-          <Text className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Sistema de Diseño Moderno
-          </Text>
-        </View>
+    <SafeAreaView className="flex-1 bg-base-white dark:bg-base-black">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        className="flex-1"
+      >
+        <View className="flex-1 justify-between px-6 py-12">
+          {/* Top Section - Logo y Welcome Text */}
+          <View className="items-center pt-8">
+            <Image
+              source={require("@/assets/images/JeltyLogo.png")}
+              style={{ width: 150, height: 150 }}
+              resizeMode="contain"
+            />
 
-        {/* Paleta de Colores */}
-        <View className="glass-card-light dark:glass-card-dark p-6">
-          <Text className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Paleta de Colores
-          </Text>
-
-          <View className="gap-3">
-            {/* Primary */}
-            <View className="flex-row items-center gap-3">
-              <View className="w-12 h-12 bg-primary rounded-xl shadow-md" />
-              <View>
-                <Text className="text-sm font-medium text-gray-900 dark:text-white">
-                  Primary
-                </Text>
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  #1F024B
-                </Text>
-              </View>
-            </View>
-
-            {/* Accent Lime */}
-            <View className="flex-row items-center gap-3">
-              <View className="w-12 h-12 bg-accent-lime rounded-xl shadow-md" />
-              <View>
-                <Text className="text-sm font-medium text-gray-900 dark:text-white">
-                  Accent Lime
-                </Text>
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  #E0FF2C
-                </Text>
-              </View>
-            </View>
-
-            {/* Accent Green */}
-            <View className="flex-row items-center gap-3">
-              <View className="w-12 h-12 bg-accent-green rounded-xl shadow-md" />
-              <View>
-                <Text className="text-sm font-medium text-gray-900 dark:text-white">
-                  Accent Green
-                </Text>
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  #0CDA51
-                </Text>
-              </View>
-            </View>
-
-            {/* Secondary */}
-            <View className="flex-row items-center gap-3">
-              <View className="w-12 h-12 bg-secondary rounded-xl shadow-md" />
-              <View>
-                <Text className="text-sm font-medium text-gray-900 dark:text-white">
-                  Secondary
-                </Text>
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  #147BFE
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Tipografía Roboto */}
-        <View className="glass-card-light dark:glass-card-dark p-6">
-          <Text className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Tipografía (Roboto)
-          </Text>
-
-          <View className="gap-3">
-            <Text className="text-4xl font-bold text-gray-900 dark:text-white">
-              Heading Bold
-            </Text>
-            <Text className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Title Semibold
-            </Text>
-            <Text className="text-lg font-medium text-gray-900 dark:text-white">
-              Subtitle Medium
-            </Text>
-            <Text className="text-base font-normal text-gray-700 dark:text-gray-300">
-              Body Regular - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Caption - Texto pequeño para detalles y metadata
-            </Text>
-          </View>
-        </View>
-
-        {/* Glass Morphism */}
-        <View className="gap-4">
-          <Text className="text-xl font-semibold text-gray-900 dark:text-white px-2">
-            Efectos Glass (Liquid Glass)
-          </Text>
-
-          <View className="glass-light rounded-2xl border border-white/20 p-6 shadow-lg">
-            <Text className="text-base font-medium text-gray-900">
-              Glass Light
-            </Text>
-            <Text className="text-sm text-gray-600 mt-1">
-              Superficie translúcida para light mode
+            <Text className="text-2xl font-semibold text-center text-gray-900 dark:text-white mt-8 px-4">
+              Welcome to your personalized health and fitness coach
             </Text>
           </View>
 
-          <View className="glass-dark rounded-2xl border border-white/10 p-6 shadow-lg">
-            <Text className="text-base font-medium text-white">
-              Glass Dark
-            </Text>
-            <Text className="text-sm text-gray-300 mt-1">
-              Superficie translúcida para dark mode
-            </Text>
-          </View>
+          {/* Middle Section - Spacer */}
+          <View className="flex-1 min-h-[50px]" />
 
-          <View className="glass-primary rounded-2xl border border-primary/30 p-6 shadow-xl">
-            <Text className="text-base font-medium text-white">
-              Glass Primary
-            </Text>
-            <Text className="text-sm text-primary-100 mt-1">
-              Superficie con tinte primary
-            </Text>
-          </View>
-        </View>
+          {/* Bottom Section - Buttons y Footer */}
+          <View>
+            {/* Buttons */}
+            <View className="gap-4 mb-8">
+              <Button
+                onPress={handleSignUp}
+                variant="brand-primary"
+                size="large"
+                className="w-full"
+              >
+                Sign Up
+              </Button>
 
-        {/* Espaciado y Bordes */}
-        <View className="glass-card-light dark:glass-card-dark p-6">
-          <Text className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Bordes Redondeados
-          </Text>
+              <Button
+                onPress={handleSignIn}
+                variant="brand-secondary"
+                size="large"
+                className="w-full"
+              >
+                Sign In
+              </Button>
+            </View>
 
-          <View className="gap-3">
-            <View className="bg-secondary/20 rounded-sm p-4">
-              <Text className="text-sm text-gray-900 dark:text-white">rounded-sm (4px)</Text>
-            </View>
-            <View className="bg-secondary/20 rounded-md p-4">
-              <Text className="text-sm text-gray-900 dark:text-white">rounded-md (12px)</Text>
-            </View>
-            <View className="bg-secondary/20 rounded-xl p-4">
-              <Text className="text-sm text-gray-900 dark:text-white">rounded-xl (20px)</Text>
-            </View>
-            <View className="bg-secondary/20 rounded-2xl p-4">
-              <Text className="text-sm text-gray-900 dark:text-white">rounded-2xl (24px)</Text>
-            </View>
-          </View>
-        </View>
+            {/* Footer */}
+            <View className="items-center space-y-2">
+              <Text className="text-xs text-center text-gray-600 dark:text-gray-400 mb-2 px-4">
+                By continuing, you agree to our{" "}
+                <Text className="underline">Terms of Service</Text> and{" "}
+                <Text className="underline">Privacy Policy</Text>
+              </Text>
 
-        {/* Semantic Colors */}
-        <View className="glass-card-light dark:glass-card-dark p-6">
-          <Text className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Colores Semánticos
-          </Text>
-
-          <View className="gap-3">
-            <View className="bg-success/10 border border-success rounded-xl p-4">
-              <Text className="text-sm font-medium text-success">Success</Text>
-            </View>
-            <View className="bg-warning/10 border border-warning rounded-xl p-4">
-              <Text className="text-sm font-medium text-warning">Warning</Text>
-            </View>
-            <View className="bg-error/10 border border-error rounded-xl p-4">
-              <Text className="text-sm font-medium text-error">Error</Text>
-            </View>
-            <View className="bg-info/10 border border-info rounded-xl p-4">
-              <Text className="text-sm font-medium text-info">Info</Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-500">
+                Version 1.0.0
+              </Text>
             </View>
           </View>
         </View>
-
-        {/* Footer */}
-        <View className="items-center py-8">
-          <Text className="text-xs text-gray-500 dark:text-gray-600">
-            Sistema de Diseño Jelty v1.0
-          </Text>
-          <Text className="text-xs text-gray-400 dark:text-gray-700 mt-1">
-            Diseño moderno y elegante
-          </Text>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
