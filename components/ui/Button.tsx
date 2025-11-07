@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 interface ButtonProps {
   onPress: () => void;
   children: ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "danger" | "brand-primary" | "brand-secondary";
   size?: "small" | "medium" | "large";
   loading?: boolean;
   disabled?: boolean;
@@ -33,6 +33,10 @@ export function Button({
         return "bg-transparent border-2 border-blue-500 active:bg-blue-50 dark:active:bg-blue-900";
       case "danger":
         return "bg-red-500 active:bg-red-600";
+      case "brand-primary":
+        return "bg-[#1F024B] active:bg-[#6D28D9]";
+      case "brand-secondary":
+        return "bg-[#147BFE] active:bg-[#1D4ED8]";
       default:
         return "bg-blue-500 active:bg-blue-600";
     }

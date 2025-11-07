@@ -10,6 +10,9 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  phone?: string;
+  country?: string;
+  countryCode?: string;
 }
 
 /**
