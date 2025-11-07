@@ -24,6 +24,7 @@ export default function SignUpScreen() {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [formData, setFormData] = useState<SignupFormData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
@@ -44,8 +45,9 @@ export default function SignUpScreen() {
   });
 
   const onSubmit = async (data: SignupFormData) => {
-    if (!isLoaded) return;
+    if (!isLoaded || isSubmitting) return;
 
+    setIsSubmitting(true);
     setLoading(true);
     setSignUpError(null);
 
@@ -66,10 +68,23 @@ export default function SignUpScreen() {
       setUserEmail(data.email);
       setShowVerifyModal(true);
       setLoading(false);
+      setIsSubmitting(false);
     } catch (err: unknown) {
-      const error = err as { errors?: Array<{ message: string }> };
-      setSignUpError(error.errors?.[0]?.message || "Error al crear la cuenta");
+      const error = err as { errors?: Array<{ message: string; longMessage?: string; code?: string }> };
+      const errorCode = error.errors?.[0]?.code;
+      const errorMessage = error.errors?.[0]?.message || error.errors?.[0]?.longMessage;
+
+      // Manejar rate limiting de Clerk
+      if (errorCode === 'form_identifier_exists' || errorMessage?.includes('already exists')) {
+        setSignUpError("This email is already registered. Please sign in instead.");
+      } else if (errorMessage?.includes('too many requests') || errorMessage?.includes('rate limit')) {
+        setSignUpError("Too many sign-up attempts. Please wait a few minutes and try again.");
+      } else {
+        setSignUpError(errorMessage || "Error creating account. Please try again.");
+      }
+
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -101,6 +116,7 @@ export default function SignUpScreen() {
               country_code: formData.countryCode,
               first_name: "",
               last_name: "",
+              termsAccepted: formData.termsAccepted,
             });
 
             // Actualizar store de Zustand con datos completos
@@ -330,27 +346,38 @@ export default function SignUpScreen() {
                 control={control}
                 name="termsAccepted"
                 render={({ field: { onChange, value } }) => (
-                  <Pressable
-                    onPress={() => onChange(!value)}
-                    className="flex-row items-start"
-                  >
-                    <View
-                      className={`mr-3 h-5 w-5 items-center justify-center rounded border-2 ${
-                        value
-                          ? "border-primary bg-primary"
-                          : "border-gray-300 dark:border-gray-700"
-                      }`}
+                  <View className="flex-row items-start">
+                    <Pressable
+                      onPress={() => onChange(!value)}
+                      className="mr-3 h-5 w-5 items-center justify-center rounded border-2"
+                      style={{
+                        borderColor: value ? "#FF6B35" : "#d1d5db",
+                        backgroundColor: value ? "#FF6B35" : "transparent",
+                      }}
                     >
                       {value && (
                         <Text className="text-xs font-bold text-white">✓</Text>
                       )}
+                    </Pressable>
+                    <View className="flex-1">
+                      <Text className="text-sm text-gray-700 dark:text-gray-300">
+                        I agree to the{" "}
+                        <Text
+                          onPress={() => router.push("/(auth)/terms-of-service")}
+                          className="font-semibold text-secondary underline"
+                        >
+                          Terms of Service
+                        </Text>{" "}
+                        and{" "}
+                        <Text
+                          onPress={() => router.push("/(auth)/privacy-policy")}
+                          className="font-semibold text-secondary underline"
+                        >
+                          Privacy Policy
+                        </Text>
+                      </Text>
                     </View>
-                    <Text className="flex-1 text-sm text-gray-700 dark:text-gray-300">
-                      I agree to the{" "}
-                      <Text className="font-semibold underline">Terms of Service</Text>{" "}
-                      and <Text className="font-semibold underline">Privacy Policy</Text>
-                    </Text>
-                  </Pressable>
+                  </View>
                 )}
               />
               {errors.termsAccepted && (
@@ -366,7 +393,7 @@ export default function SignUpScreen() {
               variant="brand-primary"
               size="large"
               loading={loading}
-              disabled={loading}
+              disabled={loading || isSubmitting}
               className="mb-4 w-full"
             >
               Sign Up

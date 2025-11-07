@@ -1,25 +1,30 @@
 import { useRef, useState, useEffect } from "react";
-import { View, TextInput, Text } from "react-native";
+import { View, TextInput, Text, NativeSyntheticEvent, TextInputContentSizeChangeEventData } from "react-native";
 
 interface CodeInputProps {
   value: string[];
   onChange: (code: string[]) => void;
+  onComplete?: () => void;
   error?: string;
   length?: number;
 }
 
 /**
- * Code Input Component con auto-focus y auto-advance
+ * Code Input Component con auto-focus, auto-advance y paste support
  * Para códigos de verificación de 6 dígitos
  */
 export function CodeInput({
   value,
   onChange,
+  onComplete,
   error,
   length = 6,
 }: CodeInputProps) {
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(0);
+  const isProcessingPaste = useRef(false);
+  const hasSubmitted = useRef(false);
+  const previousValueRef = useRef<string>("");
 
   // Auto-focus en el primer input al montar
   useEffect(() => {
@@ -27,6 +32,41 @@ export function CodeInput({
       inputRefs.current[0].focus();
     }
   }, []);
+
+  // Resetear hasSubmitted cuando el código cambie a incompleto
+  useEffect(() => {
+    const currentValue = value.join("");
+    const isComplete = value.every((digit) => digit !== "");
+    const isEmpty = value.every((digit) => digit === "");
+
+    // Si el código cambió y no está completo, resetear hasSubmitted
+    if (!isComplete && currentValue !== previousValueRef.current) {
+      hasSubmitted.current = false;
+    }
+
+    // Si el código se limpió completamente, enfocar el primer input
+    if (isEmpty && previousValueRef.current !== "") {
+      setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 100);
+    }
+
+    previousValueRef.current = currentValue;
+  }, [value]);
+
+  // Auto-submit cuando el código esté completo (solo una vez)
+  useEffect(() => {
+    const isComplete = value.every((digit) => digit !== "");
+
+    if (isComplete && onComplete && !hasSubmitted.current) {
+      hasSubmitted.current = true;
+
+      // Pequeño delay para asegurar que el estado se actualice primero
+      setTimeout(() => {
+        onComplete();
+      }, 150);
+    }
+  }, [value]);
 
   const handleChange = (text: string, index: number) => {
     // Solo permitir números
@@ -52,23 +92,27 @@ export function CodeInput({
         setFocusedIndex(index + 1);
       }
     } else if (numericText.length > 1) {
-      // Si pega múltiples dígitos, distribuirlos
+      // Paste de múltiples dígitos - distribuir desde el inicio
       const digits = numericText.slice(0, length).split("");
-      const newValue = [...value];
+      const newValue = Array(length).fill("");
 
+      // Llenar desde el inicio
       digits.forEach((digit, i) => {
-        if (index + i < length) {
-          newValue[index + i] = digit;
+        if (i < length) {
+          newValue[i] = digit;
         }
       });
 
       onChange(newValue);
 
-      // Focus en el último input llenado o el siguiente vacío
-      const nextEmptyIndex = newValue.findIndex((v) => v === "");
-      const targetIndex = nextEmptyIndex !== -1 ? nextEmptyIndex : length - 1;
-      inputRefs.current[targetIndex]?.focus();
-      setFocusedIndex(targetIndex);
+      // Focus en el último input llenado
+      const lastFilledIndex = Math.min(digits.length - 1, length - 1);
+      setTimeout(() => {
+        inputRefs.current[lastFilledIndex]?.focus();
+        setFocusedIndex(lastFilledIndex);
+      }, 50);
+
+      // El auto-submit lo manejará el useEffect, no aquí
     }
   };
 
@@ -104,12 +148,17 @@ export function CodeInput({
                   : "border-gray-300 dark:border-gray-700"
               }
             `}
+            style={{
+              paddingTop: 10,
+              paddingBottom: 10,
+              textAlignVertical: "center",
+            }}
             value={value[index] || ""}
             onChangeText={(text) => handleChange(text, index)}
             onKeyPress={(e) => handleKeyPress(e, index)}
             onFocus={() => handleFocus(index)}
             keyboardType="number-pad"
-            maxLength={1}
+            maxLength={6}
             selectTextOnFocus
             textContentType="oneTimeCode"
             autoComplete="sms-otp"

@@ -67,8 +67,19 @@ export default function WelcomeScreen() {
             <View className="items-center space-y-2">
               <Text className="text-xs text-center text-gray-600 dark:text-gray-400 mb-2 px-4">
                 By continuing, you agree to our{" "}
-                <Text className="underline">Terms of Service</Text> and{" "}
-                <Text className="underline">Privacy Policy</Text>
+                <Text
+                  onPress={() => router.push("/(auth)/terms-of-service")}
+                  className="font-semibold text-secondary underline"
+                >
+                  Terms of Service
+                </Text>{" "}
+                and{" "}
+                <Text
+                  onPress={() => router.push("/(auth)/privacy-policy")}
+                  className="font-semibold text-secondary underline"
+                >
+                  Privacy Policy
+                </Text>
               </Text>
 
               <Text className="text-xs text-gray-500 dark:text-gray-500">

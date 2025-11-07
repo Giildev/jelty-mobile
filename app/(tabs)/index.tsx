@@ -1,10 +1,12 @@
 import { View, Text, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 
 /**
  * Pantalla principal / Home
  * Demo del Sistema de Diseño Jelty
  */
 export default function HomeScreen() {
+  const router = useRouter();
   return (
     <ScrollView className="flex-1 bg-base-white dark:bg-base-black">
       <View className="p-6 gap-6">
@@ -190,6 +192,23 @@ export default function HomeScreen() {
           <Text className="text-xs text-gray-400 dark:text-gray-700 mt-1">
             Diseño moderno y elegante
           </Text>
+
+          {/* Legal Links */}
+          <View className="flex-row items-center gap-2 mt-4">
+            <Text
+              onPress={() => router.push("/(auth)/terms-of-service")}
+              className="text-xs font-medium text-secondary underline"
+            >
+              Terms of Service
+            </Text>
+            <Text className="text-xs text-gray-400">•</Text>
+            <Text
+              onPress={() => router.push("/(auth)/privacy-policy")}
+              className="text-xs font-medium text-secondary underline"
+            >
+              Privacy Policy
+            </Text>
+          </View>
         </View>
       </View>
     </ScrollView>

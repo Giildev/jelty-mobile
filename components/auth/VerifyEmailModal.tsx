@@ -39,6 +39,7 @@ export function VerifyEmailModal({
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
 
   // Animación del modal
   const translateY = useSharedValue(1000);
@@ -49,6 +50,9 @@ export function VerifyEmailModal({
       // Animar entrada
       translateY.value = withSpring(0, { damping: 20, stiffness: 90 });
       opacity.value = withTiming(1, { duration: 300 });
+      // Resetear código y error al abrir
+      setCode(["", "", "", "", "", ""]);
+      setError("");
     } else {
       // Animar salida
       translateY.value = withTiming(1000, { duration: 300 });
@@ -60,7 +64,7 @@ export function VerifyEmailModal({
   useEffect(() => {
     if (!visible) return;
 
-    // Resetear timer al abrir modal
+    // Resetear timer al abrir modal o cuando cambie timerKey
     setResendTimer(30);
     setCanResend(false);
 
@@ -76,7 +80,7 @@ export function VerifyEmailModal({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [visible]);
+  }, [visible, timerKey]);
 
   const modalBackdropStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -101,23 +105,34 @@ export function VerifyEmailModal({
       await onVerify(codeString);
       // Si es exitoso, el parent component manejará la navegación
     } catch (err: any) {
-      setError(
-        err.errors?.[0]?.message || "Invalid code. Please try again."
-      );
+      // Mostrar mensaje de error
+      const errorMessage =
+        err.errors?.[0]?.message ||
+        err.errors?.[0]?.longMessage ||
+        err.message ||
+        "Invalid code. Please try again.";
+
+      setError(errorMessage);
+
+      // Limpiar el código para permitir nuevo intento (después de mostrar el error)
+      setTimeout(() => {
+        setCode(["", "", "", "", "", ""]);
+      }, 1500);
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
-    if (!canResend) return;
+    if (!canResend || loading) return;
 
     setLoading(true);
     setError("");
 
     try {
       await onResendCode();
-      // Resetear timer
+      // Reiniciar timer incrementando timerKey
+      setTimerKey((prev) => prev + 1);
       setResendTimer(30);
       setCanResend(false);
     } catch (err: any) {
@@ -198,6 +213,7 @@ export function VerifyEmailModal({
             <CodeInput
               value={code}
               onChange={handleCodeChange}
+              onComplete={handleVerify}
               error={error}
               length={6}
             />
@@ -223,17 +239,21 @@ export function VerifyEmailModal({
               </Text>
 
               {canResend ? (
-                <Pressable onPress={handleResend} disabled={loading}>
+                <Pressable
+                  onPress={handleResend}
+                  disabled={loading}
+                  className={loading ? "opacity-50" : ""}
+                >
                   <Text className="font-semibold text-secondary">
-                    Resend code
+                    {loading ? "Sending..." : "Resend code"}
                   </Text>
                 </Pressable>
               ) : (
                 <View>
-                  <Text className="font-semibold text-gray-400">
+                  <Text className="font-semibold text-gray-400 dark:text-gray-500">
                     Resend code
                   </Text>
-                  <Text className="mt-1 text-center text-xs text-gray-400">
+                  <Text className="mt-1 text-center text-xs text-gray-400 dark:text-gray-500">
                     You can request a new code in {resendTimer}s
                   </Text>
                 </View>

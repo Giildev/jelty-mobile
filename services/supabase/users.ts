@@ -1,4 +1,4 @@
-import { supabase } from "./client";
+import { supabase, supabaseAdmin } from "./client";
 import type {
   SupabaseUser,
   SupabaseUserProfile,
@@ -9,6 +9,7 @@ import type {
 /**
  * User Service
  * Handles all user-related database operations in Supabase
+ * Uses supabaseAdmin for write operations to bypass RLS
  */
 
 /**
@@ -25,8 +26,10 @@ import type {
  *   email: 'user@example.com',
  *   phone: '+1234567890',
  *   country: 'United States',
+ *   country_code: '+1',
  *   first_name: 'John',
- *   last_name: 'Doe'
+ *   last_name: 'Doe',
+ *   termsAccepted: true
  * });
  */
 export async function createUser(userData: CreateUserData): Promise<{
@@ -34,13 +37,14 @@ export async function createUser(userData: CreateUserData): Promise<{
   profile: SupabaseUserProfile;
 }> {
   try {
-    // 1. Create user in user_user table
-    const { data: user, error: userError } = await supabase
+    // 1. Create user in user_user table (using admin client to bypass RLS)
+    const { data: user, error: userError } = await supabaseAdmin
       .from("user_user")
       .insert({
         clerk_user_id: userData.clerk_user_id,
         email: userData.email,
         status: "active",
+        terms_accepted_at: userData.termsAccepted ? new Date().toISOString() : null,
       })
       .select()
       .single();
@@ -53,8 +57,8 @@ export async function createUser(userData: CreateUserData): Promise<{
       throw new Error("User creation returned no data");
     }
 
-    // 2. Create user profile in user_profile table
-    const { data: profile, error: profileError } = await supabase
+    // 2. Create user profile in user_profile table (using admin client)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .insert({
         user_id: user.id,
@@ -69,12 +73,12 @@ export async function createUser(userData: CreateUserData): Promise<{
 
     if (profileError) {
       // If profile creation fails, we should delete the user to maintain consistency
-      await supabase.from("user_user").delete().eq("id", user.id);
+      await supabaseAdmin.from("user_user").delete().eq("id", user.id);
       throw new Error(`Failed to create user profile: ${profileError.message}`);
     }
 
     if (!profile) {
-      await supabase.from("user_user").delete().eq("id", user.id);
+      await supabaseAdmin.from("user_user").delete().eq("id", user.id);
       throw new Error("Profile creation returned no data");
     }
 
@@ -154,7 +158,7 @@ export async function updateUserProfile(
 ): Promise<SupabaseUserProfile | null> {
   try {
     // First get the user to find their user_id
-    const { data: user } = await supabase
+    const { data: user } = await supabaseAdmin
       .from("user_user")
       .select("id")
       .eq("clerk_user_id", clerkUserId)
@@ -165,8 +169,8 @@ export async function updateUserProfile(
       throw new Error("User not found");
     }
 
-    // Update profile
-    const { data: profile, error: profileError } = await supabase
+    // Update profile (using admin client)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .update({
         ...profileData,
@@ -201,8 +205,8 @@ export async function deleteUser(clerkUserId: string): Promise<boolean> {
   try {
     const now = new Date().toISOString();
 
-    // Get user first
-    const { data: user } = await supabase
+    // Get user first (using admin client)
+    const { data: user } = await supabaseAdmin
       .from("user_user")
       .select("id")
       .eq("clerk_user_id", clerkUserId)
@@ -212,14 +216,14 @@ export async function deleteUser(clerkUserId: string): Promise<boolean> {
       return false;
     }
 
-    // Soft delete profile
-    await supabase
+    // Soft delete profile (using admin client)
+    await supabaseAdmin
       .from("user_profile")
       .update({ deleted_at: now })
       .eq("user_id", user.id);
 
-    // Soft delete user
-    const { error } = await supabase
+    // Soft delete user (using admin client)
+    const { error } = await supabaseAdmin
       .from("user_user")
       .update({ deleted_at: now, status: "inactive" })
       .eq("id", user.id);

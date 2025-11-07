@@ -13,6 +13,7 @@ export interface SupabaseUser {
   clerk_user_id: string; // Unique identifier from Clerk
   email: string;
   status: string; // 'active' | 'inactive' | 'suspended'
+  terms_accepted_at: string | null; // ISO timestamp when user accepted terms
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null
@@ -56,6 +57,7 @@ export interface CreateUserData {
   country_code: string;
   first_name?: string;
   last_name?: string;
+  termsAccepted: boolean;
 }
 
 /**
