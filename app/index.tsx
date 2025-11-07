@@ -1,19 +1,20 @@
 import { View, Text, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 
 /**
  * Pantalla de bienvenida
  */
 export default function WelcomeScreen() {
+  const router = useRouter();
+
   const handleSignUp = () => {
-    // TODO: Navegar a sign-up cuando implementemos Clerk
-    console.log("Sign Up pressed");
+    router.push("/(auth)/sign-up");
   };
 
   const handleSignIn = () => {
-    // TODO: Navegar a sign-in cuando implementemos Clerk
-    console.log("Sign In pressed");
+    router.push("/(auth)/sign-in");
   };
 
   return (
