@@ -7,7 +7,7 @@ import { useUserStore } from "@/store/userStore";
  * Pantalla de configuración
  */
 export default function SettingsScreen() {
-  const { colorScheme, setColorScheme, isDark } = useColorScheme();
+  const { colorScheme, setColorScheme, isDark, isSystem } = useColorScheme();
   const { preferences, updatePreferences } = useUserStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     preferences.notifications
@@ -76,7 +76,7 @@ export default function SettingsScreen() {
 
             <Pressable
               className={`flex-1 rounded-lg border p-3 ${
-                colorScheme === "system"
+                isSystem
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
                   : "border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800"
               }`}
@@ -84,7 +84,7 @@ export default function SettingsScreen() {
             >
               <Text
                 className={`text-center text-sm ${
-                  colorScheme === "system"
+                  isSystem
                     ? "font-semibold text-blue-600 dark:text-blue-400"
                     : "text-gray-700 dark:text-gray-300"
                 }`}
