@@ -9,6 +9,8 @@ import { signupSchema, SignupFormData } from "@/utils/validation/schemas";
 import { Button } from "@/components/ui/Button";
 import { CountryCodePicker } from "@/components/ui/CountryCodePicker";
 import { VerifyEmailModal } from "@/components/auth/VerifyEmailModal";
+import { createUser } from "@/services/supabase/users";
+import { useUserStore } from "@/store/userStore";
 
 /**
  * Pantalla de registro con formulario completo y verificación de email
@@ -16,10 +18,12 @@ import { VerifyEmailModal } from "@/components/auth/VerifyEmailModal";
 export default function SignUpScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
+  const setUser = useUserStore(state => state.setUser);
   const [loading, setLoading] = useState(false);
   const [signUpError, setSignUpError] = useState<string | null>(null);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [formData, setFormData] = useState<SignupFormData | null>(null);
 
   const {
     control,
@@ -57,7 +61,8 @@ export default function SignUpScreen() {
         strategy: "email_code",
       });
 
-      // Paso 3: Guardar email y mostrar modal de verificación
+      // Paso 3: Guardar datos del formulario, email y mostrar modal de verificación
+      setFormData(data);
       setUserEmail(data.email);
       setShowVerifyModal(true);
       setLoading(false);
@@ -69,17 +74,54 @@ export default function SignUpScreen() {
   };
 
   const handleVerifyCode = async (code: string) => {
-    if (!isLoaded) return;
+    if (!isLoaded || !formData) return;
 
     try {
-      // Intentar verificar el código
+      // Paso 1: Intentar verificar el código
       const result = await signUp.attemptEmailAddressVerification({
         code,
       });
 
-      // Si la verificación es exitosa, activar la sesión
+      // Si la verificación es exitosa
       if (result.status === "complete") {
+        // Paso 2: Activar la sesión
         await setActive({ session: result.createdSessionId });
+
+        // Paso 3: Guardar datos adicionales en Supabase
+        try {
+          const clerkUserId = result.createdUserId;
+
+          if (clerkUserId) {
+            // Crear usuario en Supabase con datos del formulario
+            const { user, profile } = await createUser({
+              clerk_user_id: clerkUserId,
+              email: formData.email,
+              phone: formData.phone,
+              country: formData.country,
+              country_code: formData.countryCode,
+              first_name: "",
+              last_name: "",
+            });
+
+            // Actualizar store de Zustand con datos completos
+            setUser({
+              id: clerkUserId,
+              email: formData.email,
+              name: "",
+              phone: formData.phone,
+              country: formData.country,
+              countryCode: formData.countryCode,
+            });
+
+            console.log("Usuario guardado en Supabase exitosamente");
+          }
+        } catch (supabaseError) {
+          // Si falla el guardado en Supabase, solo logueamos el error
+          // pero NO bloqueamos el flujo ya que Clerk es la fuente de verdad
+          console.error("Error guardando en Supabase (no crítico):", supabaseError);
+        }
+
+        // Paso 4: Cerrar modal y redirigir
         setShowVerifyModal(false);
         router.replace("/(tabs)");
       } else {
@@ -148,7 +190,7 @@ export default function SignUpScreen() {
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    className={`rounded-xl border bg-white p-4 text-base text-gray-900 dark:bg-gray-800 dark:text-white ${
+                    className={`rounded-xl border bg-white px-4 py-3 text-base leading-5 text-gray-900 dark:bg-gray-800 dark:text-white ${
                       errors.email
                         ? "border-error"
                         : "border-gray-300 dark:border-gray-700"
@@ -161,6 +203,7 @@ export default function SignUpScreen() {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoComplete="email"
+                    style={{ paddingTop: 12, paddingBottom: 12 }}
                   />
                 )}
               />
@@ -196,7 +239,7 @@ export default function SignUpScreen() {
                 name="phone"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    className={`rounded-xl border bg-white p-4 text-base text-gray-900 dark:bg-gray-800 dark:text-white ${
+                    className={`rounded-xl border bg-white px-4 py-3 text-base leading-5 text-gray-900 dark:bg-gray-800 dark:text-white ${
                       errors.phone
                         ? "border-error"
                         : "border-gray-300 dark:border-gray-700"
@@ -208,6 +251,7 @@ export default function SignUpScreen() {
                     onBlur={onBlur}
                     keyboardType="phone-pad"
                     autoComplete="tel"
+                    style={{ paddingTop: 12, paddingBottom: 12 }}
                   />
                 )}
               />
@@ -226,7 +270,7 @@ export default function SignUpScreen() {
                 name="password"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    className={`rounded-xl border bg-white p-4 text-base text-gray-900 dark:bg-gray-800 dark:text-white ${
+                    className={`rounded-xl border bg-white px-4 py-3 text-base leading-5 text-gray-900 dark:bg-gray-800 dark:text-white ${
                       errors.password
                         ? "border-error"
                         : "border-gray-300 dark:border-gray-700"
@@ -238,6 +282,7 @@ export default function SignUpScreen() {
                     onBlur={onBlur}
                     secureTextEntry
                     autoCapitalize="none"
+                    style={{ paddingTop: 12, paddingBottom: 12 }}
                   />
                 )}
               />
@@ -256,7 +301,7 @@ export default function SignUpScreen() {
                 name="confirmPassword"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    className={`rounded-xl border bg-white p-4 text-base text-gray-900 dark:bg-gray-800 dark:text-white ${
+                    className={`rounded-xl border bg-white px-4 py-3 text-base leading-5 text-gray-900 dark:bg-gray-800 dark:text-white ${
                       errors.confirmPassword
                         ? "border-error"
                         : "border-gray-300 dark:border-gray-700"
@@ -268,6 +313,7 @@ export default function SignUpScreen() {
                     onBlur={onBlur}
                     secureTextEntry
                     autoCapitalize="none"
+                    style={{ paddingTop: 12, paddingBottom: 12 }}
                   />
                 )}
               />
