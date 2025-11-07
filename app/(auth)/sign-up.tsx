@@ -1,4 +1,4 @@
-import { View, Text, TextInput, KeyboardAvoidingView, ScrollView, Platform, Pressable } from "react-native";
+import { View, Text, TextInput, KeyboardAvoidingView, ScrollView, Platform, Pressable, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter } from "expo-router";
 import { useSignUp } from "@clerk/clerk-expo";
@@ -184,9 +184,19 @@ export default function SignUpScreen() {
               <Text className="text-3xl font-bold text-gray-900 dark:text-white">
                 Create Account
               </Text>
-              <Text className="mt-2 text-base text-gray-600 dark:text-gray-400">
-                Join Jelty and start your fitness journey
-              </Text>
+              <View className="mt-2 flex-row items-center">
+                <Text className="text-base text-gray-600 dark:text-gray-400">
+                  Join{" "}
+                </Text>
+                <Image
+                  source={require("@/assets/images/JeltyIcon.png")}
+                  style={{ width: 16, height: 16 }}
+                  resizeMode="contain"
+                />
+                <Text className="text-base text-gray-600 dark:text-gray-400">
+                  {" "}Jelty and start your fitness journey
+                </Text>
+              </View>
             </View>
 
             {/* Error General */}

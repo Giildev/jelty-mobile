@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, ImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
@@ -18,21 +18,30 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-base-white dark:bg-base-black">
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+    <View className="flex-1">
+      <ImageBackground
+        source={require("@/assets/images/IndexBackground.jpg")}
         className="flex-1"
+        resizeMode="cover"
       >
-        <View className="flex-1 justify-between px-6 py-12">
+        {/* Overlay con opacidad para atenuar la imagen */}
+        <View className="absolute inset-0 bg-black/60" />
+
+        <SafeAreaView className="flex-1">
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            className="flex-1"
+          >
+            <View className="flex-1 justify-between px-6 py-12">
           {/* Top Section - Logo y Welcome Text */}
-          <View className="items-center pt-8">
+          <View className="items-center" style={{ paddingTop: 10 }}>
             <Image
-              source={require("@/assets/images/JeltyLogo.png")}
-              style={{ width: 150, height: 150 }}
+              source={require("@/assets/images/JeltyLogoWhite.png")}
+              style={{ width: 181, height: 181 }}
               resizeMode="contain"
             />
 
-            <Text className="text-2xl font-semibold text-center text-gray-900 dark:text-white mt-8 px-4">
+            <Text className="text-2xl font-semibold text-center text-white px-4">
               Welcome to your personalized health and fitness coach
             </Text>
           </View>
@@ -90,5 +99,7 @@ export default function WelcomeScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
+      </ImageBackground>
+    </View>
   );
 }
