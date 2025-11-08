@@ -39,6 +39,9 @@ export interface SupabaseUserProfile {
   weight_kg: number | null;
   bodyfat_percentage: number | null;
   age_years: number | null;
+  measurement_system: string | null; // 'metric' | 'imperial'
+  activity_level: string | null; // 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active'
+  onboarding_completed: boolean; // Whether user completed onboarding wizard
   notes: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
@@ -77,4 +80,7 @@ export interface UpdateUserProfileData {
   height_cm?: number;
   weight_kg?: number;
   bodyfat_percentage?: number;
+  measurement_system?: string;
+  activity_level?: string;
+  onboarding_completed?: boolean;
 }

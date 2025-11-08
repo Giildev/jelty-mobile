@@ -11,6 +11,7 @@ import { CountryCodePicker } from "@/components/ui/CountryCodePicker";
 import { VerifyEmailModal } from "@/components/auth/VerifyEmailModal";
 import { createUser } from "@/services/supabase/users";
 import { useUserStore } from "@/store/userStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * Pantalla de registro con formulario completo y verificación de email
@@ -103,10 +104,18 @@ export default function SignUpScreen() {
         await setActive({ session: result.createdSessionId });
 
         // Paso 3: Guardar datos adicionales en Supabase
-        try {
-          const clerkUserId = result.createdUserId;
+        const clerkUserId = result.createdUserId;
+        let supabaseUserId: string | null = null;
 
-          if (clerkUserId) {
+        if (clerkUserId) {
+          try {
+            console.log("Intentando crear usuario en Supabase con datos:", {
+              clerk_user_id: clerkUserId,
+              email: formData.email,
+              phone: formData.phone,
+              country: formData.country,
+            });
+
             // Crear usuario en Supabase con datos del formulario
             const { user, profile } = await createUser({
               clerk_user_id: clerkUserId,
@@ -119,27 +128,38 @@ export default function SignUpScreen() {
               termsAccepted: formData.termsAccepted,
             });
 
-            // Actualizar store de Zustand con datos completos
-            setUser({
-              id: clerkUserId,
-              email: formData.email,
-              name: "",
-              phone: formData.phone,
-              country: formData.country,
-              countryCode: formData.countryCode,
-            });
+            supabaseUserId = user.id;
 
-            console.log("Usuario guardado en Supabase exitosamente");
+            // Guardar el Supabase user.id en AsyncStorage para usar en onboarding
+            await AsyncStorage.setItem("supabase_user_id", user.id);
+
+            console.log("✅ Usuario guardado en Supabase exitosamente", {
+              supabaseUserId: user.id,
+              email: user.email,
+              profileId: profile.user_id,
+            });
+          } catch (supabaseError: any) {
+            console.error("❌ Error guardando en Supabase:", supabaseError);
+            console.error("❌ Error message:", supabaseError?.message);
+            console.error("❌ Error details:", JSON.stringify(supabaseError, null, 2));
+            // Continuar sin UUID de Supabase - se creará en onboarding
           }
-        } catch (supabaseError) {
-          // Si falla el guardado en Supabase, solo logueamos el error
-          // pero NO bloqueamos el flujo ya que Clerk es la fuente de verdad
-          console.error("Error guardando en Supabase (no crítico):", supabaseError);
         }
 
-        // Paso 4: Cerrar modal y redirigir
+        // Actualizar store de Zustand con datos completos
+        setUser({
+          id: clerkUserId,
+          supabaseUserId: supabaseUserId || undefined,
+          email: formData.email,
+          name: "",
+          phone: formData.phone,
+          country: formData.country,
+          countryCode: formData.countryCode,
+        });
+
+        // Paso 4: Cerrar modal y redirigir al onboarding
         setShowVerifyModal(false);
-        router.replace("/(tabs)");
+        router.replace("/(onboarding)/step-1");
       } else {
         // Si el status no es complete, lanzar error
         throw new Error("Verification incomplete");

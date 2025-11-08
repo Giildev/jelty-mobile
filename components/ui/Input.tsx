@@ -24,7 +24,7 @@ export function Input({
       )}
       <TextInput
         className={`
-          rounded-lg border bg-white p-4 text-gray-900
+          rounded-xl border bg-white px-4 text-base leading-5 text-gray-900
           dark:bg-gray-800 dark:text-white
           ${
             error
@@ -32,6 +32,7 @@ export function Input({
               : "border-gray-300 dark:border-gray-700"
           }
         `}
+        style={{ paddingTop: 12, paddingBottom: 12, textAlignVertical: "center" }}
         placeholderTextColor="#9CA3AF"
         {...textInputProps}
       />

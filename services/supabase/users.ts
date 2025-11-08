@@ -67,6 +67,7 @@ export async function createUser(userData: CreateUserData): Promise<{
         phone: userData.phone,
         country: userData.country,
         country_code: userData.country_code,
+        onboarding_completed: false, // User needs to complete onboarding
       })
       .select()
       .single();
@@ -135,6 +136,50 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
     return { user, profile };
   } catch (error) {
     console.error("Error getting user by Clerk ID:", error);
+    return null;
+  }
+}
+
+/**
+ * Gets a user and their profile by Supabase UUID
+ *
+ * @param supabaseUserId - The Supabase user UUID
+ * @returns User and profile data, or null if not found
+ */
+export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
+  user: SupabaseUser;
+  profile: SupabaseUserProfile;
+} | null> {
+  try {
+    // Get user from user_user table (using admin client to bypass RLS)
+    const { data: user, error: userError } = await supabaseAdmin
+      .from("user_user")
+      .select("*")
+      .eq("id", supabaseUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (userError || !user) {
+      console.error("Error getting user from user_user:", userError);
+      return null;
+    }
+
+    // Get user profile (using admin client to bypass RLS)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from("user_profile")
+      .select("*")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    if (profileError || !profile) {
+      console.error("Error getting profile from user_profile:", profileError);
+      return null;
+    }
+
+    return { user, profile };
+  } catch (error) {
+    console.error("Error getting user by Supabase ID:", error);
     return null;
   }
 }
