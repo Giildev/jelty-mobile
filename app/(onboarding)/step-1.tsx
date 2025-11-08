@@ -142,7 +142,41 @@ export default function OnboardingStep1Screen() {
       setValue("country_code", profile.country_code || "");
       setValue("first_name", profile.first_name || "");
       setValue("last_name", profile.last_name || "");
+      setValue("city", profile.city || "");
+      setValue("address", profile.address || "");
+      setValue("zip_code", profile.zip_code || "");
 
+      // Birth date - convert from ISO to dd/mm/yyyy format
+      if (profile.birth_date) {
+        const isoDate = new Date(profile.birth_date);
+        const day = isoDate.getDate().toString().padStart(2, "0");
+        const month = (isoDate.getMonth() + 1).toString().padStart(2, "0");
+        const year = isoDate.getFullYear();
+        setValue("birth_date", `${day}/${month}/${year}`);
+      }
+
+      // Gender
+      if (profile.gender) {
+        setValue("gender", profile.gender as Gender);
+      }
+
+      // Physical measurements
+      if (profile.height_cm) {
+        setValue("height_cm", profile.height_cm);
+      }
+      if (profile.weight_kg) {
+        setValue("weight_kg", profile.weight_kg);
+      }
+      if (profile.bodyfat_percentage) {
+        setValue("bodyfat_percentage", profile.bodyfat_percentage);
+      }
+
+      // Activity level
+      if (profile.activity_level) {
+        setValue("activity_level", profile.activity_level as ActivityLevel);
+      }
+
+      // Measurement system
       if (profile.measurement_system) {
         setMeasurementSystem(profile.measurement_system as MeasurementSystem);
         setValue(
@@ -155,6 +189,9 @@ export default function OnboardingStep1Screen() {
         email: dbUser.email,
         phone: profile.phone,
         country: profile.country,
+        birth_date: profile.birth_date,
+        height_cm: profile.height_cm,
+        weight_kg: profile.weight_kg,
         supabaseUserId: dbUser.id,
       });
     } catch (error) {
@@ -216,17 +253,8 @@ export default function OnboardingStep1Screen() {
           zipCode: data.zip_code,
         });
 
-        // Navigate to next step (placeholder for now - redirect to tabs)
-        Alert.alert(
-          "¡Éxito!",
-          "Información guardada correctamente. En el futuro se redirigirá al paso 2.",
-          [
-            {
-              text: "Continuar",
-              onPress: () => router.replace("/(tabs)"),
-            },
-          ]
-        );
+        // Navigate to step 2
+        router.push("/(onboarding)/step-2");
       } else {
         Alert.alert("Error", "No se pudo guardar la información");
       }
@@ -526,12 +554,12 @@ export default function OnboardingStep1Screen() {
           <View className="my-6">
             <Button
               onPress={handleSubmit(onSubmit)}
-              variant="primary"
+              variant="brand-primary"
               size="large"
               loading={loading}
               disabled={loading}
             >
-              Next
+              Siguiente
             </Button>
           </View>
 

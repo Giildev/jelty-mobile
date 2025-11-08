@@ -136,3 +136,156 @@ export const genderLabels: Record<Gender, string> = {
   other: "Otro",
   prefer_not_to_say: "Prefiero no decir",
 };
+
+/**
+ * Onboarding Step 2: Fitness Goals & Progress Tracking Schema
+ * Validates all fields required in the second step of onboarding
+ */
+export const fitnessGoalSchema = z.object({
+  // Primary fitness goal
+  goal_type: z.enum(
+    ["lose_fat", "build_muscle", "improve_health", "increase_performance", "maintain"],
+    {
+      errorMap: () => ({ message: "Selecciona tu objetivo principal" }),
+    }
+  ),
+
+  // Timeframe to achieve the goal
+  timeframe: z.enum(
+    [
+      "4_weeks",
+      "8_weeks",
+      "12_weeks",
+      "16_weeks",
+      "3_months",
+      "6_months",
+      "9_months",
+      "12_months",
+    ],
+    {
+      errorMap: () => ({ message: "Selecciona el tiempo para lograr tu objetivo" }),
+    }
+  ),
+
+  // Target weight (optional)
+  target_weight_kg: z
+    .number()
+    .min(30, "El peso objetivo debe ser al menos 30 kg")
+    .max(300, "El peso objetivo no puede exceder 300 kg")
+    .optional()
+    .nullable(),
+
+  // Target body fat percentage (optional)
+  target_bodyfat_pct: z
+    .number()
+    .min(3, "El porcentaje de grasa corporal debe ser al menos 3%")
+    .max(60, "El porcentaje de grasa corporal no puede exceder 60%")
+    .optional()
+    .nullable(),
+
+  // Current body measurements (all optional)
+  chest_cm: z
+    .number()
+    .min(50, "La medida debe ser al menos 50 cm")
+    .max(200, "La medida no puede exceder 200 cm")
+    .optional()
+    .nullable(),
+  waist_cm: z
+    .number()
+    .min(40, "La medida debe ser al menos 40 cm")
+    .max(200, "La medida no puede exceder 200 cm")
+    .optional()
+    .nullable(),
+  hips_cm: z
+    .number()
+    .min(50, "La medida debe ser al menos 50 cm")
+    .max(200, "La medida no puede exceder 200 cm")
+    .optional()
+    .nullable(),
+  biceps_cm: z
+    .number()
+    .min(15, "La medida debe ser al menos 15 cm")
+    .max(80, "La medida no puede exceder 80 cm")
+    .optional()
+    .nullable(),
+  thighs_cm: z
+    .number()
+    .min(30, "La medida debe ser al menos 30 cm")
+    .max(120, "La medida no puede exceder 120 cm")
+    .optional()
+    .nullable(),
+  neck_cm: z
+    .number()
+    .min(20, "La medida debe ser al menos 20 cm")
+    .max(60, "La medida no puede exceder 60 cm")
+    .optional()
+    .nullable(),
+  shoulders_cm: z
+    .number()
+    .min(70, "La medida debe ser al menos 70 cm")
+    .max(180, "La medida no puede exceder 180 cm")
+    .optional()
+    .nullable(),
+  forearms_cm: z
+    .number()
+    .min(15, "La medida debe ser al menos 15 cm")
+    .max(60, "La medida no puede exceder 60 cm")
+    .optional()
+    .nullable(),
+  calves_cm: z
+    .number()
+    .min(20, "La medida debe ser al menos 20 cm")
+    .max(80, "La medida no puede exceder 80 cm")
+    .optional()
+    .nullable(),
+});
+
+export type FitnessGoalFormData = z.infer<typeof fitnessGoalSchema>;
+
+/**
+ * Fitness goal types
+ */
+export type FitnessGoalType =
+  | "lose_fat"
+  | "build_muscle"
+  | "improve_health"
+  | "increase_performance"
+  | "maintain";
+
+/**
+ * Timeframe options
+ */
+export type GoalTimeframe =
+  | "4_weeks"
+  | "8_weeks"
+  | "12_weeks"
+  | "16_weeks"
+  | "3_months"
+  | "6_months"
+  | "9_months"
+  | "12_months";
+
+/**
+ * Fitness goal display names in Spanish
+ */
+export const fitnessGoalLabels: Record<FitnessGoalType, string> = {
+  lose_fat: "Perder grasa",
+  build_muscle: "Ganar músculo",
+  improve_health: "Mejorar salud",
+  increase_performance: "Aumentar rendimiento",
+  maintain: "Mantener",
+};
+
+/**
+ * Timeframe display names in Spanish
+ */
+export const timeframeLabels: Record<GoalTimeframe, string> = {
+  "4_weeks": "4 semanas",
+  "8_weeks": "8 semanas",
+  "12_weeks": "12 semanas",
+  "16_weeks": "16 semanas",
+  "3_months": "3 meses",
+  "6_months": "6 meses",
+  "9_months": "9 meses",
+  "12_months": "12 meses",
+};

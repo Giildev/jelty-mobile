@@ -268,3 +268,164 @@ export function decryptUserFields(
 
   return decryptedData;
 }
+
+/**
+ * Encripta todos los campos sensibles de objetivos del usuario
+ *
+ * Campos encriptados:
+ * - target_weight_kg
+ * - target_bodyfat_pct
+ * - timeframe
+ *
+ * @param goalData - Datos del objetivo sin encriptar
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Datos con campos encriptados
+ */
+export function encryptGoalFields(
+  goalData: Record<string, any>,
+  userSalt: string,
+  userId: string
+): Record<string, any> {
+  const encryptedData = { ...goalData };
+
+  // Lista de campos a encriptar
+  const fieldsToEncrypt = ["target_weight_kg", "target_bodyfat_pct", "timeframe"];
+
+  fieldsToEncrypt.forEach((field) => {
+    if (field in goalData) {
+      encryptedData[field] = encryptData(goalData[field], userSalt, userId);
+    }
+  });
+
+  return encryptedData;
+}
+
+/**
+ * Desencripta todos los campos sensibles de objetivos del usuario
+ *
+ * @param encryptedData - Datos del objetivo encriptados
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Datos con campos desencriptados
+ */
+export function decryptGoalFields(
+  encryptedData: Record<string, any>,
+  userSalt: string,
+  userId: string
+): Record<string, any> {
+  const decryptedData = { ...encryptedData };
+
+  // Lista de campos a desencriptar
+  const fieldsToDecrypt = ["target_weight_kg", "target_bodyfat_pct", "timeframe"];
+
+  // Campos numéricos
+  const numericFields = ["target_weight_kg", "target_bodyfat_pct"];
+
+  fieldsToDecrypt.forEach((field) => {
+    if (field in encryptedData && encryptedData[field] !== null) {
+      try {
+        const decrypted = decryptData(encryptedData[field], userSalt, userId);
+
+        // Campos numéricos como number
+        if (numericFields.includes(field)) {
+          decryptedData[field] = decrypted ? Number(decrypted) : null;
+        }
+        // Otros campos mantener tipo original
+        else {
+          decryptedData[field] = decrypted;
+        }
+      } catch (error) {
+        console.error(`Error decrypting field ${field}:`, error);
+        decryptedData[field] = null;
+      }
+    }
+  });
+
+  return decryptedData;
+}
+
+/**
+ * Encripta todos los campos de medidas corporales objetivo
+ *
+ * Campos encriptados:
+ * - chest_cm, waist_cm, hips_cm, biceps_cm, thighs_cm
+ * - neck_cm, shoulders_cm, forearms_cm, calves_cm
+ *
+ * @param bodyGoalData - Datos de medidas corporales sin encriptar
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Datos con campos encriptados
+ */
+export function encryptBodyGoalFields(
+  bodyGoalData: Record<string, any>,
+  userSalt: string,
+  userId: string
+): Record<string, any> {
+  const encryptedData = { ...bodyGoalData };
+
+  // Lista de campos a encriptar
+  const fieldsToEncrypt = [
+    "chest_cm",
+    "waist_cm",
+    "hips_cm",
+    "biceps_cm",
+    "thighs_cm",
+    "neck_cm",
+    "shoulders_cm",
+    "forearms_cm",
+    "calves_cm",
+  ];
+
+  fieldsToEncrypt.forEach((field) => {
+    if (field in bodyGoalData) {
+      encryptedData[field] = encryptData(bodyGoalData[field], userSalt, userId);
+    }
+  });
+
+  return encryptedData;
+}
+
+/**
+ * Desencripta todos los campos de medidas corporales objetivo
+ *
+ * @param encryptedData - Datos de medidas corporales encriptadas
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Datos con campos desencriptados
+ */
+export function decryptBodyGoalFields(
+  encryptedData: Record<string, any>,
+  userSalt: string,
+  userId: string
+): Record<string, any> {
+  const decryptedData = { ...encryptedData };
+
+  // Lista de campos a desencriptar (todos son numéricos)
+  const fieldsToDecrypt = [
+    "chest_cm",
+    "waist_cm",
+    "hips_cm",
+    "biceps_cm",
+    "thighs_cm",
+    "neck_cm",
+    "shoulders_cm",
+    "forearms_cm",
+    "calves_cm",
+  ];
+
+  fieldsToDecrypt.forEach((field) => {
+    if (field in encryptedData && encryptedData[field] !== null) {
+      try {
+        const decrypted = decryptData(encryptedData[field], userSalt, userId);
+        // Todos son numéricos
+        decryptedData[field] = decrypted ? Number(decrypted) : null;
+      } catch (error) {
+        console.error(`Error decrypting field ${field}:`, error);
+        decryptedData[field] = null;
+      }
+    }
+  });
+
+  return decryptedData;
+}
