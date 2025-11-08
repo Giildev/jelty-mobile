@@ -289,3 +289,35 @@ export const timeframeLabels: Record<GoalTimeframe, string> = {
   "9_months": "9 meses",
   "12_months": "12 meses",
 };
+
+/**
+ * Onboarding Step 3: Health Information Schema
+ * Validates all fields required in the third step of onboarding
+ */
+export const healthInfoSchema = z.object({
+  // Medical conditions (array of strings, optional)
+  medicalConditions: z
+    .array(z.string().min(1, "La condición no puede estar vacía"))
+    .default([])
+    .optional(),
+
+  // Current medications (array of strings, optional)
+  medications: z
+    .array(z.string().min(1, "El medicamento no puede estar vacío"))
+    .default([])
+    .optional(),
+
+  // Previous injuries (array of strings, optional)
+  injuries: z
+    .array(z.string().min(1, "La lesión no puede estar vacía"))
+    .default([])
+    .optional(),
+
+  // Allergies (array of strings, optional)
+  allergies: z
+    .array(z.string().min(1, "La alergia no puede estar vacía"))
+    .default([])
+    .optional(),
+});
+
+export type HealthInfoFormData = z.infer<typeof healthInfoSchema>;

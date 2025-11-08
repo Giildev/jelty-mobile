@@ -163,16 +163,8 @@ export default function OnboardingStep2Screen() {
       );
 
       if (success) {
-        Alert.alert(
-          "¡Éxito!",
-          "Objetivos guardados correctamente. En el futuro se redirigirá al paso 3.",
-          [
-            {
-              text: "Continuar",
-              onPress: () => router.replace("/(tabs)"),
-            },
-          ]
-        );
+        // Navigate to step 3
+        router.push("/(onboarding)/step-3");
       } else {
         Alert.alert("Error", "No se pudo guardar la información");
       }

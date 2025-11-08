@@ -10,7 +10,16 @@ import {
   encryptBodyGoalFields,
   decryptGoalFields,
   decryptBodyGoalFields,
+  encryptHealthConditions,
+  decryptHealthConditions,
+  encryptMedications,
+  decryptMedications,
+  encryptInjuries,
+  decryptInjuries,
+  encryptAllergies,
+  decryptAllergies,
 } from "@/services/encryption/crypto";
+import type { HealthInfoData } from "@/types/supabase";
 
 /**
  * Onboarding Service
@@ -406,6 +415,253 @@ export async function loadOnboardingStep2(clerkUserId: string): Promise<{
     };
   } catch (error) {
     console.error("Error loading onboarding step 2:", error);
+    return null;
+  }
+}
+
+/**
+ * Saves Step 3 data (Health Information) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param healthData - Health information data (medical conditions, medications, injuries, allergies)
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep3('user_123', {
+ *   medicalConditions: ['Diabetes', 'Hypertension'],
+ *   medications: ['Aspirin', 'Vitamins'],
+ *   injuries: ['Knee injury'],
+ *   allergies: ['Lactose', 'Peanuts'],
+ * });
+ */
+export async function saveOnboardingStep3(
+  clerkUserId: string,
+  healthData: HealthInfoData
+): Promise<boolean> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // 1. Medical Conditions
+    // Soft delete existing conditions
+    await supabaseAdmin
+      .from("user_medical_condition")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new conditions if any
+    if (healthData.medicalConditions && healthData.medicalConditions.length > 0) {
+      const encryptedConditions = encryptHealthConditions(
+        healthData.medicalConditions,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const conditionsToInsert = encryptedConditions.map((condition) => ({
+        user_id: user.id,
+        name: condition.name,
+        details: condition.details,
+      }));
+
+      const { error: conditionsError } = await supabaseAdmin
+        .from("user_medical_condition")
+        .insert(conditionsToInsert);
+
+      if (conditionsError) {
+        throw new Error(`Failed to insert medical conditions: ${conditionsError.message}`);
+      }
+    }
+
+    // 2. Medications
+    // Soft delete existing medications
+    await supabaseAdmin
+      .from("user_medication")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new medications if any
+    if (healthData.medications && healthData.medications.length > 0) {
+      const encryptedMedications = encryptMedications(
+        healthData.medications,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const medicationsToInsert = encryptedMedications.map((medication) => ({
+        user_id: user.id,
+        name: medication.name,
+        dosage: medication.dosage,
+        notes: medication.notes,
+      }));
+
+      const { error: medicationsError } = await supabaseAdmin
+        .from("user_medication")
+        .insert(medicationsToInsert);
+
+      if (medicationsError) {
+        throw new Error(`Failed to insert medications: ${medicationsError.message}`);
+      }
+    }
+
+    // 3. Injuries
+    // Soft delete existing injuries
+    await supabaseAdmin
+      .from("user_injury")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new injuries if any
+    if (healthData.injuries && healthData.injuries.length > 0) {
+      const encryptedInjuries = encryptInjuries(
+        healthData.injuries,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const injuriesToInsert = encryptedInjuries.map((injury) => ({
+        user_id: user.id,
+        name: injury.name,
+        details: injury.details,
+      }));
+
+      const { error: injuriesError } = await supabaseAdmin
+        .from("user_injury")
+        .insert(injuriesToInsert);
+
+      if (injuriesError) {
+        throw new Error(`Failed to insert injuries: ${injuriesError.message}`);
+      }
+    }
+
+    // 4. Allergies
+    // Soft delete existing allergies
+    await supabaseAdmin
+      .from("user_allergy")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new allergies if any
+    if (healthData.allergies && healthData.allergies.length > 0) {
+      const encryptedAllergies = encryptAllergies(
+        healthData.allergies,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const allergiesToInsert = encryptedAllergies.map((allergy) => ({
+        user_id: user.id,
+        name: allergy.name,
+      }));
+
+      const { error: allergiesError } = await supabaseAdmin
+        .from("user_allergy")
+        .insert(allergiesToInsert);
+
+      if (allergiesError) {
+        throw new Error(`Failed to insert allergies: ${allergiesError.message}`);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 3:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 3 data (Health Information) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Health information data, or null if not found
+ *
+ * @example
+ * const step3Data = await loadOnboardingStep3('user_123');
+ * if (step3Data) {
+ *   console.log('Medical conditions:', step3Data.medicalConditions);
+ *   console.log('Medications:', step3Data.medications);
+ * }
+ */
+export async function loadOnboardingStep3(clerkUserId: string): Promise<HealthInfoData | null> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // Load medical conditions
+    const { data: conditions } = await supabaseAdmin
+      .from("user_medical_condition")
+      .select("name, details")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load medications
+    const { data: medications } = await supabaseAdmin
+      .from("user_medication")
+      .select("name, dosage, notes")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load injuries
+    const { data: injuries } = await supabaseAdmin
+      .from("user_injury")
+      .select("name, details")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load allergies
+    const { data: allergies } = await supabaseAdmin
+      .from("user_allergy")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Decrypt and return data
+    return {
+      medicalConditions: conditions
+        ? decryptHealthConditions(conditions, user.encryption_salt, clerkUserId)
+        : [],
+      medications: medications
+        ? decryptMedications(medications, user.encryption_salt, clerkUserId)
+        : [],
+      injuries: injuries
+        ? decryptInjuries(injuries, user.encryption_salt, clerkUserId)
+        : [],
+      allergies: allergies
+        ? decryptAllergies(allergies, user.encryption_salt, clerkUserId)
+        : [],
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 3:", error);
     return null;
   }
 }

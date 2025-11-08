@@ -169,3 +169,81 @@ export interface UpdateUserBodyGoalData {
   forearms_cm?: number;
   calves_cm?: number;
 }
+
+/**
+ * User Medical Condition table (user_medical_condition)
+ * Medical conditions reported by the user
+ */
+export interface SupabaseUserMedicalCondition {
+  id: string; // UUID
+  user_id: string; // UUID, foreign key to user_user.id
+  name: string; // ENCRYPTED - Name of the medical condition
+  details: string | null; // ENCRYPTED - Additional details about the condition
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  deleted_at: string | null; // ISO timestamp or null (soft delete)
+}
+
+/**
+ * User Medication table (user_medication)
+ * Medications currently taken by the user
+ */
+export interface SupabaseUserMedication {
+  id: string; // UUID
+  user_id: string; // UUID, foreign key to user_user.id
+  name: string; // ENCRYPTED - Name of the medication
+  dosage: string | null; // ENCRYPTED - Dosage information
+  notes: string | null; // ENCRYPTED - Additional notes
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  deleted_at: string | null; // ISO timestamp or null (soft delete)
+}
+
+/**
+ * User Injury table (user_injury)
+ * Previous or current injuries
+ */
+export interface SupabaseUserInjury {
+  id: string; // UUID
+  user_id: string; // UUID, foreign key to user_user.id
+  name: string; // ENCRYPTED - Name/type of the injury
+  details: string | null; // ENCRYPTED - Details about the injury
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  deleted_at: string | null; // ISO timestamp or null (soft delete)
+}
+
+/**
+ * User Allergy table (user_allergy)
+ * Allergies reported by the user
+ */
+export interface SupabaseUserAllergy {
+  id: string; // UUID
+  user_id: string; // UUID, foreign key to user_user.id
+  name: string; // ENCRYPTED - Name of the allergy
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  deleted_at: string | null; // ISO timestamp or null (soft delete)
+}
+
+/**
+ * Health Information Form Data (for Step 3 form)
+ * Simple arrays of strings entered by the user
+ */
+export interface HealthInfoFormData {
+  medicalConditions: string[];
+  medications: string[];
+  injuries: string[];
+  allergies: string[];
+}
+
+/**
+ * Health Information Data (loaded from database)
+ * Returned after decryption
+ */
+export interface HealthInfoData {
+  medicalConditions: string[];
+  medications: string[];
+  injuries: string[];
+  allergies: string[];
+}

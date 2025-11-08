@@ -27,6 +27,13 @@ export default function OnboardingLayout() {
           title: "",
         }}
       />
+      <Stack.Screen
+        name="step-3"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
     </Stack>
   );
 }

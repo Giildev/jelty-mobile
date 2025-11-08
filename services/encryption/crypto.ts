@@ -429,3 +429,180 @@ export function decryptBodyGoalFields(
 
   return decryptedData;
 }
+
+/**
+ * Encripta una lista de condiciones médicas
+ *
+ * @param conditions - Array de nombres de condiciones médicas
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de objetos con campos encriptados {name, details}
+ */
+export function encryptHealthConditions(
+  conditions: string[],
+  userSalt: string,
+  userId: string
+): Array<{ name: string | null; details: string | null }> {
+  return conditions.map((condition) => ({
+    name: encryptData(condition, userSalt, userId),
+    details: encryptData("", userSalt, userId), // details vacío por defecto
+  }));
+}
+
+/**
+ * Desencripta una lista de condiciones médicas
+ *
+ * @param encryptedConditions - Array de objetos con campos encriptados
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de strings con nombres de condiciones
+ */
+export function decryptHealthConditions(
+  encryptedConditions: Array<{ name: string | null; details: string | null }>,
+  userSalt: string,
+  userId: string
+): string[] {
+  return encryptedConditions
+    .map((condition) => {
+      try {
+        return decryptData(condition.name, userSalt, userId);
+      } catch (error) {
+        console.error("Error decrypting health condition:", error);
+        return null;
+      }
+    })
+    .filter((name): name is string => name !== null && name !== "");
+}
+
+/**
+ * Encripta una lista de medicamentos
+ *
+ * @param medications - Array de nombres de medicamentos
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de objetos con campos encriptados {name, dosage, notes}
+ */
+export function encryptMedications(
+  medications: string[],
+  userSalt: string,
+  userId: string
+): Array<{ name: string | null; dosage: string | null; notes: string | null }> {
+  return medications.map((medication) => ({
+    name: encryptData(medication, userSalt, userId),
+    dosage: encryptData("", userSalt, userId), // dosage vacío por defecto
+    notes: encryptData("", userSalt, userId), // notes vacío por defecto
+  }));
+}
+
+/**
+ * Desencripta una lista de medicamentos
+ *
+ * @param encryptedMedications - Array de objetos con campos encriptados
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de strings con nombres de medicamentos
+ */
+export function decryptMedications(
+  encryptedMedications: Array<{ name: string | null; dosage: string | null; notes: string | null }>,
+  userSalt: string,
+  userId: string
+): string[] {
+  return encryptedMedications
+    .map((medication) => {
+      try {
+        return decryptData(medication.name, userSalt, userId);
+      } catch (error) {
+        console.error("Error decrypting medication:", error);
+        return null;
+      }
+    })
+    .filter((name): name is string => name !== null && name !== "");
+}
+
+/**
+ * Encripta una lista de lesiones
+ *
+ * @param injuries - Array de nombres de lesiones
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de objetos con campos encriptados {name, details}
+ */
+export function encryptInjuries(
+  injuries: string[],
+  userSalt: string,
+  userId: string
+): Array<{ name: string | null; details: string | null }> {
+  return injuries.map((injury) => ({
+    name: encryptData(injury, userSalt, userId),
+    details: encryptData("", userSalt, userId), // details vacío por defecto
+  }));
+}
+
+/**
+ * Desencripta una lista de lesiones
+ *
+ * @param encryptedInjuries - Array de objetos con campos encriptados
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de strings con nombres de lesiones
+ */
+export function decryptInjuries(
+  encryptedInjuries: Array<{ name: string | null; details: string | null }>,
+  userSalt: string,
+  userId: string
+): string[] {
+  return encryptedInjuries
+    .map((injury) => {
+      try {
+        return decryptData(injury.name, userSalt, userId);
+      } catch (error) {
+        console.error("Error decrypting injury:", error);
+        return null;
+      }
+    })
+    .filter((name): name is string => name !== null && name !== "");
+}
+
+/**
+ * Encripta una lista de alergias
+ *
+ * @param allergies - Array de nombres de alergias
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de objetos con campo encriptado {name}
+ */
+export function encryptAllergies(
+  allergies: string[],
+  userSalt: string,
+  userId: string
+): Array<{ name: string | null }> {
+  return allergies.map((allergy) => ({
+    name: encryptData(allergy, userSalt, userId),
+  }));
+}
+
+/**
+ * Desencripta una lista de alergias
+ *
+ * @param encryptedAllergies - Array de objetos con campo encriptado
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de strings con nombres de alergias
+ */
+export function decryptAllergies(
+  encryptedAllergies: Array<{ name: string | null }>,
+  userSalt: string,
+  userId: string
+): string[] {
+  return encryptedAllergies
+    .map((allergy) => {
+      try {
+        return decryptData(allergy.name, userSalt, userId);
+      } catch (error) {
+        console.error("Error decrypting allergy:", error);
+        return null;
+      }
+    })
+    .filter((name): name is string => name !== null && name !== "");
+}
+
