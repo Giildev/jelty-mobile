@@ -312,9 +312,8 @@ export default function OnboardingStep1Screen() {
                 <Input
                   label="Email"
                   value={value}
-                  editable={false}
+                  disabled={true}
                   placeholder="user@example.com"
-                  className="bg-gray-100 dark:bg-gray-800"
                 />
               )}
             />
@@ -327,9 +326,8 @@ export default function OnboardingStep1Screen() {
                 <Input
                   label="Phone Number"
                   value={value}
-                  editable={false}
+                  disabled={true}
                   placeholder="+1 (555) 000-0000"
-                  className="bg-gray-100 dark:bg-gray-800"
                 />
               )}
             />
@@ -464,14 +462,11 @@ export default function OnboardingStep1Screen() {
                   <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Country
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => setShowCountryPicker(true)}
-                    className="rounded-xl border border-gray-300 bg-white px-4 py-3.5 dark:border-gray-600 dark:bg-gray-800"
-                  >
-                    <Text className="text-base text-gray-900 dark:text-white">
+                  <View className="rounded-xl border border-gray-300 bg-white px-4 py-3.5">
+                    <Text className="text-base text-gray-500">
                       {value || "Select your country"}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                   {errors.country && (
                     <Text className="mt-1 text-sm text-error">
                       {errors.country.message}

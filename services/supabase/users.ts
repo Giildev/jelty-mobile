@@ -5,6 +5,11 @@ import type {
   CreateUserData,
   UpdateUserProfileData,
 } from "@/types/supabase";
+import {
+  generateUserSalt,
+  encryptUserFields,
+  decryptUserFields,
+} from "@/services/encryption/crypto";
 
 /**
  * User Service
@@ -37,13 +42,30 @@ export async function createUser(userData: CreateUserData): Promise<{
   profile: SupabaseUserProfile;
 }> {
   try {
-    // 1. Create user in user_user table (using admin client to bypass RLS)
+    // 1. Generate unique salt for this user
+    const userSalt = generateUserSalt();
+
+    // 2. Encrypt sensitive profile data
+    const encryptedProfileData = encryptUserFields(
+      {
+        first_name: userData.first_name || "",
+        last_name: userData.last_name || "",
+        phone: userData.phone,
+        country: userData.country,
+        country_code: userData.country_code,
+      },
+      userSalt,
+      userData.clerk_user_id
+    );
+
+    // 3. Create user in user_user table with encryption salt
     const { data: user, error: userError } = await supabaseAdmin
       .from("user_user")
       .insert({
         clerk_user_id: userData.clerk_user_id,
-        email: userData.email,
+        email: userData.email, // Email NOT encrypted (needed for searches)
         status: "active",
+        encryption_salt: userSalt, // Save salt for future encryption/decryption
         terms_accepted_at: userData.termsAccepted ? new Date().toISOString() : null,
       })
       .select()
@@ -57,23 +79,23 @@ export async function createUser(userData: CreateUserData): Promise<{
       throw new Error("User creation returned no data");
     }
 
-    // 2. Create user profile in user_profile table (using admin client)
+    // 4. Create user profile with ENCRYPTED data
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .insert({
         user_id: user.id,
-        first_name: userData.first_name || "",
-        last_name: userData.last_name || "",
-        phone: userData.phone,
-        country: userData.country,
-        country_code: userData.country_code,
-        onboarding_completed: false, // User needs to complete onboarding
+        first_name: encryptedProfileData.first_name, // ENCRYPTED
+        last_name: encryptedProfileData.last_name,   // ENCRYPTED
+        phone: encryptedProfileData.phone,           // ENCRYPTED
+        country: encryptedProfileData.country,       // ENCRYPTED
+        country_code: encryptedProfileData.country_code, // ENCRYPTED
+        onboarding_completed: false,
       })
       .select()
       .single();
 
     if (profileError) {
-      // If profile creation fails, we should delete the user to maintain consistency
+      // If profile creation fails, delete user to maintain consistency
       await supabaseAdmin.from("user_user").delete().eq("id", user.id);
       throw new Error(`Failed to create user profile: ${profileError.message}`);
     }
@@ -83,7 +105,10 @@ export async function createUser(userData: CreateUserData): Promise<{
       throw new Error("Profile creation returned no data");
     }
 
-    return { user, profile };
+    // 5. Decrypt profile data before returning to app
+    const decryptedProfile = decryptUserFields(profile, userSalt, userData.clerk_user_id);
+
+    return { user, profile: decryptedProfile };
   } catch (error) {
     console.error("Error creating user in Supabase:", error);
     throw error;
@@ -109,8 +134,8 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
   profile: SupabaseUserProfile;
 } | null> {
   try {
-    // Get user from user_user table
-    const { data: user, error: userError } = await supabase
+    // Get user from user_user table (using admin to bypass RLS)
+    const { data: user, error: userError } = await supabaseAdmin
       .from("user_user")
       .select("*")
       .eq("clerk_user_id", clerkUserId)
@@ -121,8 +146,8 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       return null;
     }
 
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    // Get user profile (ENCRYPTED data)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .select("*")
       .eq("user_id", user.id)
@@ -133,7 +158,16 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       return null;
     }
 
-    return { user, profile };
+    // Check if user has encryption salt
+    if (!user.encryption_salt) {
+      console.warn("User has no encryption salt, data may be unencrypted (legacy user)");
+      return { user, profile };
+    }
+
+    // Decrypt profile data
+    const decryptedProfile = decryptUserFields(profile, user.encryption_salt, clerkUserId);
+
+    return { user, profile: decryptedProfile };
   } catch (error) {
     console.error("Error getting user by Clerk ID:", error);
     return null;
@@ -164,7 +198,7 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       return null;
     }
 
-    // Get user profile (using admin client to bypass RLS)
+    // Get user profile (ENCRYPTED data)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .select("*")
@@ -177,7 +211,20 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       return null;
     }
 
-    return { user, profile };
+    // Check if user has encryption salt
+    if (!user.encryption_salt) {
+      console.warn("User has no encryption salt, data may be unencrypted (legacy user)");
+      return { user, profile };
+    }
+
+    // Decrypt profile data
+    const decryptedProfile = decryptUserFields(
+      profile,
+      user.encryption_salt,
+      user.clerk_user_id
+    );
+
+    return { user, profile: decryptedProfile };
   } catch (error) {
     console.error("Error getting user by Supabase ID:", error);
     return null;

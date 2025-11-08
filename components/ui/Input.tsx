@@ -4,6 +4,7 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -13,6 +14,7 @@ export function Input({
   label,
   error,
   className = "",
+  disabled = false,
   ...textInputProps
 }: InputProps) {
   return (
@@ -24,8 +26,9 @@ export function Input({
       )}
       <TextInput
         className={`
-          rounded-xl border bg-white px-4 text-base leading-5 text-gray-900
-          dark:bg-gray-800 dark:text-white
+          rounded-xl border bg-white px-4 text-base leading-5
+          ${disabled ? "text-gray-500" : "text-gray-900 dark:text-white"}
+          ${disabled ? "dark:bg-white" : "dark:bg-gray-800"}
           ${
             error
               ? "border-red-500"
@@ -34,6 +37,7 @@ export function Input({
         `}
         style={{ paddingTop: 12, paddingBottom: 12, textAlignVertical: "center" }}
         placeholderTextColor="#9CA3AF"
+        editable={!disabled}
         {...textInputProps}
       />
       {error && <Text className="mt-1 text-sm text-red-500">{error}</Text>}

@@ -25,19 +25,19 @@ export interface SupabaseUser {
  */
 export interface SupabaseUserProfile {
   user_id: string; // UUID, foreign key to user_user.id
-  first_name: string;
-  last_name: string;
-  birth_date: string | null; // ISO date string
+  first_name: string | null; // ENCRYPTED - NULL until onboarding completed
+  last_name: string | null; // ENCRYPTED - NULL until onboarding completed
+  birth_date: string | null; // ENCRYPTED - ISO date string
   gender: string | null;
-  phone: string | null;
-  country: string | null;
-  country_code: string | null; // Country dialing code (e.g., +1, +52, +34)
-  city: string | null;
-  address: string | null;
-  zip_code: string | null;
-  height_cm: number | null;
-  weight_kg: number | null;
-  bodyfat_percentage: number | null;
+  phone: string | null; // ENCRYPTED
+  country: string | null; // ENCRYPTED
+  country_code: string | null; // ENCRYPTED - Country dialing code (e.g., +1, +52, +34)
+  city: string | null; // ENCRYPTED
+  address: string | null; // ENCRYPTED
+  zip_code: string | null; // ENCRYPTED
+  height_cm: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
+  weight_kg: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
+  bodyfat_percentage: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
   age_years: number | null;
   measurement_system: string | null; // 'metric' | 'imperial'
   activity_level: string | null; // 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active'

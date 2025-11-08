@@ -123,8 +123,11 @@ export function NumberInput({
         </View>
 
         {/* Unit indicator */}
-        <View className="rounded-xl bg-primary px-4 py-3.5 dark:bg-secondary">
-          <Text className="text-base font-semibold text-white">{units}</Text>
+        <View
+          className="rounded-xl bg-primary px-3 py-2.5 dark:bg-secondary"
+          style={{ width: 48 }}
+        >
+          <Text className="text-center text-sm font-semibold text-white">{units}</Text>
         </View>
       </View>
 

@@ -1,5 +1,6 @@
 import { supabase, supabaseAdmin } from "./client";
 import type { UpdateUserProfileData } from "@/types/supabase";
+import { encryptUserFields } from "@/services/encryption/crypto";
 
 /**
  * Onboarding Service
@@ -29,10 +30,10 @@ export async function saveOnboardingStep1(
   data: UpdateUserProfileData
 ): Promise<boolean> {
   try {
-    // Get user first
+    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id")
+      .select("id, encryption_salt")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
@@ -41,11 +42,18 @@ export async function saveOnboardingStep1(
       throw new Error("User not found");
     }
 
-    // Update profile with step 1 data
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // Encrypt sensitive data before saving
+    const encryptedData = encryptUserFields(data, user.encryption_salt, clerkUserId);
+
+    // Update profile with ENCRYPTED step 1 data
     const { error } = await supabaseAdmin
       .from("user_profile")
       .update({
-        ...data,
+        ...encryptedData,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id);
