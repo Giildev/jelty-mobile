@@ -606,3 +606,46 @@ export function decryptAllergies(
     .filter((name): name is string => name !== null && name !== "");
 }
 
+/**
+ * Encripta una lista de ingredientes (disliked o favorite)
+ *
+ * @param ingredients - Array de nombres de ingredientes
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de objetos con campo encriptado {name}
+ */
+export function encryptIngredients(
+  ingredients: string[],
+  userSalt: string,
+  userId: string
+): Array<{ name: string | null }> {
+  return ingredients.map((ingredient) => ({
+    name: encryptData(ingredient, userSalt, userId),
+  }));
+}
+
+/**
+ * Desencripta una lista de ingredientes
+ *
+ * @param encryptedIngredients - Array de objetos con campo encriptado
+ * @param userSalt - Salt único del usuario
+ * @param userId - ID del usuario
+ * @returns Array de strings con nombres de ingredientes
+ */
+export function decryptIngredients(
+  encryptedIngredients: Array<{ name: string | null }>,
+  userSalt: string,
+  userId: string
+): string[] {
+  return encryptedIngredients
+    .map((ingredient) => {
+      try {
+        return decryptData(ingredient.name, userSalt, userId);
+      } catch (error) {
+        console.error("Error decrypting ingredient:", error);
+        return null;
+      }
+    })
+    .filter((name): name is string => name !== null && name !== "");
+}
+

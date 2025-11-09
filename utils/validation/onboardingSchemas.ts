@@ -321,3 +321,81 @@ export const healthInfoSchema = z.object({
 });
 
 export type HealthInfoFormData = z.infer<typeof healthInfoSchema>;
+
+/**
+ * Onboarding Step 4: Dietary Preferences Schema
+ * Validates all fields required in the fourth step of onboarding
+ */
+export const dietaryPreferencesSchema = z.object({
+  // Dietary patterns (multi-select, optional)
+  dietaryPatterns: z
+    .array(z.string())
+    .default([])
+    .optional(),
+
+  // Preferred cuisines (multi-select, optional)
+  cuisines: z
+    .array(z.string())
+    .default([])
+    .optional(),
+
+  // Ingredients to avoid (array of strings, optional)
+  ingredientsToAvoid: z
+    .array(z.string().min(1, "El ingrediente no puede estar vacío"))
+    .default([])
+    .optional(),
+
+  // Ingredients to include/favorite (array of strings, optional)
+  ingredientsToInclude: z
+    .array(z.string().min(1, "El ingrediente no puede estar vacío"))
+    .default([])
+    .optional(),
+
+  // Meals per day (2-6, optional)
+  mealsPerDay: z
+    .number()
+    .min(2, "Debes seleccionar al menos 2 comidas por día")
+    .max(6, "No puedes seleccionar más de 6 comidas por día")
+    .optional()
+    .nullable(),
+
+  // Daily water intake in liters (1-4+, optional)
+  waterIntake: z
+    .number()
+    .min(1, "Debes seleccionar al menos 1L")
+    .max(5, "No puedes seleccionar más de 5L")
+    .optional()
+    .nullable(),
+});
+
+export type DietaryPreferencesFormData = z.infer<typeof dietaryPreferencesSchema>;
+
+/**
+ * Available dietary patterns
+ */
+export const DIETARY_PATTERNS = [
+  "Vegetariana",
+  "Vegana",
+  "Pescetariana",
+  "Carnívora",
+  "Keto",
+  "Paleo",
+  "Mediterránea",
+  "Flexitariana",
+] as const;
+
+/**
+ * Available cuisine preferences
+ */
+export const CUISINE_TYPES = [
+  "Italiana",
+  "Mexicana",
+  "Japonesa",
+  "China",
+  "Tailandesa",
+  "India",
+  "Francesa",
+  "Mediterránea",
+  "Coreana",
+  "Americana",
+] as const;

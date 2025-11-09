@@ -18,6 +18,8 @@ import {
   decryptInjuries,
   encryptAllergies,
   decryptAllergies,
+  encryptIngredients,
+  decryptIngredients,
 } from "@/services/encryption/crypto";
 import type { HealthInfoData } from "@/types/supabase";
 
@@ -662,6 +664,307 @@ export async function loadOnboardingStep3(clerkUserId: string): Promise<HealthIn
     };
   } catch (error) {
     console.error("Error loading onboarding step 3:", error);
+    return null;
+  }
+}
+
+/**
+ * Dietary Preferences Data Interface
+ */
+export interface DietaryPreferencesData {
+  dietaryPatterns?: string[];
+  cuisines?: string[];
+  ingredientsToAvoid?: string[];
+  ingredientsToInclude?: string[];
+  mealsPerDay?: number | null;
+  waterIntake?: number | null;
+}
+
+/**
+ * Saves Step 4 data (Dietary Preferences) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param dietaryData - Dietary preferences data
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep4('user_123', {
+ *   dietaryPatterns: ['Vegetariana', 'Mediterránea'],
+ *   cuisines: ['Italiana', 'Japonesa'],
+ *   ingredientsToAvoid: ['Nuts', 'Dairy'],
+ *   ingredientsToInclude: ['Quinoa', 'Avocado'],
+ *   mealsPerDay: 4,
+ *   waterIntake: 2.5,
+ * });
+ */
+export async function saveOnboardingStep4(
+  clerkUserId: string,
+  dietaryData: DietaryPreferencesData
+): Promise<boolean> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // 1. Dietary Patterns (user_restriction)
+    // Soft delete existing restrictions
+    await supabaseAdmin
+      .from("user_restriction")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new dietary patterns if any
+    if (dietaryData.dietaryPatterns && dietaryData.dietaryPatterns.length > 0) {
+      const restrictionsToInsert = dietaryData.dietaryPatterns.map((pattern) => ({
+        user_id: user.id,
+        name: pattern, // NOT encrypted (predefined options)
+      }));
+
+      const { error: restrictionsError } = await supabaseAdmin
+        .from("user_restriction")
+        .insert(restrictionsToInsert);
+
+      if (restrictionsError) {
+        throw new Error(`Failed to insert dietary patterns: ${restrictionsError.message}`);
+      }
+    }
+
+    // 2. Preferred Cuisines (user_cuisine)
+    // Soft delete existing cuisines
+    await supabaseAdmin
+      .from("user_cuisine")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new cuisines if any
+    if (dietaryData.cuisines && dietaryData.cuisines.length > 0) {
+      const cuisinesToInsert = dietaryData.cuisines.map((cuisine) => ({
+        user_id: user.id,
+        name: cuisine, // NOT encrypted (predefined options)
+      }));
+
+      const { error: cuisinesError } = await supabaseAdmin
+        .from("user_cuisine")
+        .insert(cuisinesToInsert);
+
+      if (cuisinesError) {
+        throw new Error(`Failed to insert cuisines: ${cuisinesError.message}`);
+      }
+    }
+
+    // 3. Ingredients to Avoid (user_disliked_ingredient)
+    // Soft delete existing disliked ingredients
+    await supabaseAdmin
+      .from("user_disliked_ingredient")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new ingredients to avoid if any
+    if (dietaryData.ingredientsToAvoid && dietaryData.ingredientsToAvoid.length > 0) {
+      const encryptedAvoid = encryptIngredients(
+        dietaryData.ingredientsToAvoid,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const avoidToInsert = encryptedAvoid.map((ingredient) => ({
+        user_id: user.id,
+        name: ingredient.name, // ENCRYPTED
+      }));
+
+      const { error: avoidError } = await supabaseAdmin
+        .from("user_disliked_ingredient")
+        .insert(avoidToInsert);
+
+      if (avoidError) {
+        throw new Error(`Failed to insert ingredients to avoid: ${avoidError.message}`);
+      }
+    }
+
+    // 4. Ingredients to Include (user_favorite_ingredient)
+    // Soft delete existing favorite ingredients
+    await supabaseAdmin
+      .from("user_favorite_ingredient")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new ingredients to include if any
+    if (dietaryData.ingredientsToInclude && dietaryData.ingredientsToInclude.length > 0) {
+      const encryptedInclude = encryptIngredients(
+        dietaryData.ingredientsToInclude,
+        user.encryption_salt,
+        clerkUserId
+      );
+
+      const includeToInsert = encryptedInclude.map((ingredient) => ({
+        user_id: user.id,
+        name: ingredient.name, // ENCRYPTED
+      }));
+
+      const { error: includeError } = await supabaseAdmin
+        .from("user_favorite_ingredient")
+        .insert(includeToInsert);
+
+      if (includeError) {
+        throw new Error(`Failed to insert ingredients to include: ${includeError.message}`);
+      }
+    }
+
+    // 5. Meals per Day & Water Intake (user_settings)
+    // Check if settings already exist
+    const { data: existingSettings } = await supabaseAdmin
+      .from("user_settings")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    const settingsData: any = {};
+    if (dietaryData.mealsPerDay !== undefined && dietaryData.mealsPerDay !== null) {
+      settingsData.meals_per_day = dietaryData.mealsPerDay;
+    }
+    if (dietaryData.waterIntake !== undefined && dietaryData.waterIntake !== null) {
+      settingsData.water_intake = dietaryData.waterIntake;
+    }
+
+    // Only update if we have data to update
+    if (Object.keys(settingsData).length > 0) {
+      if (existingSettings) {
+        // Update existing settings
+        const { error: settingsError } = await supabaseAdmin
+          .from("user_settings")
+          .update({
+            ...settingsData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", user.id);
+
+        if (settingsError) {
+          throw new Error(`Failed to update settings: ${settingsError.message}`);
+        }
+      } else {
+        // Insert new settings
+        const { error: settingsError } = await supabaseAdmin
+          .from("user_settings")
+          .insert({
+            user_id: user.id,
+            ...settingsData,
+          });
+
+        if (settingsError) {
+          throw new Error(`Failed to insert settings: ${settingsError.message}`);
+        }
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 4:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 4 data (Dietary Preferences) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Dietary preferences data, or null if not found
+ *
+ * @example
+ * const step4Data = await loadOnboardingStep4('user_123');
+ * if (step4Data) {
+ *   console.log('Dietary patterns:', step4Data.dietaryPatterns);
+ *   console.log('Cuisines:', step4Data.cuisines);
+ *   console.log('Meals per day:', step4Data.mealsPerDay);
+ * }
+ */
+export async function loadOnboardingStep4(
+  clerkUserId: string
+): Promise<DietaryPreferencesData | null> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // Load dietary patterns (restrictions)
+    const { data: restrictions } = await supabaseAdmin
+      .from("user_restriction")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load cuisines
+    const { data: cuisines } = await supabaseAdmin
+      .from("user_cuisine")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load disliked ingredients
+    const { data: dislikedIngredients } = await supabaseAdmin
+      .from("user_disliked_ingredient")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load favorite ingredients
+    const { data: favoriteIngredients } = await supabaseAdmin
+      .from("user_favorite_ingredient")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load settings (meals_per_day, water_intake)
+    const { data: settings } = await supabaseAdmin
+      .from("user_settings")
+      .select("meals_per_day, water_intake")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    // Return data
+    return {
+      dietaryPatterns: restrictions ? restrictions.map((r) => r.name) : [],
+      cuisines: cuisines ? cuisines.map((c) => c.name) : [],
+      ingredientsToAvoid: dislikedIngredients
+        ? decryptIngredients(dislikedIngredients, user.encryption_salt, clerkUserId)
+        : [],
+      ingredientsToInclude: favoriteIngredients
+        ? decryptIngredients(favoriteIngredients, user.encryption_salt, clerkUserId)
+        : [],
+      mealsPerDay: settings?.meals_per_day || null,
+      waterIntake: settings?.water_intake || null,
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 4:", error);
     return null;
   }
 }

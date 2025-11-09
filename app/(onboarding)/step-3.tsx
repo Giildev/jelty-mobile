@@ -32,7 +32,6 @@ export default function OnboardingStep3Screen() {
   const router = useRouter();
   const { userId } = useAuth();
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const {
@@ -68,8 +67,6 @@ export default function OnboardingStep3Screen() {
       }
     } catch (error) {
       console.error("Error loading step 3 data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -90,17 +87,8 @@ export default function OnboardingStep3Screen() {
       });
 
       if (success) {
-        // Show success message and inform about future step 4
-        Alert.alert(
-          "¡Información guardada!",
-          "Tu información de salud ha sido guardada de forma segura. Próximamente se redirigirá al paso 4.",
-          [
-            {
-              text: "Continuar",
-              onPress: () => router.replace("/(tabs)"),
-            },
-          ]
-        );
+        // Navigate to step 4
+        router.push("/(onboarding)/step-4");
       } else {
         Alert.alert("Error", "No se pudo guardar la información");
       }
@@ -115,18 +103,6 @@ export default function OnboardingStep3Screen() {
   const handleBack = () => {
     router.back();
   };
-
-  if (loading) {
-    return (
-      <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-base-black">
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-base text-gray-600 dark:text-gray-400">
-            Cargando información...
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-base-black">
