@@ -51,7 +51,7 @@ export function MultiSelectChips({
                 rounded-full px-4 py-2.5 border
                 ${
                   isSelected
-                    ? "bg-primary/10 border-primary"
+                    ? "bg-primary border-primary"
                     : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
                 }
               `}
@@ -62,7 +62,7 @@ export function MultiSelectChips({
                   text-sm font-medium
                   ${
                     isSelected
-                      ? "text-primary"
+                      ? "text-white"
                       : "text-gray-700 dark:text-gray-300"
                   }
                 `}

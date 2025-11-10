@@ -968,3 +968,399 @@ export async function loadOnboardingStep4(
     return null;
   }
 }
+
+/**
+ * Exercise Preferences Data Interface
+ */
+export interface ExercisePreferencesData {
+  experienceLevel: string;
+  preferredTrainingTypes?: string[];
+  equipmentAvailability: string;
+}
+
+/**
+ * Saves Step 5 data (Exercise Preferences) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param exerciseData - Exercise preferences data
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep5('user_123', {
+ *   experienceLevel: 'intermediate',
+ *   preferredTrainingTypes: ['Strength', 'Cardio'],
+ *   equipmentAvailability: 'home_equipment',
+ * });
+ */
+export async function saveOnboardingStep5(
+  clerkUserId: string,
+  exerciseData: ExercisePreferencesData
+): Promise<boolean> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // 1. Training Preference (experience_level, time_per_session, preferred_time_of_day)
+    // Check if training preference already exists
+    const { data: existingTrainingPref } = await supabaseAdmin
+      .from("user_training_preference")
+      .select("id")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    if (existingTrainingPref) {
+      // Update existing training preference
+      const { error: trainingPrefError } = await supabaseAdmin
+        .from("user_training_preference")
+        .update({
+          experience_level: exerciseData.experienceLevel,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+
+      if (trainingPrefError) {
+        throw new Error(`Failed to update training preference: ${trainingPrefError.message}`);
+      }
+    } else {
+      // Insert new training preference
+      const { error: trainingPrefError } = await supabaseAdmin
+        .from("user_training_preference")
+        .insert({
+          user_id: user.id,
+          experience_level: exerciseData.experienceLevel,
+        });
+
+      if (trainingPrefError) {
+        throw new Error(`Failed to insert training preference: ${trainingPrefError.message}`);
+      }
+    }
+
+    // 2. Preferred Training Types (user_exercise_preference)
+    // Soft delete existing exercise preferences
+    await supabaseAdmin
+      .from("user_exercise_preference")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new training types if any
+    if (exerciseData.preferredTrainingTypes && exerciseData.preferredTrainingTypes.length > 0) {
+      const trainingTypesToInsert = exerciseData.preferredTrainingTypes.map((type) => ({
+        user_id: user.id,
+        name: type, // NOT encrypted (predefined options)
+      }));
+
+      const { error: trainingTypesError } = await supabaseAdmin
+        .from("user_exercise_preference")
+        .insert(trainingTypesToInsert);
+
+      if (trainingTypesError) {
+        throw new Error(`Failed to insert training types: ${trainingTypesError.message}`);
+      }
+    }
+
+    // 3. Equipment Availability (user_equipment_access)
+    // Soft delete existing equipment access
+    await supabaseAdmin
+      .from("user_equipment_access")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert equipment availability
+    const { error: equipmentError } = await supabaseAdmin
+      .from("user_equipment_access")
+      .insert({
+        user_id: user.id,
+        name: exerciseData.equipmentAvailability, // NOT encrypted (predefined option)
+      });
+
+    if (equipmentError) {
+      throw new Error(`Failed to insert equipment availability: ${equipmentError.message}`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 5:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 5 data (Exercise Preferences) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Exercise preferences data, or null if not found
+ *
+ * @example
+ * const step5Data = await loadOnboardingStep5('user_123');
+ * if (step5Data) {
+ *   console.log('Experience level:', step5Data.experienceLevel);
+ *   console.log('Training types:', step5Data.preferredTrainingTypes);
+ * }
+ */
+export async function loadOnboardingStep5(
+  clerkUserId: string
+): Promise<ExercisePreferencesData | null> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // Load training preference
+    const { data: trainingPref } = await supabaseAdmin
+      .from("user_training_preference")
+      .select("experience_level")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    // Load exercise preferences (training types)
+    const { data: exercisePrefs } = await supabaseAdmin
+      .from("user_exercise_preference")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Load equipment access
+    const { data: equipmentAccess } = await supabaseAdmin
+      .from("user_equipment_access")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Return data
+    return {
+      experienceLevel: trainingPref?.experience_level || "beginner",
+      preferredTrainingTypes: exercisePrefs ? exercisePrefs.map((p) => p.name) : [],
+      equipmentAvailability: equipmentAccess?.[0]?.name || "none",
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 5:", error);
+    return null;
+  }
+}
+
+/**
+ * Availability Data Interface
+ */
+export interface AvailabilityData {
+  daysAvailable: string[];
+  timePerSession: number;
+  preferredTimeOfDay: string;
+  additionalNotes?: string | null;
+}
+
+/**
+ * Saves Step 6 data (Availability & Schedule) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param availabilityData - Availability and schedule data
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep6('user_123', {
+ *   daysAvailable: ['monday', 'wednesday', 'friday'],
+ *   timePerSession: 60,
+ *   preferredTimeOfDay: 'morning',
+ *   additionalNotes: 'Prefer early morning sessions',
+ * });
+ */
+export async function saveOnboardingStep6(
+  clerkUserId: string,
+  availabilityData: AvailabilityData
+): Promise<boolean> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // 1. Update Training Preference (time_per_session, preferred_time_of_day, additional_notes)
+    // Check if training preference already exists
+    const { data: existingTrainingPref } = await supabaseAdmin
+      .from("user_training_preference")
+      .select("id")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    // Encrypt additional notes if provided
+    const additionalNotes = availabilityData.additionalNotes
+      ? encryptInjuries(
+          [availabilityData.additionalNotes],
+          user.encryption_salt,
+          clerkUserId
+        )[0]?.name || null
+      : null;
+
+    if (existingTrainingPref) {
+      // Update existing training preference
+      const { error: trainingPrefError } = await supabaseAdmin
+        .from("user_training_preference")
+        .update({
+          time_per_session_min: availabilityData.timePerSession,
+          time_per_session_max: availabilityData.timePerSession,
+          preferred_time_of_day: availabilityData.preferredTimeOfDay,
+          additional_notes: additionalNotes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+
+      if (trainingPrefError) {
+        throw new Error(`Failed to update training preference: ${trainingPrefError.message}`);
+      }
+    } else {
+      // Insert new training preference
+      const { error: trainingPrefError } = await supabaseAdmin
+        .from("user_training_preference")
+        .insert({
+          user_id: user.id,
+          time_per_session_min: availabilityData.timePerSession,
+          time_per_session_max: availabilityData.timePerSession,
+          preferred_time_of_day: availabilityData.preferredTimeOfDay,
+          additional_notes: additionalNotes,
+        });
+
+      if (trainingPrefError) {
+        throw new Error(`Failed to insert training preference: ${trainingPrefError.message}`);
+      }
+    }
+
+    // 2. Days Available (user_availability)
+    // Soft delete existing availability
+    await supabaseAdmin
+      .from("user_availability")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Insert new availability days
+    if (availabilityData.daysAvailable && availabilityData.daysAvailable.length > 0) {
+      const daysToInsert = availabilityData.daysAvailable.map((day) => ({
+        user_id: user.id,
+        day_of_week: day, // NOT encrypted (predefined options)
+      }));
+
+      const { error: daysError } = await supabaseAdmin
+        .from("user_availability")
+        .insert(daysToInsert);
+
+      if (daysError) {
+        throw new Error(`Failed to insert availability days: ${daysError.message}`);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 6:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 6 data (Availability & Schedule) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Availability data, or null if not found
+ *
+ * @example
+ * const step6Data = await loadOnboardingStep6('user_123');
+ * if (step6Data) {
+ *   console.log('Days available:', step6Data.daysAvailable);
+ *   console.log('Session time:', step6Data.timePerSession);
+ * }
+ */
+export async function loadOnboardingStep6(
+  clerkUserId: string
+): Promise<AvailabilityData | null> {
+  try {
+    // Get user with encryption salt
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id, encryption_salt")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    if (!user.encryption_salt) {
+      throw new Error("User encryption salt not found");
+    }
+
+    // Load training preference
+    const { data: trainingPref } = await supabaseAdmin
+      .from("user_training_preference")
+      .select("time_per_session_min, preferred_time_of_day, additional_notes")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    // Load availability days
+    const { data: availability } = await supabaseAdmin
+      .from("user_availability")
+      .select("day_of_week")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    // Decrypt additional notes if present
+    const decryptedNotes = trainingPref?.additional_notes
+      ? decryptInjuries(
+          [{ name: trainingPref.additional_notes, details: null }],
+          user.encryption_salt,
+          clerkUserId
+        )[0] || null
+      : null;
+
+    // Return data
+    return {
+      daysAvailable: availability ? availability.map((a) => a.day_of_week) : [],
+      timePerSession: trainingPref?.time_per_session_min || 45,
+      preferredTimeOfDay: trainingPref?.preferred_time_of_day || "morning",
+      additionalNotes: decryptedNotes || null,
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 6:", error);
+    return null;
+  }
+}

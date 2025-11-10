@@ -399,3 +399,118 @@ export const CUISINE_TYPES = [
   "Coreana",
   "Americana",
 ] as const;
+
+/**
+ * Onboarding Step 5: Exercise Preferences Schema
+ * Validates all fields required in the fifth step of onboarding
+ */
+export const exercisePreferencesSchema = z.object({
+  // Experience level (single select, required)
+  experienceLevel: z.enum(["beginner", "intermediate", "advanced"], {
+    errorMap: () => ({ message: "Selecciona tu nivel de experiencia" }),
+  }),
+
+  // Preferred training types (multi-select, optional)
+  preferredTrainingTypes: z
+    .array(z.string())
+    .default([])
+    .optional(),
+
+  // Equipment availability (single select, required)
+  equipmentAvailability: z.enum(["none", "home_equipment", "full_gym"], {
+    errorMap: () => ({ message: "Selecciona tu disponibilidad de equipamiento" }),
+  }),
+});
+
+export type ExercisePreferencesFormData = z.infer<typeof exercisePreferencesSchema>;
+
+/**
+ * Experience levels
+ */
+export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
+
+/**
+ * Equipment availability types
+ */
+export type EquipmentAvailability = "none" | "home_equipment" | "full_gym";
+
+/**
+ * Experience level display names in Spanish
+ */
+export const experienceLevelLabels: Record<ExperienceLevel, string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
+
+/**
+ * Equipment availability display names in Spanish
+ */
+export const equipmentAvailabilityLabels: Record<EquipmentAvailability, string> = {
+  none: "None",
+  home_equipment: "Home Equipment",
+  full_gym: "Full Gym",
+};
+
+/**
+ * Available training types
+ */
+export const TRAINING_TYPES = [
+  "Strength",
+  "Cardio",
+  "Hypertrophy",
+  "Yoga",
+  "Functional",
+  "Mixed",
+] as const;
+
+/**
+ * Onboarding Step 6: Availability & Schedule Schema
+ * Validates all fields required in the sixth step of onboarding
+ */
+export const availabilitySchema = z.object({
+  // Days available (multi-select, at least 1 required)
+  daysAvailable: z
+    .array(z.string())
+    .min(1, "Selecciona al menos un día de la semana")
+    .default([]),
+
+  // Time per session in minutes (required)
+  timePerSession: z.number({
+    errorMap: () => ({ message: "Selecciona la duración de tu sesión" }),
+  }),
+
+  // Preferred time of day (single select, required)
+  preferredTimeOfDay: z.enum(["morning", "afternoon", "evening", "flexible"], {
+    errorMap: () => ({ message: "Selecciona tu horario preferido" }),
+  }),
+
+  // Additional notes (optional)
+  additionalNotes: z
+    .string()
+    .max(500, "Las notas no pueden exceder 500 caracteres")
+    .optional()
+    .nullable(),
+});
+
+export type AvailabilityFormData = z.infer<typeof availabilitySchema>;
+
+/**
+ * Time of day preferences
+ */
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "flexible";
+
+/**
+ * Time of day display names in Spanish
+ */
+export const timeOfDayLabels: Record<TimeOfDay, string> = {
+  morning: "Morning",
+  afternoon: "Afternoon",
+  evening: "Evening",
+  flexible: "Flexible",
+};
+
+/**
+ * Session duration options in minutes
+ */
+export const SESSION_DURATIONS = [30, 45, 60, 75, 90] as const;

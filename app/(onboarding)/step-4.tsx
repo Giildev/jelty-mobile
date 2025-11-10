@@ -102,16 +102,8 @@ export default function OnboardingStep4Screen() {
       });
 
       if (success) {
-        // Show alert about future step 5
-        Alert.alert(
-          "¡Preferencias guardadas!",
-          "Tus preferencias alimentarias han sido guardadas de forma segura. Próximamente mostraremos el paso 5.",
-          [
-            {
-              text: "OK",
-            },
-          ]
-        );
+        // Navigate to step 5
+        router.push("/(onboarding)/step-5");
       } else {
         Alert.alert("Error", "No se pudo guardar la información");
       }
