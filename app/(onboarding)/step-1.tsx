@@ -95,7 +95,7 @@ export default function OnboardingStep1Screen() {
 
       console.log("Supabase userId from Zustand:", supabaseUserId);
 
-      // Si no está en Zustand, intentar obtenerlo de AsyncStorage
+      // If not in Zustand, try to get it from AsyncStorage
       if (!supabaseUserId) {
         const storedId = await AsyncStorage.getItem("supabase_user_id");
         console.log("Supabase userId from AsyncStorage:", storedId);
@@ -230,7 +230,7 @@ export default function OnboardingStep1Screen() {
       }
 
       console.log("✅ All fields were populated correctly");
-      console.log("=== RESUMEN DE DATOS CARGADOS ===");
+      console.log("=== LOADED DATA SUMMARY ===");
       console.log({
         email: dbUser?.email,
         phone: profile?.phone,
@@ -244,9 +244,9 @@ export default function OnboardingStep1Screen() {
         activity_level: profile?.activity_level,
         supabaseUserId: dbUser?.id,
       });
-      console.log("=== FIN LOADUSERDATA ===");
+      console.log("=== END LOADUSERDATA ===");
     } catch (error) {
-      console.error("❌ ERROR en loadUserData:", error);
+      console.error("❌ ERROR in loadUserData:", error);
       console.error("Error details:", {
         message: error.message,
         stack: error.stack,

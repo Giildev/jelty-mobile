@@ -235,10 +235,10 @@ export function decryptUserFields(
     "country_code",
   ];
 
-  // Campos que deben ser strings (no números) después de desencriptar
+  // Fields that must be strings (not numbers) after decryption
   const stringFields = ["phone", "zip_code", "country_code"];
 
-  // Campos numéricos que deben parsearse como number
+  // Numeric fields that must be parsed as number
   const numericFields = ["height_cm", "weight_kg", "bodyfat_percentage"];
 
   fieldsToDecrypt.forEach((field) => {

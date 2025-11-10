@@ -37,7 +37,7 @@ export function TimeframeDropdown({
   value,
   onChange,
   error,
-  placeholder = "Selecciona el tiempo para lograr tu objetivo",
+  placeholder = "Select timeframe to achieve your goal",
 }: TimeframeDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 

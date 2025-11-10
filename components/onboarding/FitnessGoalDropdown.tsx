@@ -34,7 +34,7 @@ export function FitnessGoalDropdown({
   value,
   onChange,
   error,
-  placeholder = "Selecciona tu objetivo principal",
+  placeholder = "Select your primary goal",
 }: FitnessGoalDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 

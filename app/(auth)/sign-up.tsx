@@ -14,7 +14,7 @@ import { useUserStore } from "@/store/userStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
- * Pantalla de registro con formulario completo y verificación de email
+ * Sign up screen with complete form and email verification
  */
 export default function SignUpScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
@@ -53,18 +53,18 @@ export default function SignUpScreen() {
     setSignUpError(null);
 
     try {
-      // Paso 1: Crear el usuario en Clerk
+      // Step 1: Create the user in Clerk
       await signUp.create({
         emailAddress: data.email,
         password: data.password,
       });
 
-      // Paso 2: Solicitar envío de código de verificación
+      // Step 2: Request verification code
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
       });
 
-      // Paso 3: Guardar datos del formulario, email y mostrar modal de verificación
+      // Step 3: Save form data, email and show verification modal
       setFormData(data);
       setUserEmail(data.email);
       setShowVerifyModal(true);
@@ -75,7 +75,7 @@ export default function SignUpScreen() {
       const errorCode = error.errors?.[0]?.code;
       const errorMessage = error.errors?.[0]?.message || error.errors?.[0]?.longMessage;
 
-      // Manejar rate limiting de Clerk
+      // Handle Clerk rate limiting
       if (errorCode === 'form_identifier_exists' || errorMessage?.includes('already exists')) {
         setSignUpError("This email is already registered. Please sign in instead.");
       } else if (errorMessage?.includes('too many requests') || errorMessage?.includes('rate limit')) {
@@ -93,30 +93,30 @@ export default function SignUpScreen() {
     if (!isLoaded || !formData) return;
 
     try {
-      // Paso 1: Intentar verificar el código
+      // Step 1: Attempt to verify the code
       const result = await signUp.attemptEmailAddressVerification({
         code,
       });
 
-      // Si la verificación es exitosa
+      // If verification is successful
       if (result.status === "complete") {
-        // Paso 2: Activar la sesión
+        // Step 2: Activate the session
         await setActive({ session: result.createdSessionId });
 
-        // Paso 3: Guardar datos adicionales en Supabase
+        // Step 3: Save additional data in Supabase
         const clerkUserId = result.createdUserId;
         let supabaseUserId: string | null = null;
 
         if (clerkUserId) {
           try {
-            console.log("Intentando crear usuario en Supabase con datos:", {
+            console.log("Attempting to create user in Supabase with data:", {
               clerk_user_id: clerkUserId,
               email: formData.email,
               phone: formData.phone,
               country: formData.country,
             });
 
-            // Crear usuario en Supabase con datos del formulario
+            // Create user in Supabase with form data
             const { user, profile } = await createUser({
               clerk_user_id: clerkUserId,
               email: formData.email,
@@ -130,23 +130,23 @@ export default function SignUpScreen() {
 
             supabaseUserId = user.id;
 
-            // Guardar el Supabase user.id en AsyncStorage para usar en onboarding
+            // Save Supabase user.id in AsyncStorage for use in onboarding
             await AsyncStorage.setItem("supabase_user_id", user.id);
 
-            console.log("✅ Usuario guardado en Supabase exitosamente", {
+            console.log("✅ User successfully saved in Supabase", {
               supabaseUserId: user.id,
               email: user.email,
               profileId: profile.user_id,
             });
           } catch (supabaseError: any) {
-            console.error("❌ Error guardando en Supabase:", supabaseError);
+            console.error("❌ Error saving in Supabase:", supabaseError);
             console.error("❌ Error message:", supabaseError?.message);
             console.error("❌ Error details:", JSON.stringify(supabaseError, null, 2));
-            // Continuar sin UUID de Supabase - se creará en onboarding
+            // Continue without Supabase UUID - will be created in onboarding
           }
         }
 
-        // Actualizar store de Zustand con datos completos
+        // Update Zustand store with complete data
         setUser({
           id: clerkUserId,
           supabaseUserId: supabaseUserId || undefined,
@@ -157,15 +157,15 @@ export default function SignUpScreen() {
           countryCode: formData.countryCode,
         });
 
-        // Paso 4: Cerrar modal y redirigir al onboarding index (loading screen)
+        // Step 4: Close modal and redirect to onboarding index (loading screen)
         setShowVerifyModal(false);
         router.replace("/(onboarding)");
       } else {
-        // Si el status no es complete, lanzar error
+        // If status is not complete, throw error
         throw new Error("Verification incomplete");
       }
     } catch (err: unknown) {
-      // Re-lanzar el error para que el modal lo maneje
+      // Re-throw the error for the modal to handle
       throw err;
     }
   };
@@ -174,7 +174,7 @@ export default function SignUpScreen() {
     if (!isLoaded) return;
 
     try {
-      // Reenviar código de verificación
+      // Resend verification code
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
       });

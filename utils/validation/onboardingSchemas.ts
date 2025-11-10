@@ -8,25 +8,25 @@ export const personalInfoSchema = z.object({
   // Basic information
   first_name: z
     .string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder 50 caracteres"),
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name cannot exceed 50 characters"),
   last_name: z
     .string()
-    .min(2, "El apellido debe tener al menos 2 caracteres")
-    .max(50, "El apellido no puede exceder 50 caracteres"),
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name cannot exceed 50 characters"),
 
   // Contact (pre-populated, validation for consistency)
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Invalid email"),
   phone: z
     .string()
-    .regex(/^[0-9]{10,15}$/, "El teléfono debe tener entre 10 y 15 dígitos"),
+    .regex(/^[0-9]{10,15}$/, "Phone must be between 10 and 15 digits"),
 
   // Birth date
   birth_date: z
     .string()
     .regex(
       /^\d{2}\/\d{2}\/\d{4}$/,
-      "La fecha debe estar en formato dd/mm/yyyy"
+      "Date must be in dd/mm/yyyy format"
     )
     .refine(
       (dateStr) => {
@@ -36,30 +36,30 @@ export const personalInfoSchema = z.object({
         const age = today.getFullYear() - date.getFullYear();
         return age >= 13 && age <= 120;
       },
-      { message: "Debes tener al menos 13 años" }
+      { message: "You must be at least 13 years old" }
     ),
 
   // Gender
   gender: z.enum(["male", "female", "other", "prefer_not_to_say"], {
-    errorMap: () => ({ message: "Selecciona una opción de género" }),
+    errorMap: () => ({ message: "Select a gender option" }),
   }),
 
   // Physical information
   measurement_system: z.enum(["metric", "imperial"], {
-    errorMap: () => ({ message: "Selecciona un sistema de medición" }),
+    errorMap: () => ({ message: "Select a measurement system" }),
   }),
   height_cm: z
     .number()
-    .min(100, "La altura debe ser al menos 100 cm")
-    .max(250, "La altura no puede exceder 250 cm"),
+    .min(100, "Height must be at least 100 cm")
+    .max(250, "Height cannot exceed 250 cm"),
   weight_kg: z
     .number()
-    .min(30, "El peso debe ser al menos 30 kg")
-    .max(300, "El peso no puede exceder 300 kg"),
+    .min(30, "Weight must be at least 30 kg")
+    .max(300, "Weight cannot exceed 300 kg"),
   bodyfat_percentage: z
     .number()
-    .min(3, "El porcentaje de grasa corporal debe ser al menos 3%")
-    .max(60, "El porcentaje de grasa corporal no puede exceder 60%")
+    .min(3, "Body fat percentage must be at least 3%")
+    .max(60, "Body fat percentage cannot exceed 60%")
     .optional()
     .nullable(),
 
@@ -73,25 +73,25 @@ export const personalInfoSchema = z.object({
       "extra_active",
     ],
     {
-      errorMap: () => ({ message: "Selecciona tu nivel de actividad" }),
+      errorMap: () => ({ message: "Select your activity level" }),
     }
   ),
 
   // Location
-  country: z.string().min(2, "Selecciona tu país"),
-  country_code: z.string().min(1, "Código de país requerido"),
+  country: z.string().min(2, "Select your country"),
+  country_code: z.string().min(1, "Country code required"),
   city: z
     .string()
-    .min(2, "La ciudad debe tener al menos 2 caracteres")
-    .max(100, "La ciudad no puede exceder 100 caracteres"),
+    .min(2, "City must be at least 2 characters")
+    .max(100, "City cannot exceed 100 characters"),
   address: z
     .string()
-    .min(5, "La dirección debe tener al menos 5 caracteres")
-    .max(200, "La dirección no puede exceder 200 caracteres"),
+    .min(5, "Address must be at least 5 characters")
+    .max(200, "Address cannot exceed 200 characters"),
   zip_code: z
     .string()
-    .min(3, "El código postal debe tener al menos 3 caracteres")
-    .max(10, "El código postal no puede exceder 10 caracteres"),
+    .min(3, "ZIP code must be at least 3 characters")
+    .max(10, "ZIP code cannot exceed 10 characters"),
 });
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
@@ -128,13 +128,13 @@ export const activityLevelLabels: Record<ActivityLevel, string> = {
 };
 
 /**
- * Gender display names in Spanish
+ * Gender display names
  */
 export const genderLabels: Record<Gender, string> = {
-  male: "Masculino",
-  female: "Femenino",
-  other: "Otro",
-  prefer_not_to_say: "Prefiero no decir",
+  male: "Male",
+  female: "Female",
+  other: "Other",
+  prefer_not_to_say: "Prefer not to say",
 };
 
 /**
@@ -146,7 +146,7 @@ export const fitnessGoalSchema = z.object({
   goal_type: z.enum(
     ["lose_fat", "build_muscle", "improve_health", "increase_performance", "maintain"],
     {
-      errorMap: () => ({ message: "Selecciona tu objetivo principal" }),
+      errorMap: () => ({ message: "Select your primary goal" }),
     }
   ),
 
@@ -163,79 +163,79 @@ export const fitnessGoalSchema = z.object({
       "12_months",
     ],
     {
-      errorMap: () => ({ message: "Selecciona el tiempo para lograr tu objetivo" }),
+      errorMap: () => ({ message: "Select timeframe to achieve your goal" }),
     }
   ),
 
   // Target weight (optional)
   target_weight_kg: z
     .number()
-    .min(30, "El peso objetivo debe ser al menos 30 kg")
-    .max(300, "El peso objetivo no puede exceder 300 kg")
+    .min(30, "Target weight must be at least 30 kg")
+    .max(300, "Target weight cannot exceed 300 kg")
     .optional()
     .nullable(),
 
   // Target body fat percentage (optional)
   target_bodyfat_pct: z
     .number()
-    .min(3, "El porcentaje de grasa corporal debe ser al menos 3%")
-    .max(60, "El porcentaje de grasa corporal no puede exceder 60%")
+    .min(3, "Body fat percentage must be at least 3%")
+    .max(60, "Body fat percentage cannot exceed 60%")
     .optional()
     .nullable(),
 
   // Current body measurements (all optional)
   chest_cm: z
     .number()
-    .min(50, "La medida debe ser al menos 50 cm")
-    .max(200, "La medida no puede exceder 200 cm")
+    .min(50, "Measurement must be at least 50 cm")
+    .max(200, "Measurement cannot exceed 200 cm")
     .optional()
     .nullable(),
   waist_cm: z
     .number()
-    .min(40, "La medida debe ser al menos 40 cm")
-    .max(200, "La medida no puede exceder 200 cm")
+    .min(40, "Measurement must be at least 40 cm")
+    .max(200, "Measurement cannot exceed 200 cm")
     .optional()
     .nullable(),
   hips_cm: z
     .number()
-    .min(50, "La medida debe ser al menos 50 cm")
-    .max(200, "La medida no puede exceder 200 cm")
+    .min(50, "Measurement must be at least 50 cm")
+    .max(200, "Measurement cannot exceed 200 cm")
     .optional()
     .nullable(),
   biceps_cm: z
     .number()
-    .min(15, "La medida debe ser al menos 15 cm")
-    .max(80, "La medida no puede exceder 80 cm")
+    .min(15, "Measurement must be at least 15 cm")
+    .max(80, "Measurement cannot exceed 80 cm")
     .optional()
     .nullable(),
   thighs_cm: z
     .number()
-    .min(30, "La medida debe ser al menos 30 cm")
-    .max(120, "La medida no puede exceder 120 cm")
+    .min(30, "Measurement must be at least 30 cm")
+    .max(120, "Measurement cannot exceed 120 cm")
     .optional()
     .nullable(),
   neck_cm: z
     .number()
-    .min(20, "La medida debe ser al menos 20 cm")
-    .max(60, "La medida no puede exceder 60 cm")
+    .min(20, "Measurement must be at least 20 cm")
+    .max(60, "Measurement cannot exceed 60 cm")
     .optional()
     .nullable(),
   shoulders_cm: z
     .number()
-    .min(70, "La medida debe ser al menos 70 cm")
-    .max(180, "La medida no puede exceder 180 cm")
+    .min(70, "Measurement must be at least 70 cm")
+    .max(180, "Measurement cannot exceed 180 cm")
     .optional()
     .nullable(),
   forearms_cm: z
     .number()
-    .min(15, "La medida debe ser al menos 15 cm")
-    .max(60, "La medida no puede exceder 60 cm")
+    .min(15, "Measurement must be at least 15 cm")
+    .max(60, "Measurement cannot exceed 60 cm")
     .optional()
     .nullable(),
   calves_cm: z
     .number()
-    .min(20, "La medida debe ser al menos 20 cm")
-    .max(80, "La medida no puede exceder 80 cm")
+    .min(20, "Measurement must be at least 20 cm")
+    .max(80, "Measurement cannot exceed 80 cm")
     .optional()
     .nullable(),
 });
@@ -266,7 +266,7 @@ export type GoalTimeframe =
   | "12_months";
 
 /**
- * Fitness goal display names in Spanish
+ * Fitness goal display names
  */
 export const fitnessGoalLabels: Record<FitnessGoalType, string> = {
   lose_fat: "Lose fat",
@@ -297,25 +297,25 @@ export const timeframeLabels: Record<GoalTimeframe, string> = {
 export const healthInfoSchema = z.object({
   // Medical conditions (array of strings, optional)
   medicalConditions: z
-    .array(z.string().min(1, "La condición no puede estar vacía"))
+    .array(z.string().min(1, "Condition cannot be empty"))
     .default([])
     .optional(),
 
   // Current medications (array of strings, optional)
   medications: z
-    .array(z.string().min(1, "El medicamento no puede estar vacío"))
+    .array(z.string().min(1, "Medication cannot be empty"))
     .default([])
     .optional(),
 
   // Previous injuries (array of strings, optional)
   injuries: z
-    .array(z.string().min(1, "La lesión no puede estar vacía"))
+    .array(z.string().min(1, "Injury cannot be empty"))
     .default([])
     .optional(),
 
   // Allergies (array of strings, optional)
   allergies: z
-    .array(z.string().min(1, "La alergia no puede estar vacía"))
+    .array(z.string().min(1, "Allergy cannot be empty"))
     .default([])
     .optional(),
 });
@@ -341,29 +341,29 @@ export const dietaryPreferencesSchema = z.object({
 
   // Ingredients to avoid (array of strings, optional)
   ingredientsToAvoid: z
-    .array(z.string().min(1, "El ingrediente no puede estar vacío"))
+    .array(z.string().min(1, "Ingredient cannot be empty"))
     .default([])
     .optional(),
 
   // Ingredients to include/favorite (array of strings, optional)
   ingredientsToInclude: z
-    .array(z.string().min(1, "El ingrediente no puede estar vacío"))
+    .array(z.string().min(1, "Ingredient cannot be empty"))
     .default([])
     .optional(),
 
   // Meals per day (2-6, optional)
   mealsPerDay: z
     .number()
-    .min(2, "Debes seleccionar al menos 2 comidas por día")
-    .max(6, "No puedes seleccionar más de 6 comidas por día")
+    .min(2, "You must select at least 2 meals per day")
+    .max(6, "You cannot select more than 6 meals per day")
     .optional()
     .nullable(),
 
   // Daily water intake in liters (1-4+, optional)
   waterIntake: z
     .number()
-    .min(1, "Debes seleccionar al menos 1L")
-    .max(5, "No puedes seleccionar más de 5L")
+    .min(1, "You must select at least 1L")
+    .max(5, "You cannot select more than 5L")
     .optional()
     .nullable(),
 });
@@ -407,7 +407,7 @@ export const CUISINE_TYPES = [
 export const exercisePreferencesSchema = z.object({
   // Experience level (single select, required)
   experienceLevel: z.enum(["beginner", "intermediate", "advanced"], {
-    errorMap: () => ({ message: "Selecciona tu nivel de experiencia" }),
+    errorMap: () => ({ message: "Select your experience level" }),
   }),
 
   // Preferred training types (multi-select, optional)
@@ -418,7 +418,7 @@ export const exercisePreferencesSchema = z.object({
 
   // Equipment availability (single select, required)
   equipmentAvailability: z.enum(["none", "home_equipment", "full_gym"], {
-    errorMap: () => ({ message: "Selecciona tu disponibilidad de equipamiento" }),
+    errorMap: () => ({ message: "Select your equipment availability" }),
   }),
 });
 
@@ -435,7 +435,7 @@ export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 export type EquipmentAvailability = "none" | "home_equipment" | "full_gym";
 
 /**
- * Experience level display names in Spanish
+ * Experience level display names
  */
 export const experienceLevelLabels: Record<ExperienceLevel, string> = {
   beginner: "Beginner",
@@ -444,7 +444,7 @@ export const experienceLevelLabels: Record<ExperienceLevel, string> = {
 };
 
 /**
- * Equipment availability display names in Spanish
+ * Equipment availability display names
  */
 export const equipmentAvailabilityLabels: Record<EquipmentAvailability, string> = {
   none: "None",
@@ -472,23 +472,23 @@ export const availabilitySchema = z.object({
   // Days available (multi-select, at least 1 required)
   daysAvailable: z
     .array(z.string())
-    .min(1, "Selecciona al menos un día de la semana")
+    .min(1, "Select at least one day of the week")
     .default([]),
 
   // Time per session in minutes (required)
   timePerSession: z.number({
-    errorMap: () => ({ message: "Selecciona la duración de tu sesión" }),
+    errorMap: () => ({ message: "Select your session duration" }),
   }),
 
   // Preferred time of day (single select, required)
   preferredTimeOfDay: z.enum(["morning", "afternoon", "evening", "flexible"], {
-    errorMap: () => ({ message: "Selecciona tu horario preferido" }),
+    errorMap: () => ({ message: "Select your preferred time" }),
   }),
 
   // Additional notes (optional)
   additionalNotes: z
     .string()
-    .max(500, "Las notas no pueden exceder 500 caracteres")
+    .max(500, "Notes cannot exceed 500 characters")
     .optional()
     .nullable(),
 });
@@ -501,7 +501,7 @@ export type AvailabilityFormData = z.infer<typeof availabilitySchema>;
 export type TimeOfDay = "morning" | "afternoon" | "evening" | "flexible";
 
 /**
- * Time of day display names in Spanish
+ * Time of day display names
  */
 export const timeOfDayLabels: Record<TimeOfDay, string> = {
   morning: "Morning",
@@ -522,23 +522,23 @@ export const SESSION_DURATIONS = [30, 45, 60, 75, 90] as const;
 export const cookingPreferencesSchema = z.object({
   // Cooking skill level (single select, required)
   cookingSkillLevel: z.enum(["beginner", "intermediate", "advanced", "expert"], {
-    errorMap: () => ({ message: "Selecciona tu nivel de habilidad en cocina" }),
+    errorMap: () => ({ message: "Select your cooking skill level" }),
   }),
 
   // Time available to cook per meal (required)
   cookTimeRange: z.enum(["under_15", "15_30", "30_45", "45_60", "over_60"], {
-    errorMap: () => ({ message: "Selecciona el tiempo disponible para cocinar" }),
+    errorMap: () => ({ message: "Select time available to cook" }),
   }),
 
   // Number of people cooking for (required, 1-5)
   cookingForPeople: z
     .number()
-    .min(1, "Debe ser al menos 1 persona")
-    .max(5, "No puede exceder 5 personas"),
+    .min(1, "Must be at least 1 person")
+    .max(5, "Cannot exceed 5 people"),
 
   // Shopping frequency (required)
   shoppingFrequency: z.enum(["weekly", "bi_weekly", "monthly"], {
-    errorMap: () => ({ message: "Selecciona tu frecuencia de compras" }),
+    errorMap: () => ({ message: "Select your shopping frequency" }),
   }),
 });
 

@@ -1,8 +1,8 @@
 /**
  * Jelty Design System Tokens
  *
- * Sistema de diseño centralizado con estética moderna
- * Todos los valores de diseño de la app deben usar estos tokens
+ * Centralized design system with modern aesthetics
+ * All app design values should use these tokens
  */
 
 // ============================================

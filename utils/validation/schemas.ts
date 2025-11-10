@@ -4,37 +4,37 @@ import { z } from "zod";
  * Login schema
  */
 export const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 /**
- * Signup schema con validaciones completas
+ * Signup schema with complete validations
  */
 export const signupSchema = z
   .object({
-    email: z.string().email("Email inválido"),
+    email: z.string().email("Invalid email"),
     phone: z
       .string()
-      .regex(/^[0-9]{10,15}$/, "El teléfono debe tener entre 10 y 15 dígitos"),
-    country: z.string().min(2, "Selecciona tu país"),
-    countryCode: z.string().min(1, "Código de país requerido"),
+      .regex(/^[0-9]{10,15}$/, "Phone must be between 10 and 15 digits"),
+    country: z.string().min(2, "Select your country"),
+    countryCode: z.string().min(1, "Country code required"),
     password: z
       .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .min(8, "Password must be at least 8 characters")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "La contraseña debe contener al menos una mayúscula, una minúscula y un número"
+        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
     confirmPassword: z.string(),
     termsAccepted: z.boolean().refine((val) => val === true, {
-      message: "Debes aceptar los términos y condiciones",
+      message: "You must accept the terms and conditions",
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
@@ -46,10 +46,10 @@ export type SignupFormData = z.infer<typeof signupSchema>;
 export const profileUpdateSchema = z.object({
   name: z
     .string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder 50 caracteres"),
-  email: z.string().email("Email inválido"),
-  avatar: z.string().url("URL inválida").optional(),
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name cannot exceed 50 characters"),
+  email: z.string().email("Invalid email"),
+  avatar: z.string().url("Invalid URL").optional(),
 });
 
 export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>;
@@ -60,12 +60,12 @@ export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>;
 export const createPostSchema = z.object({
   title: z
     .string()
-    .min(1, "El título es requerido")
-    .max(100, "El título no puede exceder 100 caracteres"),
+    .min(1, "Title is required")
+    .max(100, "Title cannot exceed 100 characters"),
   content: z
     .string()
-    .min(1, "El contenido es requerido")
-    .max(1000, "El contenido no puede exceder 1000 caracteres"),
+    .min(1, "Content is required")
+    .max(1000, "Content cannot exceed 1000 characters"),
   tags: z.array(z.string()).optional(),
 });
 
@@ -75,7 +75,7 @@ export type CreatePostFormData = z.infer<typeof createPostSchema>;
  * Forgot password schema
  */
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Invalid email"),
 });
 
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -87,15 +87,15 @@ export const resetPasswordSchema = z
   .object({
     code: z
       .string()
-      .length(6, "El código debe tener 6 dígitos")
-      .regex(/^[0-9]{6}$/, "El código debe contener solo números"),
+      .length(6, "Code must be 6 digits")
+      .regex(/^[0-9]{6}$/, "Code must contain only numbers"),
     password: z
       .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres"),
+      .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
