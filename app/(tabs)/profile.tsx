@@ -3,7 +3,7 @@ import { useUser, useAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
 /**
- * Pantalla de perfil de usuario
+ * User profile screen
  */
 export default function ProfileScreen() {
   const { user } = useUser();
@@ -15,7 +15,7 @@ export default function ProfileScreen() {
       await signOut();
       router.replace("/(auth)/sign-in");
     } catch (error) {
-      Alert.alert("Error", "No se pudo cerrar sesión");
+      Alert.alert("Error", "Could not sign out");
     }
   };
 
@@ -29,7 +29,7 @@ export default function ProfileScreen() {
         </View>
 
         <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-          {user?.fullName || "Usuario"}
+          {user?.fullName || "User"}
         </Text>
         <Text className="mt-2 text-gray-600 dark:text-gray-400">
           {user?.primaryEmailAddress?.emailAddress}
@@ -39,7 +39,7 @@ export default function ProfileScreen() {
       <View className="mt-8">
         <View className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
           <Text className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-            Nombre
+            First Name
           </Text>
           <Text className="text-base text-gray-900 dark:text-white">
             {user?.firstName || "N/A"}
@@ -48,7 +48,7 @@ export default function ProfileScreen() {
 
         <View className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
           <Text className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-            Apellido
+            Last Name
           </Text>
           <Text className="text-base text-gray-900 dark:text-white">
             {user?.lastName || "N/A"}
@@ -71,7 +71,7 @@ export default function ProfileScreen() {
           onPress={handleSignOut}
         >
           <Text className="text-center text-base font-semibold text-white">
-            Cerrar sesión
+            Sign Out
           </Text>
         </Pressable>
       </View>

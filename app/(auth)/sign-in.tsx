@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 /**
- * Pantalla de inicio de sesión
+ * Sign in screen
  */
 export default function SignInScreen() {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -72,12 +72,12 @@ export default function SignInScreen() {
         console.log("Redirecting to home");
         router.replace("/(tabs)");
       } else if (completeSignIn.status === "needs_identifier") {
-        setErrorMessage("Se requiere verificación adicional");
+        setErrorMessage("Additional verification required");
       } else if (completeSignIn.status === "needs_first_factor") {
-        setErrorMessage("Se requiere autenticación de dos factores");
+        setErrorMessage("Two-factor authentication required");
       } else {
         console.log("Unexpected status:", completeSignIn.status);
-        setErrorMessage("Error al iniciar sesión. Por favor, intenta nuevamente.");
+        setErrorMessage("Error signing in. Please try again.");
       }
     } catch (err: unknown) {
       console.log("Sign in error:", err);
@@ -102,15 +102,15 @@ export default function SignInScreen() {
         // If session exists, sign out and ask user to try again
         try {
           await signOut();
-          setErrorMessage("Se cerró la sesión anterior. Por favor, intenta nuevamente.");
+          setErrorMessage("Previous session closed. Please try again.");
         } catch {
-          setErrorMessage("Ya existe una sesión activa. Por favor, recarga la app.");
+          setErrorMessage("An active session already exists. Please reload the app.");
         }
       } else if (errorMsg) {
         // Show the message from Clerk directly
         setErrorMessage(errorMsg);
       } else {
-        setErrorMessage("Error al iniciar sesión. Por favor, intenta nuevamente.");
+        setErrorMessage("Error signing in. Please try again.");
       }
     } finally {
       setLoading(false);

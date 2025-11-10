@@ -1,61 +1,61 @@
 # Jelty - React Native + Expo App
 
-Aplicación móvil construida con React Native, Expo y un stack moderno de desarrollo.
+Mobile application built with React Native, Expo and a modern development stack.
 
-## Stack Tecnológico
+## Technology Stack
 
 ### Core
-- **React Native** con **Expo SDK 54**
+- **React Native** with **Expo SDK 54**
 - **TypeScript** (strict mode)
 - **Expo Router** (file-based routing v4)
 - **Metro bundler**
 
-### Estilos
-- **NativeWind v4** (Tailwind CSS para React Native)
-- **React Native Reanimated** (animaciones)
+### Styling
+- **NativeWind v4** (Tailwind CSS for React Native)
+- **React Native Reanimated** (animations)
 - Dark mode support (light/dark/system)
 
-### Estado y Datos
-- **Zustand** (state management global con persist)
-- **AsyncStorage** (persistencia local)
-- **React Hook Form** + **Zod** (formularios con validación)
+### State and Data
+- **Zustand** (global state management with persist)
+- **AsyncStorage** (local persistence)
+- **React Hook Form** + **Zod** (forms with validation)
 
-### Autenticación
+### Authentication
 - **Clerk** (@clerk/clerk-expo)
-- **expo-secure-store** (almacenamiento seguro)
+- **expo-secure-store** (secure storage)
 
 ### Networking
-- **Axios** (HTTP client con interceptors)
+- **Axios** (HTTP client with interceptors)
 
-### Iconos
+### Icons
 - **@expo/vector-icons**
 
 ### Development Tools
 - **ESLint** + **Prettier**
-- **SuperClaude Framework** (asistente de desarrollo mejorado)
+- **SuperClaude Framework** (enhanced development assistant)
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 jelty/
 ├── app/                      # Expo Router (file-based routing)
-│   ├── (auth)/              # Rutas públicas de autenticación
+│   ├── (auth)/              # Public authentication routes
 │   │   ├── sign-in.tsx
 │   │   ├── sign-up.tsx
 │   │   └── _layout.tsx
-│   ├── (tabs)/              # Rutas protegidas con tabs
+│   ├── (tabs)/              # Protected routes with tabs
 │   │   ├── index.tsx        # Home
-│   │   ├── profile.tsx      # Perfil
-│   │   ├── settings.tsx     # Configuración
+│   │   ├── profile.tsx      # Profile
+│   │   ├── settings.tsx     # Settings
 │   │   └── _layout.tsx
 │   └── _layout.tsx          # Root layout (ClerkProvider)
 │
 ├── components/
-│   ├── ui/                  # Componentes UI base
+│   ├── ui/                  # Base UI components
 │   │   ├── Button.tsx
 │   │   ├── Input.tsx
 │   │   └── Card.tsx
-│   └── forms/               # Componentes de formularios
+│   └── forms/               # Form components
 │
 ├── hooks/                   # Custom hooks
 │   ├── useColorScheme.ts
@@ -69,7 +69,7 @@ jelty/
 │   │   ├── client.ts        # Axios instance
 │   │   └── endpoints.ts
 │   └── storage/
-│       └── secureStorage.ts # Token cache para Clerk
+│       └── secureStorage.ts # Token cache for Clerk
 │
 ├── types/                   # TypeScript definitions
 │   └── api.ts
@@ -82,131 +82,131 @@ jelty/
     └── config.ts
 ```
 
-## Configuración Inicial
+## Initial Setup
 
-### 1. Variables de Entorno
+### 1. Environment Variables
 
-Crea o edita el archivo `.env` y agrega tu Clerk Publishable Key:
+Create or edit the `.env` file and add your Clerk Publishable Key:
 
 ```bash
-EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_tu_clave_aqui
-EXPO_PUBLIC_API_URL=https://tu-api.com
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+EXPO_PUBLIC_API_URL=https://your-api.com
 EXPO_PUBLIC_ENV=development
 ```
 
-**Importante:** Para obtener tu Clerk Publishable Key:
-1. Ve a [clerk.com](https://clerk.com) y crea una cuenta
-2. Crea una nueva aplicación
-3. En el dashboard, ve a "API Keys"
-4. Copia la "Publishable Key" al archivo `.env`
+**Important:** To get your Clerk Publishable Key:
+1. Go to [clerk.com](https://clerk.com) and create an account
+2. Create a new application
+3. In the dashboard, go to "API Keys"
+4. Copy the "Publishable Key" to the `.env` file
 
-### 2. Instalar Dependencias
+### 2. Install Dependencies
 
-Las dependencias ya están instaladas, pero si necesitas reinstalar:
+Dependencies are already installed, but if you need to reinstall:
 
 ```bash
 npm install
 ```
 
-### 3. Iniciar el Proyecto
+### 3. Start the Project
 
 ```bash
 npm start
 ```
 
-O para plataformas específicas:
+Or for specific platforms:
 
 ```bash
 npm run android  # Android
-npm run ios      # iOS (solo macOS)
+npm run ios      # iOS (macOS only)
 npm run web      # Web
 ```
 
-## Características Principales
+## Main Features
 
-### Autenticación con Clerk
+### Authentication with Clerk
 - ✅ Sign in / Sign up
-- ✅ Protección de rutas
-- ✅ Sesiones seguras con expo-secure-store
+- ✅ Route protection
+- ✅ Secure sessions with expo-secure-store
 - ✅ Logout
 
-### Navegación
-- ✅ File-based routing con Expo Router
-- ✅ Tabs navigation (Home, Perfil, Configuración)
-- ✅ Stack navigation dentro de cada tab
-- ✅ Protección de rutas autenticadas
+### Navigation
+- ✅ File-based routing with Expo Router
+- ✅ Tabs navigation (Home, Profile, Settings)
+- ✅ Stack navigation within each tab
+- ✅ Protected authenticated routes
 
-### Estilos
+### Styling
 - ✅ NativeWind (Tailwind CSS)
-- ✅ Dark mode completo (light/dark/system)
-- ✅ Componentes UI reutilizables
+- ✅ Complete dark mode (light/dark/system)
+- ✅ Reusable UI components
 - ✅ Responsive design
 
-### Estado y Formularios
-- ✅ Zustand con persistencia
-- ✅ React Hook Form + Zod para validación
-- ✅ API client configurado con Axios
-- ✅ Custom hooks para API calls
+### State and Forms
+- ✅ Zustand with persistence
+- ✅ React Hook Form + Zod for validation
+- ✅ API client configured with Axios
+- ✅ Custom hooks for API calls
 
-## Comandos Útiles
+## Useful Commands
 
 ```bash
-# Desarrollo
-npm start                    # Iniciar dev server
-npm run android             # Abrir en Android
-npm run ios                 # Abrir en iOS
-npm run web                 # Abrir en navegador
+# Development
+npm start                    # Start dev server
+npm run android             # Open on Android
+npm run ios                 # Open on iOS
+npm run web                 # Open in browser
 
 # Code Quality
-npm run lint                # Ejecutar ESLint
-npm run format              # Formatear con Prettier
+npm run lint                # Run ESLint
+npm run format              # Format with Prettier
 
-# Build (requiere configuración de EAS)
+# Build (requires EAS configuration)
 npx eas build --platform android
 npx eas build --platform ios
 ```
 
-## Convenciones de Código
+## Code Conventions
 
 ### TypeScript
-- Usar tipos estrictos (strict mode habilitado)
-- Definir interfaces para todos los props
-- Usar `z.infer<typeof schema>` para tipos desde Zod
+- Use strict types (strict mode enabled)
+- Define interfaces for all props
+- Use `z.infer<typeof schema>` for types from Zod
 
-### Componentes
-- Functional components con hooks
-- Usar React.memo cuando sea necesario
-- Nombrar en PascalCase
+### Components
+- Functional components with hooks
+- Use React.memo when necessary
+- Name in PascalCase
 
-### Estilos
-- Usar NativeWind en lugar de StyleSheet
-- Formato: `className="bg-white dark:bg-gray-900"`
-- Usar variantes dark para todos los componentes
+### Styling
+- Use NativeWind instead of StyleSheet
+- Format: `className="bg-white dark:bg-gray-900"`
+- Use dark variants for all components
 
-### Formularios
-- React Hook Form con zodResolver
-- Schemas en `utils/validation/schemas.ts`
-- Mostrar errores bajo cada campo
+### Forms
+- React Hook Form with zodResolver
+- Schemas in `utils/validation/schemas.ts`
+- Show errors under each field
 
-## Próximos Pasos
+## Next Steps
 
-1. **Configurar Clerk**: Agrega tu Publishable Key al archivo `.env`
-2. **Personalizar**: Modifica colores en `tailwind.config.js`
-3. **Agregar Features**: Usa los componentes y hooks existentes
-4. **Conectar API**: Configura endpoints en `services/api/endpoints.ts`
-5. **Testing**: Agrega tests con Jest y React Native Testing Library
+1. **Configure Clerk**: Add your Publishable Key to the `.env` file
+2. **Customize**: Modify colors in `tailwind.config.js`
+3. **Add Features**: Use existing components and hooks
+4. **Connect API**: Configure endpoints in `services/api/endpoints.ts`
+5. **Testing**: Add tests with Jest and React Native Testing Library
 
 ## SuperClaude Framework
 
-Este proyecto incluye SuperClaude Framework para asistencia de desarrollo mejorada. Los comandos disponibles incluyen:
+This project includes SuperClaude Framework for enhanced development assistance. Available commands include:
 
-- `/agent` - Ejecutar agentes especializados
-- `/research` - Investigación profunda con búsqueda web
-- `/index-repo` - Indexar el repositorio (optimización de tokens)
+- `/agent` - Run specialized agents
+- `/research` - Deep research with web search
+- `/index-repo` - Index the repository (token optimization)
 
-Para más información: https://github.com/SuperClaude-Org/SuperClaude_Framework
+For more information: https://github.com/SuperClaude-Org/SuperClaude_Framework
 
-## Recursos
+## Resources
 
 - [Expo Docs](https://docs.expo.dev/)
 - [Expo Router](https://docs.expo.dev/router/introduction/)
@@ -216,10 +216,10 @@ Para más información: https://github.com/SuperClaude-Org/SuperClaude_Framework
 - [React Hook Form](https://react-hook-form.com/)
 - [Zod](https://zod.dev/)
 
-## Soporte
+## Support
 
-Para problemas o preguntas, consulta la documentación oficial de cada tecnología o revisa el archivo `.claude/CLAUDE.md` para convenciones específicas del proyecto.
+For issues or questions, consult the official documentation for each technology or review the `.claude/CLAUDE.md` file for project-specific conventions.
 
 ---
 
-**¡Feliz desarrollo! 🚀**
+**Happy coding! 🚀**

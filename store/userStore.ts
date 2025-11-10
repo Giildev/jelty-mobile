@@ -6,13 +6,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  * User type definition
  */
 export interface User {
-  id: string;
+  id: string; // Clerk user ID
+  supabaseUserId?: string; // Supabase user_user.id (UUID) - cached for quick access
   email: string;
   name: string;
   avatar?: string;
   phone?: string;
   country?: string;
   countryCode?: string;
+  // Onboarding fields
+  firstName?: string;
+  lastName?: string;
+  birthDate?: string;
+  gender?: string;
+  city?: string;
+  address?: string;
+  zipCode?: string;
+  heightCm?: number;
+  weightKg?: number;
+  bodyfatPercentage?: number;
+  measurementSystem?: "metric" | "imperial";
+  activityLevel?: string;
+  onboardingCompleted?: boolean;
 }
 
 /**

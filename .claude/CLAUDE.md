@@ -1,116 +1,116 @@
 # Jelty Project - Claude Code Configuration
 
-## Stack Tecnológico
+## Technology Stack
 
 ### Core
-- **React Native** con **Expo** (SDK 52+)
+- **React Native** with **Expo** (SDK 52+)
 - **TypeScript** (strict mode)
 - **Expo Router** (file-based routing v4)
 - **Metro bundler** (React Native)
 
-### Estilos
-- **NativeWind v4** (Tailwind CSS para React Native)
-- **React Native Reanimated** (animaciones)
+### Styling
+- **NativeWind v4** (Tailwind CSS for React Native)
+- **React Native Reanimated** (animations)
 - Dark mode support (light/dark/system)
 
-### Estado y Datos
-- **Zustand** (state management global)
-- **AsyncStorage** (persistencia local)
-- **React Hook Form** (manejo de formularios)
-- **Zod** (validación de schemas)
+### State and Data
+- **Zustand** (global state management)
+- **AsyncStorage** (local persistence)
+- **React Hook Form** (form handling)
+- **Zod** (schema validation)
 
-### Autenticación
+### Authentication
 - **Clerk** (@clerk/clerk-expo)
-- **expo-secure-store** (almacenamiento seguro de tokens)
+- **expo-secure-store** (secure token storage)
 
-### API y Networking
-- **Axios** (HTTP client con interceptors)
-- Base URL configurada via env variables
+### API and Networking
+- **Axios** (HTTP client with interceptors)
+- Base URL configured via env variables
 
-### Navegación
+### Navigation
 - **Expo Router** file-based routing
-- Arquitectura: **Tabs + Stack**
-- Grupos de rutas:
-  - `(auth)`: Rutas públicas (sign-in, sign-up)
-  - `(tabs)`: Rutas protegidas con tabs (home, profile, settings)
+- Architecture: **Tabs + Stack**
+- Route groups:
+  - `(auth)`: Public routes (sign-in, sign-up)
+  - `(tabs)`: Protected routes with tabs (home, profile, settings)
 
-### Icons y Assets
+### Icons and Assets
 - **@expo/vector-icons**
 
 ### Development Tools
 - **ESLint** (TypeScript + Prettier integration)
 - **Prettier** (code formatting)
 
-## Convenciones de Código
+## Code Conventions
 
 ### TypeScript
-- Usar `strict: true` en tsconfig
-- Definir types para todos los estados de Zustand
-- Usar `z.infer<typeof schema>` para tipos desde Zod schemas
-- Evitar `any`, usar `unknown` cuando no se conozca el tipo
-- Path aliases: `@/*` para importaciones desde la raíz
+- Use `strict: true` in tsconfig
+- Define types for all Zustand states
+- Use `z.infer<typeof schema>` for types from Zod schemas
+- Avoid `any`, use `unknown` when type is unknown
+- Path aliases: `@/*` for imports from root
 
-### Componentes
-- **Functional components** con hooks únicamente
-- Usar React.memo para componentes que no cambian frecuentemente
-- Implementar `useMemo` y `useCallback` donde sea necesario
-- Nombrar componentes en PascalCase
-- Un componente por archivo (excepto componentes pequeños relacionados)
+### Components
+- **Functional components** with hooks only
+- Use React.memo for components that don't change frequently
+- Implement `useMemo` and `useCallback` where necessary
+- Name components in PascalCase
+- One component per file (except small related components)
 
-### Estilos
-- **NativeWind** en lugar de StyleSheet
-- Formato: `className="bg-white dark:bg-gray-900"`
-- Usar variantes dark: `dark:bg-gray-800`, `dark:text-white`
-- Evitar estilos inline cuando sea posible
-- Responsive con breakpoints de Tailwind
+### Styling
+- **NativeWind** instead of StyleSheet
+- Format: `className="bg-white dark:bg-gray-900"`
+- Use dark variants: `dark:bg-gray-800`, `dark:text-white`
+- Avoid inline styles when possible
+- Responsive with Tailwind breakpoints
 
-### Formularios
-- Usar React Hook Form con zodResolver
-- Definir schemas en `utils/validation/schemas.ts`
-- Controller component para inputs controlados
-- Mostrar errores de validación bajo cada campo
+### Forms
+- Use React Hook Form with zodResolver
+- Define schemas in `utils/validation/schemas.ts`
+- Controller component for controlled inputs
+- Show validation errors under each field
 
-### Estado Global (Zustand)
-- Stores modulares por dominio (auth, user, cart, etc.)
-- Usar persist middleware con AsyncStorage para datos que necesitan persistir
-- Definir tipos TypeScript para cada store
-- Acciones como funciones dentro del store
+### Global State (Zustand)
+- Modular stores by domain (auth, user, cart, etc.)
+- Use persist middleware with AsyncStorage for data that needs to persist
+- Define TypeScript types for each store
+- Actions as functions within the store
 
-### Manejo de Errores
-- Try-catch en todas las llamadas async
-- Mostrar mensajes de error user-friendly
-- Logging en desarrollo, silent en producción
-- Usar error boundaries para errores de React
+### Error Handling
+- Try-catch in all async calls
+- Show user-friendly error messages
+- Logging in development, silent in production
+- Use error boundaries for React errors
 
-### Nomenclatura
-- **Componentes**: PascalCase (`UserProfile.tsx`)
-- **Hooks**: camelCase con prefijo use (`useAuth.ts`)
+### Naming
+- **Components**: PascalCase (`UserProfile.tsx`)
+- **Hooks**: camelCase with use prefix (`useAuth.ts`)
 - **Utilities**: camelCase (`formatDate.ts`)
 - **Types**: PascalCase (`User.ts`, `AuthState.ts`)
-- **Constants**: UPPER_SNAKE_CASE en `constants/`
+- **Constants**: UPPER_SNAKE_CASE in `constants/`
 
-## Arquitectura
+## Architecture
 
-### Estructura de Carpetas
+### Folder Structure
 
 ```
 jelty/
 ├── app/                          # Expo Router (file-based routing)
-│   ├── (auth)/                   # Grupo: Rutas públicas
+│   ├── (auth)/                   # Group: Public routes
 │   │   ├── _layout.tsx
 │   │   ├── sign-in.tsx
 │   │   └── sign-up.tsx
-│   ├── (tabs)/                   # Grupo: Rutas protegidas con tabs
-│   │   ├── _layout.tsx           # Configuración de tabs
+│   ├── (tabs)/                   # Group: Protected routes with tabs
+│   │   ├── _layout.tsx           # Tabs configuration
 │   │   ├── index.tsx             # Tab: Home
-│   │   ├── profile.tsx           # Tab: Perfil
-│   │   └── settings.tsx          # Tab: Configuración
+│   │   ├── profile.tsx           # Tab: Profile
+│   │   └── settings.tsx          # Tab: Settings
 │   ├── _layout.tsx               # Root layout (providers)
 │   └── +not-found.tsx
 │
-├── components/                   # Componentes reutilizables
-│   ├── ui/                       # Componentes UI base
-│   └── forms/                    # Componentes de formularios
+├── components/                   # Reusable components
+│   ├── ui/                       # Base UI components
+│   └── forms/                    # Form components
 │
 ├── hooks/                        # Custom hooks
 │   ├── useAuth.ts
@@ -122,7 +122,7 @@ jelty/
 │   ├── userStore.ts
 │   └── index.ts
 │
-├── services/                     # Servicios y API clients
+├── services/                     # Services and API clients
 │   ├── api/
 │   │   ├── client.ts             # Axios instance
 │   │   ├── endpoints.ts
@@ -135,46 +135,46 @@ jelty/
 │   ├── user.ts
 │   └── api.ts
 │
-├── utils/                        # Utilidades
+├── utils/                        # Utilities
 │   ├── validation/
 │   │   └── schemas.ts            # Zod schemas
 │   └── helpers.ts
 │
-├── constants/                    # Constantes
+├── constants/                    # Constants
 │   ├── colors.ts
 │   └── config.ts
 │
-└── assets/                       # Assets estáticos
+└── assets/                       # Static assets
     ├── images/
     └── fonts/
 ```
 
-### Flujo de Autenticación
+### Authentication Flow
 
-1. Usuario accede a la app
-2. Root layout (_layout.tsx) envuelve con ClerkProvider
-3. Layout de tabs verifica autenticación con `useAuth()`
-4. Si no autenticado → Redirect a `/(auth)/sign-in`
-5. Si autenticado → Muestra tabs protegidos
-6. Token de Clerk se almacena en expo-secure-store via tokenCache
+1. User accesses the app
+2. Root layout (_layout.tsx) wraps with ClerkProvider
+3. Tabs layout verifies authentication with `useAuth()`
+4. If not authenticated → Redirect to `/(auth)/sign-in`
+5. If authenticated → Show protected tabs
+6. Clerk token stored in expo-secure-store via tokenCache
 
-### Flujo de Datos
+### Data Flow
 
 1. **API Calls**:
    - `useApi` hook → axios client → interceptors (add auth token)
-   - Respuesta se almacena en estado local o Zustand
+   - Response stored in local state or Zustand
 
-2. **Estado Local vs Global**:
-   - Local: useState, useReducer para estado específico de componente
-   - Global: Zustand para estado compartido (user, auth, cart)
+2. **Local vs Global State**:
+   - Local: useState, useReducer for component-specific state
+   - Global: Zustand for shared state (user, auth, cart)
 
-3. **Persistencia**:
+3. **Persistence**:
    - Zustand + persist middleware → AsyncStorage
-   - Datos sensibles → expo-secure-store
+   - Sensitive data → expo-secure-store
 
-## Guías de Desarrollo
+## Development Guidelines
 
-### Crear Nuevo Componente UI
+### Create New UI Component
 
 ```typescript
 // components/ui/Button.tsx
@@ -218,18 +218,18 @@ export function Button({
 }
 ```
 
-### Crear Formulario con Validación
+### Create Form with Validation
 
 ```typescript
 // utils/validation/schemas.ts
 import { z } from "zod";
 
 export const signUpSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(8, "Mínimo 8 caracteres"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Minimum 8 characters"),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
+  message: "Passwords do not match",
   path: ["confirmPassword"],
 });
 
@@ -255,7 +255,7 @@ export function SignUpForm() {
 }
 ```
 
-### Crear Zustand Store
+### Create Zustand Store
 
 ```typescript
 // store/userStore.ts
@@ -290,7 +290,7 @@ export const useUserStore = create<UserState>()(
 );
 ```
 
-### Proteger Rutas
+### Protect Routes
 
 ```typescript
 // app/(tabs)/_layout.tsx
@@ -316,54 +316,54 @@ export default function TabsLayout() {
 }
 ```
 
-## Consideraciones Importantes
+## Important Considerations
 
 ### Performance
-- FlatList con `windowSize` optimizado para listas largas
-- Implementar virtualization con FlashList si >1000 items
-- useMemo para cálculos costosos
-- useCallback para funciones pasadas como props
-- React.memo para componentes puros
-- Lazy loading de imágenes con expo-image
+- FlatList with optimized `windowSize` for long lists
+- Implement virtualization with FlashList if >1000 items
+- useMemo for expensive calculations
+- useCallback for functions passed as props
+- React.memo for pure components
+- Lazy loading of images with expo-image
 
-### Seguridad
-- NUNCA commitear `.env` al repositorio
-- Usar `expo-secure-store` para tokens y datos sensibles
-- Validar siempre en backend, validación client-side es solo UX
-- Sanitizar inputs antes de mostrar
-- Implementar rate limiting en backend
+### Security
+- NEVER commit `.env` to repository
+- Use `expo-secure-store` for tokens and sensitive data
+- Always validate on backend, client-side validation is only UX
+- Sanitize inputs before displaying
+- Implement rate limiting on backend
 
 ### Dark Mode
-- Usar hook `useColorScheme` de NativeWind
-- Todas las pantallas deben soportar dark mode
-- Formato: `className="bg-white dark:bg-gray-900"`
-- Configurar `userInterfaceStyle: "automatic"` en app.json
+- Use `useColorScheme` hook from NativeWind
+- All screens must support dark mode
+- Format: `className="bg-white dark:bg-gray-900"`
+- Configure `userInterfaceStyle: "automatic"` in app.json
 
 ### Expo Specifics
-- Usar `expo-constants` para acceso a env vars
-- Prefijo `EXPO_PUBLIC_` para variables expuestas al cliente
-- npx expo install para dependencias nativas
-- Usar Expo modules cuando sea posible sobre native modules
+- Use `expo-constants` for access to env vars
+- Prefix `EXPO_PUBLIC_` for client-exposed variables
+- npx expo install for native dependencies
+- Use Expo modules when possible over native modules
 
 ### Testing
-- Jest para unit tests
-- React Native Testing Library para component tests
-- Mockar Clerk con `@clerk/testing`
-- Mockar AsyncStorage en tests
-- Coverage mínimo: 70%
+- Jest for unit tests
+- React Native Testing Library for component tests
+- Mock Clerk with `@clerk/testing`
+- Mock AsyncStorage in tests
+- Minimum coverage: 70%
 
-## Variables de Entorno
+## Environment Variables
 
 ```bash
 # .env
 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxx
-EXPO_PUBLIC_API_URL=https://api.ejemplo.com
+EXPO_PUBLIC_API_URL=https://api.example.com
 ```
 
-## Comandos Comunes
+## Common Commands
 
 ```bash
-# Desarrollo
+# Development
 npm start                 # Expo dev server
 npm run android          # Android emulator
 npm run ios              # iOS simulator
@@ -377,7 +377,7 @@ eas build --platform android
 eas build --platform ios
 ```
 
-## Recursos y Documentación
+## Resources and Documentation
 
 - Expo Docs: https://docs.expo.dev/
 - Expo Router: https://docs.expo.dev/router/introduction/
@@ -387,10 +387,10 @@ eas build --platform ios
 - React Hook Form: https://react-hook-form.com/
 - Zod: https://zod.dev/
 
-## Notas Adicionales
+## Additional Notes
 
-- Este es un proyecto de app compleja con múltiples features
-- Priorizar experiencia de usuario y performance
-- Mantener código limpio y bien documentado
-- Seguir principios SOLID y DRY
-- Code reviews obligatorios antes de merge
+- This is a complex app project with multiple features
+- Prioritize user experience and performance
+- Maintain clean and well-documented code
+- Follow SOLID and DRY principles
+- Code reviews mandatory before merge

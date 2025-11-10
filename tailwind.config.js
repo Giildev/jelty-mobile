@@ -204,9 +204,9 @@ module.exports = {
       addUtilities(glassUtilities);
     },
 
-    // Nota: Las sombras personalizadas para React Native deben ser aplicadas
-    // usando StyleSheet.create() con los objetos de constants/tokens/shadows.ts
-    // porque React Native requiere shadowOffset como objeto { width, height },
-    // no como string CSS.
+    // Note: Custom shadows for React Native must be applied
+    // using StyleSheet.create() with the objects from constants/tokens/shadows.ts
+    // because React Native requires shadowOffset as an object { width, height },
+    // not as a CSS string.
   ],
 }
