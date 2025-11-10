@@ -66,8 +66,8 @@ export default function OnboardingStep1Screen() {
       birth_date: "",
       gender: "male" as Gender,
       measurement_system: "metric",
-      height_cm: 175,
-      weight_kg: 70,
+      height_cm: undefined,
+      weight_kg: undefined,
       bodyfat_percentage: undefined,
       activity_level: "moderately_active" as ActivityLevel,
       country: "",
@@ -131,7 +131,7 @@ export default function OnboardingStep1Screen() {
       const profile = userData?.profile;
 
       if (!userData || !dbUser || !profile) {
-        console.log("❌ No se encontró usuario en la base de datos");
+        console.log("❌ User not found in database");
         console.log("userData:", userData);
         console.log("dbUser:", dbUser);
         console.log("profile:", profile);
@@ -229,7 +229,7 @@ export default function OnboardingStep1Screen() {
         );
       }
 
-      console.log("✅ Todos los campos fueron populados correctamente");
+      console.log("✅ All fields were populated correctly");
       console.log("=== RESUMEN DE DATOS CARGADOS ===");
       console.log({
         email: dbUser?.email,
@@ -260,7 +260,7 @@ export default function OnboardingStep1Screen() {
 
   const onSubmit = async (data: PersonalInfoFormData) => {
     if (!userId) {
-      Alert.alert("Error", "No se encontró el usuario");
+      Alert.alert("Error", "User not found");
       return;
     }
 

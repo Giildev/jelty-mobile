@@ -136,7 +136,7 @@ export function WaterIntakeDropdown({
                 className="mt-4 rounded-xl bg-gray-200 px-4 py-3 dark:bg-gray-700"
               >
                 <Text className="text-center text-base font-semibold text-gray-900 dark:text-white">
-                  Cancelar
+                  Close
                 </Text>
               </TouchableOpacity>
             </View>

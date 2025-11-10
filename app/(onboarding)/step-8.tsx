@@ -11,7 +11,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { OnboardingStepLayout } from "@/components/onboarding/OnboardingStepLayout";
-import { QuietHoursPicker } from "@/components/onboarding/QuietHoursPicker";
 import {
   notificationSettingsSchema,
   type NotificationSettingsFormData,
@@ -31,7 +30,6 @@ export default function OnboardingStep8Screen() {
     control,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<NotificationSettingsFormData>({
     resolver: zodResolver(notificationSettingsSchema),
@@ -43,14 +41,6 @@ export default function OnboardingStep8Screen() {
       quietHoursEnd: null,
     },
   });
-
-  const mealsEnabled = watch("mealsEnabled");
-  const workoutsEnabled = watch("workoutsEnabled");
-  const remindersEnabled = watch("remindersEnabled");
-
-  // Compute if any notification is enabled (for quiet hours)
-  const anyNotificationEnabled =
-    mealsEnabled || workoutsEnabled || remindersEnabled;
 
   // Load existing data on mount
   useEffect(() => {
@@ -219,41 +209,12 @@ export default function OnboardingStep8Screen() {
           )}
         </View>
 
-        {/* Quiet Hours */}
-        <Controller
-          control={control}
-          name="quietHoursStart"
-          render={({ field: { value: startValue, onChange: onStartChange } }) => (
-            <Controller
-              control={control}
-              name="quietHoursEnd"
-              render={({ field: { value: endValue, onChange: onEndChange } }) => (
-                <QuietHoursPicker
-                  label="Quiet Hours"
-                  startTime={startValue}
-                  endTime={endValue}
-                  onStartChange={onStartChange}
-                  onEndChange={onEndChange}
-                  enabled={anyNotificationEnabled}
-                />
-              )}
-            />
-          )}
-        />
-        {(errors.quietHoursStart || errors.quietHoursEnd) && (
-          <Text className="mt-1 text-sm text-red-500">
-            {errors.quietHoursStart?.message || errors.quietHoursEnd?.message}
-          </Text>
-        )}
-
         {/* Info Message */}
-        {anyNotificationEnabled && (
-          <View className="mt-4 rounded-xl bg-blue-50 px-4 py-3 dark:bg-blue-900/20">
-            <Text className="text-sm text-blue-900 dark:text-blue-100">
-              💡 You can change these settings anytime in your profile
-            </Text>
-          </View>
-        )}
+        <View className="mt-4 rounded-xl bg-blue-50 px-4 py-3 dark:bg-blue-900/20">
+          <Text className="text-sm text-blue-900 dark:text-blue-100">
+            💡 You can change these settings anytime in your profile
+          </Text>
+        </View>
       </View>
     </OnboardingStepLayout>
   );

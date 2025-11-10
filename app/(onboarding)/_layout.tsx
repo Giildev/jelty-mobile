@@ -14,6 +14,13 @@ export default function OnboardingLayout() {
       }}
     >
       <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
+      <Stack.Screen
         name="step-1"
         options={{
           headerShown: false,

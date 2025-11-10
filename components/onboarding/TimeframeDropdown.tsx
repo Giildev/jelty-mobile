@@ -152,7 +152,7 @@ export function TimeframeDropdown({
                 className="mx-2 mt-2 rounded-xl bg-gray-100 py-3 dark:bg-gray-800"
               >
                 <Text className="text-center text-base font-medium text-gray-700 dark:text-gray-300">
-                  Cerrar
+                  Close
                 </Text>
               </TouchableOpacity>
             </Pressable>

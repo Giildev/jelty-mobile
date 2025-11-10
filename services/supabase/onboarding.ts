@@ -189,10 +189,7 @@ export async function isOnboardingComplete(
   clerkUserId: string
 ): Promise<boolean> {
   try {
-    console.log("[isOnboardingComplete] ========== START ==========");
     console.log("[isOnboardingComplete] Checking for Clerk user:", clerkUserId);
-    console.log("[isOnboardingComplete] clerkUserId type:", typeof clerkUserId);
-    console.log("[isOnboardingComplete] clerkUserId length:", clerkUserId?.length);
 
     // Use supabaseAdmin to bypass RLS and access user tables
     // Join user_user with user_profile directly to get onboarding_completed
@@ -206,24 +203,21 @@ export async function isOnboardingComplete(
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .is("user_profile.deleted_at", null)
-      .single();
+      .maybeSingle(); // Use maybeSingle() instead of single() to handle 0 rows gracefully
 
+    // If error or no data, user doesn't exist yet or hasn't completed onboarding
     if (error) {
-      console.error("[isOnboardingComplete] Error fetching user with profile:", error);
-
-      // Try alternative: fetch all users to debug
-      const { data: allUsers } = await supabaseAdmin
-        .from("user_user")
-        .select("id, clerk_user_id")
-        .is("deleted_at", null)
-        .limit(5);
-
-      console.log("[isOnboardingComplete] Sample users in DB:", allUsers);
+      // PGRST116 means 0 rows - this is expected for new users, so don't log as error
+      if (error.code === "PGRST116") {
+        console.log("[isOnboardingComplete] User not found in database (new user)");
+        return false;
+      }
+      console.error("[isOnboardingComplete] Unexpected error:", error);
       return false;
     }
 
     if (!data) {
-      console.log("[isOnboardingComplete] User not found");
+      console.log("[isOnboardingComplete] User not found (new user)");
       return false;
     }
 

@@ -88,7 +88,7 @@ export default function TabLayout() {
 
   // Redirigir al onboarding si no lo ha completado
   if (!onboardingCompleted) {
-    return <Redirect href="/(onboarding)/step-1" />;
+    return <Redirect href="/(onboarding)" />;
   }
 
   return (

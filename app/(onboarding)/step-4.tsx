@@ -85,7 +85,7 @@ export default function OnboardingStep4Screen() {
 
   const onSubmit = async (data: DietaryPreferencesFormData) => {
     if (!userId) {
-      Alert.alert("Error", "No se encontró el usuario");
+      Alert.alert("Error", "User not found");
       return;
     }
 
@@ -105,11 +105,11 @@ export default function OnboardingStep4Screen() {
         // Navigate to step 5
         router.push("/(onboarding)/step-5");
       } else {
-        Alert.alert("Error", "No se pudo guardar la información");
+        Alert.alert("Error", "Could not save information");
       }
     } catch (error) {
       console.error("Error saving onboarding step 4:", error);
-      Alert.alert("Error", "Ocurrió un error al guardar la información");
+      Alert.alert("Error", "An error occurred while saving information");
     } finally {
       setSaving(false);
     }
@@ -119,7 +119,7 @@ export default function OnboardingStep4Screen() {
     <OnboardingStepLayout
       currentStep={4}
       totalSteps={9}
-      stepLabel="Preferencias Alimentarias"
+      stepLabel="Dietary Preferences"
       title="Dietary Preferences"
       description="Tell us about your dietary preferences and restrictions."
       onBack={() => router.back()}

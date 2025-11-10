@@ -117,14 +117,14 @@ export type MeasurementSystem = "metric" | "imperial";
 export type Gender = "male" | "female" | "other" | "prefer_not_to_say";
 
 /**
- * Activity level display names in Spanish
+ * Activity level display names
  */
 export const activityLevelLabels: Record<ActivityLevel, string> = {
-  sedentary: "Sedentario (poco o ningún ejercicio)",
-  lightly_active: "Ligeramente activo (ejercicio ligero 1-3 días/semana)",
-  moderately_active: "Moderadamente activo (ejercicio moderado 3-5 días/semana)",
-  very_active: "Muy activo (ejercicio intenso 6-7 días/semana)",
-  extra_active: "Extra activo (ejercicio muy intenso, trabajo físico)",
+  sedentary: "Sedentary (little or no exercise)",
+  lightly_active: "Lightly active (light exercise 1-3 days/week)",
+  moderately_active: "Moderately active (moderate exercise 3-5 days/week)",
+  very_active: "Very active (intense exercise 6-7 days/week)",
+  extra_active: "Extra active (very intense exercise, physical job)",
 };
 
 /**
@@ -269,25 +269,25 @@ export type GoalTimeframe =
  * Fitness goal display names in Spanish
  */
 export const fitnessGoalLabels: Record<FitnessGoalType, string> = {
-  lose_fat: "Perder grasa",
-  build_muscle: "Ganar músculo",
-  improve_health: "Mejorar salud",
-  increase_performance: "Aumentar rendimiento",
-  maintain: "Mantener",
+  lose_fat: "Lose fat",
+  build_muscle: "Build muscle",
+  improve_health: "Improve health",
+  increase_performance: "Increase performance",
+  maintain: "Maintain",
 };
 
 /**
- * Timeframe display names in Spanish
+ * Timeframe display names
  */
 export const timeframeLabels: Record<GoalTimeframe, string> = {
-  "4_weeks": "4 semanas",
-  "8_weeks": "8 semanas",
-  "12_weeks": "12 semanas",
-  "16_weeks": "16 semanas",
-  "3_months": "3 meses",
-  "6_months": "6 meses",
-  "9_months": "9 meses",
-  "12_months": "12 meses",
+  "4_weeks": "4 weeks",
+  "8_weeks": "8 weeks",
+  "12_weeks": "12 weeks",
+  "16_weeks": "16 weeks",
+  "3_months": "3 months",
+  "6_months": "6 months",
+  "9_months": "9 months",
+  "12_months": "12 months",
 };
 
 /**
@@ -374,30 +374,30 @@ export type DietaryPreferencesFormData = z.infer<typeof dietaryPreferencesSchema
  * Available dietary patterns
  */
 export const DIETARY_PATTERNS = [
-  "Vegetariana",
-  "Vegana",
-  "Pescetariana",
-  "Carnívora",
+  "Vegetarian",
+  "Vegan",
+  "Pescatarian",
+  "Carnivore",
   "Keto",
   "Paleo",
-  "Mediterránea",
-  "Flexitariana",
+  "Mediterranean",
+  "Flexitarian",
 ] as const;
 
 /**
  * Available cuisine preferences
  */
 export const CUISINE_TYPES = [
-  "Italiana",
-  "Mexicana",
-  "Japonesa",
-  "China",
-  "Tailandesa",
-  "India",
-  "Francesa",
-  "Mediterránea",
-  "Coreana",
-  "Americana",
+  "Italian",
+  "Mexican",
+  "Japanese",
+  "Chinese",
+  "Thai",
+  "Indian",
+  "French",
+  "Mediterranean",
+  "Korean",
+  "American",
 ] as const;
 
 /**

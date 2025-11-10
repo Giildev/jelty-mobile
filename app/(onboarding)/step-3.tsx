@@ -70,7 +70,7 @@ export default function OnboardingStep3Screen() {
 
   const onSubmit = async (data: HealthInfoFormData) => {
     if (!userId) {
-      Alert.alert("Error", "No se encontró el usuario");
+      Alert.alert("Error", "User not found");
       return;
     }
 
@@ -88,11 +88,11 @@ export default function OnboardingStep3Screen() {
         // Navigate to step 4
         router.push("/(onboarding)/step-4");
       } else {
-        Alert.alert("Error", "No se pudo guardar la información");
+        Alert.alert("Error", "Could not save information");
       }
     } catch (error) {
       console.error("Error saving onboarding step 3:", error);
-      Alert.alert("Error", "Ocurrió un error al guardar la información");
+      Alert.alert("Error", "An error occurred while saving information");
     } finally {
       setSaving(false);
     }
@@ -102,9 +102,9 @@ export default function OnboardingStep3Screen() {
     <OnboardingStepLayout
       currentStep={3}
       totalSteps={9}
-      stepLabel="Información de Salud"
-      title="Cuéntanos sobre tu salud"
-      description="Esta información nos ayuda a adaptar tu plan de manera segura. Todos los campos son opcionales."
+      stepLabel="Health Information"
+      title="Tell us about your health"
+      description="This information helps us adapt your plan safely. All fields are optional."
       onBack={() => router.back()}
       onNext={handleSubmit(onSubmit)}
       loading={loading}
@@ -118,10 +118,10 @@ export default function OnboardingStep3Screen() {
           name="medicalConditions"
           render={({ field: { onChange, value } }) => (
             <ChipInput
-              label="Condiciones Médicas"
+              label="Medical Conditions"
               value={value || []}
               onChange={onChange}
-              placeholder="ej. Diabetes, Hipertensión"
+              placeholder="e.g. Diabetes, Hypertension"
               error={errors.medicalConditions?.message}
             />
           )}
@@ -133,10 +133,10 @@ export default function OnboardingStep3Screen() {
           name="medications"
           render={({ field: { onChange, value } }) => (
             <ChipInput
-              label="Medicamentos Actuales"
+              label="Current Medications"
               value={value || []}
               onChange={onChange}
-              placeholder="ej. Aspirina, Vitaminas"
+              placeholder="e.g. Aspirin, Vitamins"
               error={errors.medications?.message}
             />
           )}
@@ -148,10 +148,10 @@ export default function OnboardingStep3Screen() {
           name="injuries"
           render={({ field: { onChange, value } }) => (
             <ChipInput
-              label="Lesiones Previas"
+              label="Previous Injuries"
               value={value || []}
               onChange={onChange}
-              placeholder="ej. Lesión de rodilla, Dolor de hombro"
+              placeholder="e.g. Knee injury, Shoulder pain"
               error={errors.injuries?.message}
             />
           )}
@@ -163,10 +163,10 @@ export default function OnboardingStep3Screen() {
           name="allergies"
           render={({ field: { onChange, value } }) => (
             <ChipInput
-              label="Alergias"
+              label="Allergies"
               value={value || []}
               onChange={onChange}
-              placeholder="ej. Lactosa, Maní, Mariscos"
+              placeholder="e.g. Lactose, Peanuts, Shellfish"
               error={errors.allergies?.message}
             />
           )}

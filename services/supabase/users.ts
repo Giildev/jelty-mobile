@@ -140,7 +140,7 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       .select("*")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle 0 rows gracefully
 
     if (userError || !user) {
       return null;
@@ -152,7 +152,7 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       .select("*")
       .eq("user_id", user.id)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle 0 rows gracefully
 
     if (profileError || !profile) {
       return null;
@@ -191,10 +191,13 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       .select("*")
       .eq("id", supabaseUserId)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle 0 rows gracefully
 
     if (userError || !user) {
-      console.error("Error getting user from user_user:", userError);
+      // Only log as error if it's not a "user not found" case
+      if (userError && userError.code !== "PGRST116") {
+        console.error("Error getting user from user_user:", userError);
+      }
       return null;
     }
 
@@ -204,10 +207,13 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       .select("*")
       .eq("user_id", user.id)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle 0 rows gracefully
 
     if (profileError || !profile) {
-      console.error("Error getting profile from user_profile:", profileError);
+      // Only log as error if it's not a "user not found" case
+      if (profileError && profileError.code !== "PGRST116") {
+        console.error("Error getting profile from user_profile:", profileError);
+      }
       return null;
     }
 

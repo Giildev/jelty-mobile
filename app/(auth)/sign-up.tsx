@@ -157,9 +157,9 @@ export default function SignUpScreen() {
           countryCode: formData.countryCode,
         });
 
-        // Paso 4: Cerrar modal y redirigir al onboarding
+        // Paso 4: Cerrar modal y redirigir al onboarding index (loading screen)
         setShowVerifyModal(false);
-        router.replace("/(onboarding)/step-1");
+        router.replace("/(onboarding)");
       } else {
         // Si el status no es complete, lanzar error
         throw new Error("Verification incomplete");

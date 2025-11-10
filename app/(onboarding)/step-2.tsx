@@ -127,7 +127,7 @@ export default function OnboardingStep2Screen() {
 
   const onSubmit = async (data: FitnessGoalFormData) => {
     if (!userId) {
-      Alert.alert("Error", "No se encontró el usuario");
+      Alert.alert("Error", "User not found");
       return;
     }
 
@@ -199,7 +199,7 @@ export default function OnboardingStep2Screen() {
               name="goal_type"
               render={({ field: { onChange, value } }) => (
                 <FitnessGoalDropdown
-                  label="Objetivo Principal"
+                  label="Main Goal"
                   value={value}
                   onChange={onChange}
                   error={errors.goal_type?.message}
@@ -211,14 +211,14 @@ export default function OnboardingStep2Screen() {
           {/* Timeframe */}
           <View className="mb-6">
             <Text className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Plazo de Tiempo
+              Timeframe
             </Text>
             <Controller
               control={control}
               name="timeframe"
               render={({ field: { onChange, value } }) => (
                 <TimeframeDropdown
-                  label="¿En cuánto tiempo?"
+                  label="How long?"
                   value={value}
                   onChange={onChange}
                   error={errors.timeframe?.message}
@@ -230,14 +230,14 @@ export default function OnboardingStep2Screen() {
           {/* Weight Goal */}
           <View className="mb-6">
             <Text className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Peso Objetivo (Opcional)
+              Target Weight (Optional)
             </Text>
             <Controller
               control={control}
               name="target_weight_kg"
               render={({ field: { onChange, value } }) => (
                 <NumberInput
-                  label="Peso objetivo"
+                  label="Target weight"
                   value={value?.toString() ?? ""}
                   onChange={(text) => onChange(text ? parseFloat(text) : null)}
                   measurementSystem={measurementSystem}
@@ -252,14 +252,14 @@ export default function OnboardingStep2Screen() {
           {/* Body Fat % Goal */}
           <View className="mb-6">
             <Text className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              % de Grasa Corporal Objetivo (Opcional)
+              Target Body Fat % (Optional)
             </Text>
             <Controller
               control={control}
               name="target_bodyfat_pct"
               render={({ field: { onChange, value } }) => (
                 <NumberInput
-                  label="Porcentaje de grasa corporal objetivo"
+                  label="Target body fat percentage"
                   value={value?.toString() ?? ""}
                   onChange={(text) => onChange(text ? parseFloat(text) : null)}
                   measurementSystem={measurementSystem}
@@ -274,11 +274,10 @@ export default function OnboardingStep2Screen() {
           {/* Current Body Measurements */}
           <View className="mb-6">
             <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-              Tus Medidas Corporales Actuales
+              Your Current Body Measurements
             </Text>
             <Text className="mb-4 text-sm text-gray-500 dark:text-gray-500">
-              Todas las medidas son opcionales. Completa las que desees para un seguimiento más
-              preciso.
+              All measurements are optional. Complete the ones you want for more accurate tracking.
             </Text>
 
             {/* First row: Chest and Waist */}
@@ -289,10 +288,10 @@ export default function OnboardingStep2Screen() {
                   name="chest_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Pecho"
+                      label="Chest"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 95 cm" : "ej. 37 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 95 cm" : "e.g. 37 in"}
                       keyboardType="decimal-pad"
                       error={errors.chest_cm?.message}
                     />
@@ -306,10 +305,10 @@ export default function OnboardingStep2Screen() {
                   name="waist_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Cintura"
+                      label="Waist"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 80 cm" : "ej. 31 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 80 cm" : "e.g. 31 in"}
                       keyboardType="decimal-pad"
                       error={errors.waist_cm?.message}
                     />
@@ -326,10 +325,10 @@ export default function OnboardingStep2Screen() {
                   name="hips_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Caderas"
+                      label="Hips"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 95 cm" : "ej. 37 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 95 cm" : "e.g. 37 in"}
                       keyboardType="decimal-pad"
                       error={errors.hips_cm?.message}
                     />
@@ -343,10 +342,10 @@ export default function OnboardingStep2Screen() {
                   name="biceps_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Bíceps"
+                      label="Biceps"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 35 cm" : "ej. 14 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 35 cm" : "e.g. 14 in"}
                       keyboardType="decimal-pad"
                       error={errors.biceps_cm?.message}
                     />
@@ -363,10 +362,10 @@ export default function OnboardingStep2Screen() {
                   name="thighs_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Muslos"
+                      label="Thighs"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 55 cm" : "ej. 22 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 55 cm" : "e.g. 22 in"}
                       keyboardType="decimal-pad"
                       error={errors.thighs_cm?.message}
                     />
@@ -380,10 +379,10 @@ export default function OnboardingStep2Screen() {
                   name="neck_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Cuello"
+                      label="Neck"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 38 cm" : "ej. 15 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 38 cm" : "e.g. 15 in"}
                       keyboardType="decimal-pad"
                       error={errors.neck_cm?.message}
                     />
@@ -400,10 +399,10 @@ export default function OnboardingStep2Screen() {
                   name="shoulders_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Hombros"
+                      label="Shoulders"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 110 cm" : "ej. 43 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 110 cm" : "e.g. 43 in"}
                       keyboardType="decimal-pad"
                       error={errors.shoulders_cm?.message}
                     />
@@ -417,10 +416,10 @@ export default function OnboardingStep2Screen() {
                   name="forearms_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Antebrazos"
+                      label="Forearms"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 28 cm" : "ej. 11 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 28 cm" : "e.g. 11 in"}
                       keyboardType="decimal-pad"
                       error={errors.forearms_cm?.message}
                     />
@@ -437,10 +436,10 @@ export default function OnboardingStep2Screen() {
                   name="calves_cm"
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      label="Pantorrillas"
+                      label="Calves"
                       value={value?.toString() ?? ""}
                       onChangeText={(text) => onChange(text ? parseFloat(text) : null)}
-                      placeholder={measurementSystem === "metric" ? "ej. 38 cm" : "ej. 15 in"}
+                      placeholder={measurementSystem === "metric" ? "e.g. 38 cm" : "e.g. 15 in"}
                       keyboardType="decimal-pad"
                       error={errors.calves_cm?.message}
                     />

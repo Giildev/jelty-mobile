@@ -9,13 +9,13 @@ interface DaySelectorProps {
 }
 
 const DAYS = [
-  { value: "monday", label: "Mon", fullLabel: "Lunes" },
-  { value: "tuesday", label: "Tue", fullLabel: "Martes" },
-  { value: "wednesday", label: "Wed", fullLabel: "Miércoles" },
-  { value: "thursday", label: "Thu", fullLabel: "Jueves" },
-  { value: "friday", label: "Fri", fullLabel: "Viernes" },
-  { value: "saturday", label: "Sat", fullLabel: "Sábado" },
-  { value: "sunday", label: "Sun", fullLabel: "Domingo" },
+  { value: "monday", label: "Mon", fullLabel: "Monday" },
+  { value: "tuesday", label: "Tue", fullLabel: "Tuesday" },
+  { value: "wednesday", label: "Wed", fullLabel: "Wednesday" },
+  { value: "thursday", label: "Thu", fullLabel: "Thursday" },
+  { value: "friday", label: "Fri", fullLabel: "Friday" },
+  { value: "saturday", label: "Sat", fullLabel: "Saturday" },
+  { value: "sunday", label: "Sun", fullLabel: "Sunday" },
 ];
 
 export function DaySelector({ label, value = [], onChange, error }: DaySelectorProps) {

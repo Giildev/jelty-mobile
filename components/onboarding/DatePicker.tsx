@@ -98,7 +98,7 @@ export function DatePicker({ label, value, onChange, error }: DatePickerProps) {
               <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
                 <TouchableOpacity onPress={() => setShowPicker(false)}>
                   <Text className="text-base font-medium text-secondary">
-                    Cancelar
+                    Cancel
                   </Text>
                 </TouchableOpacity>
                 <Text className="text-base font-semibold text-gray-900 dark:text-white">
@@ -106,7 +106,7 @@ export function DatePicker({ label, value, onChange, error }: DatePickerProps) {
                 </Text>
                 <TouchableOpacity onPress={handleConfirm}>
                   <Text className="text-base font-medium text-secondary">
-                    Confirmar
+                    Confirm
                   </Text>
                 </TouchableOpacity>
               </View>

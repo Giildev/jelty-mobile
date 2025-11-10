@@ -75,7 +75,7 @@ export default function OnboardingStep5Screen() {
 
   const onSubmit = async (data: ExercisePreferencesFormData) => {
     if (!userId) {
-      Alert.alert("Error", "No se encontró el usuario");
+      Alert.alert("Error", "User not found");
       return;
     }
 
@@ -92,11 +92,11 @@ export default function OnboardingStep5Screen() {
         // Navigate to step 6
         router.push("/(onboarding)/step-6");
       } else {
-        Alert.alert("Error", "No se pudo guardar la información");
+        Alert.alert("Error", "Could not save information");
       }
     } catch (error) {
       console.error("Error saving onboarding step 5:", error);
-      Alert.alert("Error", "Ocurrió un error al guardar la información");
+      Alert.alert("Error", "An error occurred while saving information");
     } finally {
       setSaving(false);
     }
