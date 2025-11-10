@@ -8,10 +8,12 @@ interface RadioOption {
 }
 
 interface RadioButtonGroupProps {
-  label: string;
+  label?: string;
   options: RadioOption[];
-  value: string;
-  onChange: (value: string) => void;
+  value?: string;
+  selectedValue?: string;
+  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
   error?: string;
 }
 
@@ -19,25 +21,33 @@ export function RadioButtonGroup({
   label,
   options,
   value,
+  selectedValue,
   onChange,
+  onValueChange,
   error,
 }: RadioButtonGroupProps) {
+  // Support both prop patterns
+  const currentValue = value ?? selectedValue;
+  const handleChange = onChange ?? onValueChange;
+
   return (
     <View className="mb-6">
       {/* Label */}
-      <Text className="mb-3 text-base font-semibold text-gray-900 dark:text-white">
-        {label}
-      </Text>
+      {label && (
+        <Text className="mb-3 text-base font-semibold text-gray-900 dark:text-white">
+          {label}
+        </Text>
+      )}
 
       {/* Radio Options */}
       <View className="gap-3">
         {options.map((option) => {
-          const isSelected = value === option.value;
+          const isSelected = currentValue === option.value;
 
           return (
             <TouchableOpacity
               key={option.value}
-              onPress={() => onChange(option.value)}
+              onPress={() => handleChange?.(option.value)}
               className={`
                 flex-row items-center rounded-xl border-2 px-4 py-4
                 ${

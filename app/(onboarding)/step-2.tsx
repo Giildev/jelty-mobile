@@ -1,13 +1,8 @@
 import {
   View,
   Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
@@ -19,12 +14,10 @@ import {
   FitnessGoalType,
   GoalTimeframe,
 } from "@/utils/validation/onboardingSchemas";
-import { Ionicons } from "@expo/vector-icons";
 
 // Components
-import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { OnboardingStepLayout } from "@/components/onboarding/OnboardingStepLayout";
 import { FitnessGoalDropdown } from "@/components/onboarding/FitnessGoalDropdown";
 import { TimeframeDropdown } from "@/components/onboarding/TimeframeDropdown";
 import { NumberInput } from "@/components/onboarding/NumberInput";
@@ -44,7 +37,8 @@ export default function OnboardingStep2Screen() {
   const router = useRouter();
   const { userId } = useAuth();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [measurementSystem, setMeasurementSystem] = useState<"metric" | "imperial">("metric");
 
   const {
@@ -78,7 +72,10 @@ export default function OnboardingStep2Screen() {
 
   const loadUserData = async () => {
     try {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       // Load user profile to get measurement system
       const userData = await getUserByClerkId(userId);
@@ -123,6 +120,8 @@ export default function OnboardingStep2Screen() {
       }
     } catch (error) {
       console.error("Error loading step 2 data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,7 +131,7 @@ export default function OnboardingStep2Screen() {
       return;
     }
 
-    setLoading(true);
+    setSaving(true);
 
     try {
       // Prepare goal data
@@ -172,46 +171,26 @@ export default function OnboardingStep2Screen() {
       console.error("Error saving onboarding step 2:", error);
       Alert.alert("Error", "Ocurrió un error al guardar la información");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-base-black">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        {/* Progress Indicator */}
-        <View className="px-6 pt-2">
-          <ProgressIndicator currentStep={2} totalSteps={9} stepLabel="Tus Objetivos" />
-        </View>
-
-        {/* Content */}
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View className="mb-6 mt-6">
-            <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-              Objetivos de Fitness y Seguimiento
-            </Text>
-            <Text className="mt-2 text-base text-gray-600 dark:text-gray-400">
-              ¿Qué quieres lograr?
-            </Text>
-            <Text className="mt-1 text-sm text-gray-500 dark:text-gray-500">
-              Esto nos ayuda a diseñar tu plan personalizado.
-            </Text>
-          </View>
-
-          {/* Fitness Goal */}
-          <View className="mb-6">
+    <OnboardingStepLayout
+      currentStep={2}
+      totalSteps={9}
+      stepLabel="Tus Objetivos"
+      title="Objetivos de Fitness y Seguimiento"
+      description="¿Qué quieres lograr? Esto nos ayuda a diseñar tu plan personalizado."
+      onBack={() => router.back()}
+      onNext={handleSubmit(onSubmit)}
+      loading={loading}
+      saving={saving}
+    >
+      {/* Content */}
+      <View className="px-6">
+        {/* Fitness Goal */}
+        <View className="mb-6">
             <Text className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Objetivo de Fitness
             </Text>
@@ -474,50 +453,7 @@ export default function OnboardingStep2Screen() {
             </View>
           </View>
 
-          {/* Navigation Buttons */}
-          <View className="my-6">
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <TouchableOpacity
-                  onPress={handleBack}
-                  disabled={loading}
-                  className="flex-row items-center justify-center rounded-xl border-2 border-primary bg-white py-3.5 dark:border-primary dark:bg-gray-900"
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    size={20}
-                    color="#1F024B"
-                    className="mr-2"
-                  />
-                  <Text className="text-base font-semibold text-primary">
-                    Atrás
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View className="flex-[2]">
-                <Button
-                  onPress={handleSubmit(onSubmit)}
-                  variant="brand-primary"
-                  size="large"
-                  loading={loading}
-                  disabled={loading}
-                >
-                  Siguiente
-                </Button>
-              </View>
-            </View>
-          </View>
-
-          {/* Privacy message */}
-          <View className="mb-8 flex-row items-center justify-center gap-2">
-            <Ionicons name="lock-closed" size={16} className="text-gray-500" />
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              Your data is encrypted and never shared
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </OnboardingStepLayout>
   );
 }

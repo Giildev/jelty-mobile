@@ -514,3 +514,108 @@ export const timeOfDayLabels: Record<TimeOfDay, string> = {
  * Session duration options in minutes
  */
 export const SESSION_DURATIONS = [30, 45, 60, 75, 90] as const;
+
+/**
+ * Onboarding Step 7: Cooking Preferences Schema
+ * Validates cooking habits and shopping routine
+ */
+export const cookingPreferencesSchema = z.object({
+  // Cooking skill level (single select, required)
+  cookingSkillLevel: z.enum(["beginner", "intermediate", "advanced", "expert"], {
+    errorMap: () => ({ message: "Selecciona tu nivel de habilidad en cocina" }),
+  }),
+
+  // Time available to cook per meal (required)
+  cookTimeRange: z.enum(["under_15", "15_30", "30_45", "45_60", "over_60"], {
+    errorMap: () => ({ message: "Selecciona el tiempo disponible para cocinar" }),
+  }),
+
+  // Number of people cooking for (required, 1-5)
+  cookingForPeople: z
+    .number()
+    .min(1, "Debe ser al menos 1 persona")
+    .max(5, "No puede exceder 5 personas"),
+
+  // Shopping frequency (required)
+  shoppingFrequency: z.enum(["weekly", "bi_weekly", "monthly"], {
+    errorMap: () => ({ message: "Selecciona tu frecuencia de compras" }),
+  }),
+});
+
+export type CookingPreferencesFormData = z.infer<typeof cookingPreferencesSchema>;
+
+/**
+ * Cooking skill levels
+ */
+export type CookingSkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
+
+/**
+ * Time range options for cooking
+ */
+export type CookTimeRange = "under_15" | "15_30" | "30_45" | "45_60" | "over_60";
+
+/**
+ * Shopping frequency options
+ */
+export type ShoppingFrequency = "weekly" | "bi_weekly" | "monthly";
+
+/**
+ * Cooking skill level display names
+ */
+export const cookingSkillLevelLabels: Record<CookingSkillLevel, string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  expert: "Expert",
+};
+
+/**
+ * Cook time range display names
+ */
+export const cookTimeRangeLabels: Record<CookTimeRange, string> = {
+  under_15: "<15 min",
+  "15_30": "15-30 min",
+  "30_45": "30-45 min",
+  "45_60": "45-60 min",
+  over_60: "60+ min",
+};
+
+/**
+ * Shopping frequency display names
+ */
+export const shoppingFrequencyLabels: Record<ShoppingFrequency, string> = {
+  weekly: "Weekly",
+  bi_weekly: "Bi-weekly",
+  monthly: "Monthly",
+};
+
+/**
+ * Onboarding Step 8: Notification Settings Schema
+ * Validates notification preferences and quiet hours
+ */
+export const notificationSettingsSchema = z
+  .object({
+    // Notification toggles (all boolean, required)
+    mealsEnabled: z.boolean(),
+    workoutsEnabled: z.boolean(),
+    remindersEnabled: z.boolean(),
+
+    // Quiet hours (optional)
+    quietHoursStart: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).nullable(),
+    quietHoursEnd: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).nullable(),
+  })
+  .refine(
+    (data) => {
+      // If either quiet hours field is set, both must be set
+      if (data.quietHoursStart || data.quietHoursEnd) {
+        return data.quietHoursStart !== null && data.quietHoursEnd !== null;
+      }
+      return true;
+    },
+    {
+      message: "Both start and end times are required for quiet hours",
+      path: ["quietHoursStart"],
+    }
+  );
+
+export type NotificationSettingsFormData = z.infer<typeof notificationSettingsSchema>;

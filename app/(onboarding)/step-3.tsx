@@ -1,24 +1,16 @@
 import {
   View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { healthInfoSchema, HealthInfoFormData } from "@/utils/validation/onboardingSchemas";
-import { Ionicons } from "@expo/vector-icons";
 
 // Components
-import { Button } from "@/components/ui/Button";
-import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { OnboardingStepLayout } from "@/components/onboarding/OnboardingStepLayout";
 import { ChipInput } from "@/components/ui/ChipInput";
 
 // Services
@@ -32,6 +24,7 @@ export default function OnboardingStep3Screen() {
   const router = useRouter();
   const { userId } = useAuth();
 
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const {
@@ -56,7 +49,10 @@ export default function OnboardingStep3Screen() {
 
   const loadHealthData = async () => {
     try {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       const healthData = await loadOnboardingStep3(userId);
       if (healthData) {
@@ -67,6 +63,8 @@ export default function OnboardingStep3Screen() {
       }
     } catch (error) {
       console.error("Error loading step 3 data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,148 +98,80 @@ export default function OnboardingStep3Screen() {
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-base-black">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        {/* Progress Indicator */}
-        <View className="px-6 pt-2">
-          <ProgressIndicator
-            currentStep={3}
-            totalSteps={9}
-            stepLabel="Información de Salud"
-          />
-        </View>
+    <OnboardingStepLayout
+      currentStep={3}
+      totalSteps={9}
+      stepLabel="Información de Salud"
+      title="Cuéntanos sobre tu salud"
+      description="Esta información nos ayuda a adaptar tu plan de manera segura. Todos los campos son opcionales."
+      onBack={() => router.back()}
+      onNext={handleSubmit(onSubmit)}
+      loading={loading}
+      saving={saving}
+    >
+      {/* Content */}
+      <View className="px-6">
+        {/* Medical Conditions */}
+        <Controller
+          control={control}
+          name="medicalConditions"
+          render={({ field: { onChange, value } }) => (
+            <ChipInput
+              label="Condiciones Médicas"
+              value={value || []}
+              onChange={onChange}
+              placeholder="ej. Diabetes, Hipertensión"
+              error={errors.medicalConditions?.message}
+            />
+          )}
+        />
 
-        {/* Content */}
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View className="mb-6 mt-6">
-            <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-              Cuéntanos sobre tu salud
-            </Text>
-            <Text className="mt-2 text-base text-gray-600 dark:text-gray-400">
-              Esta información nos ayuda a adaptar tu plan de manera segura.
-            </Text>
-            <Text className="mt-1 text-sm text-gray-500 dark:text-gray-500">
-              Todos los campos son opcionales.
-            </Text>
-          </View>
+        {/* Current Medications */}
+        <Controller
+          control={control}
+          name="medications"
+          render={({ field: { onChange, value } }) => (
+            <ChipInput
+              label="Medicamentos Actuales"
+              value={value || []}
+              onChange={onChange}
+              placeholder="ej. Aspirina, Vitaminas"
+              error={errors.medications?.message}
+            />
+          )}
+        />
 
-          {/* Medical Conditions */}
-          <Controller
-            control={control}
-            name="medicalConditions"
-            render={({ field: { onChange, value } }) => (
-              <ChipInput
-                label="Condiciones Médicas"
-                value={value || []}
-                onChange={onChange}
-                placeholder="ej. Diabetes, Hipertensión"
-                error={errors.medicalConditions?.message}
-              />
-            )}
-          />
+        {/* Previous Injuries */}
+        <Controller
+          control={control}
+          name="injuries"
+          render={({ field: { onChange, value } }) => (
+            <ChipInput
+              label="Lesiones Previas"
+              value={value || []}
+              onChange={onChange}
+              placeholder="ej. Lesión de rodilla, Dolor de hombro"
+              error={errors.injuries?.message}
+            />
+          )}
+        />
 
-          {/* Current Medications */}
-          <Controller
-            control={control}
-            name="medications"
-            render={({ field: { onChange, value } }) => (
-              <ChipInput
-                label="Medicamentos Actuales"
-                value={value || []}
-                onChange={onChange}
-                placeholder="ej. Aspirina, Vitaminas"
-                error={errors.medications?.message}
-              />
-            )}
-          />
-
-          {/* Previous Injuries */}
-          <Controller
-            control={control}
-            name="injuries"
-            render={({ field: { onChange, value } }) => (
-              <ChipInput
-                label="Lesiones Previas"
-                value={value || []}
-                onChange={onChange}
-                placeholder="ej. Lesión de rodilla, Dolor de hombro"
-                error={errors.injuries?.message}
-              />
-            )}
-          />
-
-          {/* Allergies */}
-          <Controller
-            control={control}
-            name="allergies"
-            render={({ field: { onChange, value } }) => (
-              <ChipInput
-                label="Alergias"
-                value={value || []}
-                onChange={onChange}
-                placeholder="ej. Lactosa, Maní, Mariscos"
-                error={errors.allergies?.message}
-              />
-            )}
-          />
-
-          {/* Navigation Buttons */}
-          <View className="my-6">
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <TouchableOpacity
-                  onPress={handleBack}
-                  disabled={saving}
-                  className="flex-row items-center justify-center rounded-xl border-2 border-primary bg-white py-3.5 dark:border-primary dark:bg-gray-900"
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    size={20}
-                    color="#1F024B"
-                    className="mr-2"
-                  />
-                  <Text className="text-base font-semibold text-primary">
-                    Atrás
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View className="flex-[2]">
-                <Button
-                  onPress={handleSubmit(onSubmit)}
-                  variant="brand-primary"
-                  size="large"
-                  loading={saving}
-                  disabled={saving}
-                >
-                  Siguiente
-                </Button>
-              </View>
-            </View>
-          </View>
-
-          {/* Privacy message */}
-          <View className="mb-8 flex-row items-center justify-center gap-2">
-            <Ionicons name="lock-closed" size={16} className="text-gray-500" />
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              Your data is encrypted and never shared
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {/* Allergies */}
+        <Controller
+          control={control}
+          name="allergies"
+          render={({ field: { onChange, value } }) => (
+            <ChipInput
+              label="Alergias"
+              value={value || []}
+              onChange={onChange}
+              placeholder="ej. Lactosa, Maní, Mariscos"
+              error={errors.allergies?.message}
+            />
+          )}
+        />
+      </View>
+    </OnboardingStepLayout>
   );
 }

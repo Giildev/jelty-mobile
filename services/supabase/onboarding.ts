@@ -1364,3 +1364,312 @@ export async function loadOnboardingStep6(
     return null;
   }
 }
+
+/**
+ * Cooking Preferences Data Interface
+ */
+export interface CookingPreferencesData {
+  cookingSkillLevel: string;
+  cookTimeRange: string;
+  cookingForPeople: number;
+  shoppingFrequency: string;
+}
+
+/**
+ * Saves Step 7 data (Cooking Preferences) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param cookingData - Cooking preferences data
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep7('user_123', {
+ *   cookingSkillLevel: 'intermediate',
+ *   cookTimeRange: '30_45',
+ *   cookingForPeople: 2,
+ *   shoppingFrequency: 'weekly',
+ * });
+ */
+export async function saveOnboardingStep7(
+  clerkUserId: string,
+  cookingData: CookingPreferencesData
+): Promise<boolean> {
+  try {
+    // Get user
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Map cook time range to min/max values
+    const cookTimeMap: Record<string, { min: number; max: number }> = {
+      under_15: { min: 0, max: 15 },
+      "15_30": { min: 15, max: 30 },
+      "30_45": { min: 30, max: 45 },
+      "45_60": { min: 45, max: 60 },
+      over_60: { min: 60, max: 120 },
+    };
+
+    const cookTime = cookTimeMap[cookingData.cookTimeRange];
+
+    // Check if cooking preference already exists
+    const { data: existingPref } = await supabaseAdmin
+      .from("user_cooking_preference")
+      .select("id")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    if (existingPref) {
+      // Update existing preference
+      const { error } = await supabaseAdmin
+        .from("user_cooking_preference")
+        .update({
+          skill_level: cookingData.cookingSkillLevel,
+          cook_time_min: cookTime.min,
+          cook_time_max: cookTime.max,
+          cooking_for_people: cookingData.cookingForPeople,
+          shopping_frequency: cookingData.shoppingFrequency,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+
+      if (error) {
+        throw new Error(`Failed to update cooking preference: ${error.message}`);
+      }
+    } else {
+      // Insert new preference
+      const { error } = await supabaseAdmin
+        .from("user_cooking_preference")
+        .insert({
+          user_id: user.id,
+          skill_level: cookingData.cookingSkillLevel,
+          cook_time_min: cookTime.min,
+          cook_time_max: cookTime.max,
+          cooking_for_people: cookingData.cookingForPeople,
+          shopping_frequency: cookingData.shoppingFrequency,
+        });
+
+      if (error) {
+        throw new Error(`Failed to insert cooking preference: ${error.message}`);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 7:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 7 data (Cooking Preferences) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Cooking preferences data, or null if not found
+ *
+ * @example
+ * const step7Data = await loadOnboardingStep7('user_123');
+ * if (step7Data) {
+ *   console.log('Cooking skill:', step7Data.cookingSkillLevel);
+ * }
+ */
+export async function loadOnboardingStep7(
+  clerkUserId: string
+): Promise<CookingPreferencesData | null> {
+  try {
+    // Get user
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    // Load cooking preference
+    const { data: cookingPref } = await supabaseAdmin
+      .from("user_cooking_preference")
+      .select("skill_level, cook_time_min, cook_time_max, cooking_for_people, shopping_frequency")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .single();
+
+    if (!cookingPref) {
+      return null;
+    }
+
+    // Map cook time values back to range
+    let cookTimeRange = "30_45"; // default
+    if (cookingPref.cook_time_max <= 15) {
+      cookTimeRange = "under_15";
+    } else if (cookingPref.cook_time_max <= 30) {
+      cookTimeRange = "15_30";
+    } else if (cookingPref.cook_time_max <= 45) {
+      cookTimeRange = "30_45";
+    } else if (cookingPref.cook_time_max <= 60) {
+      cookTimeRange = "45_60";
+    } else {
+      cookTimeRange = "over_60";
+    }
+
+    return {
+      cookingSkillLevel: cookingPref.skill_level || "beginner",
+      cookTimeRange,
+      cookingForPeople: cookingPref.cooking_for_people || 1,
+      shoppingFrequency: cookingPref.shopping_frequency || "weekly",
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 7:", error);
+    return null;
+  }
+}
+
+/**
+ * Notification Settings Data Interface
+ */
+export interface NotificationSettingsData {
+  mealsEnabled: boolean;
+  workoutsEnabled: boolean;
+  remindersEnabled: boolean;
+  quietHoursStart: string | null;
+  quietHoursEnd: string | null;
+}
+
+/**
+ * Saves Step 8 data (Notification Settings) to database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @param notificationData - Notification settings data
+ * @returns Success status
+ *
+ * @example
+ * const success = await saveOnboardingStep8('user_123', {
+ *   mealsEnabled: true,
+ *   workoutsEnabled: true,
+ *   remindersEnabled: true,
+ *   quietHoursStart: '22:00',
+ *   quietHoursEnd: '07:00',
+ * });
+ */
+export async function saveOnboardingStep8(
+  clerkUserId: string,
+  notificationData: NotificationSettingsData
+): Promise<boolean> {
+  try {
+    // Get user
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Upsert notification settings (user_id is primary key)
+    const { error } = await supabaseAdmin
+      .from("user_notification_settings")
+      .upsert(
+        {
+          user_id: user.id,
+          meals_enabled: notificationData.mealsEnabled,
+          workouts_enabled: notificationData.workoutsEnabled,
+          reminders_enabled: notificationData.remindersEnabled,
+          quiet_hours_start: notificationData.quietHoursStart || null,
+          quiet_hours_end: notificationData.quietHoursEnd || null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
+
+    if (error) {
+      throw new Error(`Failed to save notification settings: ${error.message}`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error saving onboarding step 8:", error);
+    return false;
+  }
+}
+
+/**
+ * Loads Step 8 data (Notification Settings) from database
+ *
+ * @param clerkUserId - The Clerk user ID
+ * @returns Notification settings data, or null if not found
+ *
+ * @example
+ * const step8Data = await loadOnboardingStep8('user_123');
+ * if (step8Data) {
+ *   console.log('Meals enabled:', step8Data.mealsEnabled);
+ * }
+ */
+export async function loadOnboardingStep8(
+  clerkUserId: string
+): Promise<NotificationSettingsData | null> {
+  try {
+    // Get user
+    const { data: user } = await supabaseAdmin
+      .from("user_user")
+      .select("id")
+      .eq("clerk_user_id", clerkUserId)
+      .is("deleted_at", null)
+      .single();
+
+    if (!user) {
+      return null;
+    }
+
+    // Load notification settings
+    const { data: settings } = await supabaseAdmin
+      .from("user_notification_settings")
+      .select("meals_enabled, workouts_enabled, reminders_enabled, quiet_hours_start, quiet_hours_end")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!settings) {
+      // Return defaults if no settings exist yet
+      return {
+        mealsEnabled: true,
+        workoutsEnabled: true,
+        remindersEnabled: true,
+        quietHoursStart: null,
+        quietHoursEnd: null,
+      };
+    }
+
+    // Format time values if they exist
+    const formatTime = (time: any): string | null => {
+      if (!time) return null;
+      // time comes from DB as "HH:MM:SS", we want "HH:MM"
+      if (typeof time === "string") {
+        return time.substring(0, 5);
+      }
+      return null;
+    };
+
+    return {
+      mealsEnabled: settings.meals_enabled ?? true,
+      workoutsEnabled: settings.workouts_enabled ?? true,
+      remindersEnabled: settings.reminders_enabled ?? true,
+      quietHoursStart: formatTime(settings.quiet_hours_start),
+      quietHoursEnd: formatTime(settings.quiet_hours_end),
+    };
+  } catch (error) {
+    console.error("Error loading onboarding step 8:", error);
+    return null;
+  }
+}

@@ -1,12 +1,7 @@
 import {
   View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
@@ -19,11 +14,9 @@ import {
   equipmentAvailabilityLabels,
   TRAINING_TYPES,
 } from "@/utils/validation/onboardingSchemas";
-import { Ionicons } from "@expo/vector-icons";
 
 // Components
-import { Button } from "@/components/ui/Button";
-import { ProgressIndicator } from "@/components/onboarding/ProgressIndicator";
+import { OnboardingStepLayout } from "@/components/onboarding/OnboardingStepLayout";
 import { MultiSelectChips } from "@/components/onboarding/MultiSelectChips";
 import { RadioButtonGroup } from "@/components/onboarding/RadioButtonGroup";
 
@@ -38,6 +31,7 @@ export default function OnboardingStep5Screen() {
   const router = useRouter();
   const { userId } = useAuth();
 
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const {
@@ -61,7 +55,10 @@ export default function OnboardingStep5Screen() {
 
   const loadExerciseData = async () => {
     try {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       const exerciseData = await loadOnboardingStep5(userId);
       if (exerciseData) {
@@ -71,6 +68,8 @@ export default function OnboardingStep5Screen() {
       }
     } catch (error) {
       console.error("Error loading step 5 data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,10 +102,6 @@ export default function OnboardingStep5Screen() {
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const experienceLevelOptions = [
     { value: "beginner", label: experienceLevelLabels.beginner },
     { value: "intermediate", label: experienceLevelLabels.intermediate },
@@ -120,108 +115,64 @@ export default function OnboardingStep5Screen() {
   ];
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white dark:bg-base-black">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        {/* Progress Indicator */}
-        <View className="px-6 pt-2">
-          <ProgressIndicator
-            currentStep={5}
-            totalSteps={9}
-            stepLabel="Exercise Preferences"
-          />
-        </View>
+    <OnboardingStepLayout
+      currentStep={5}
+      totalSteps={9}
+      stepLabel="Exercise Preferences"
+      title="Exercise Preferences"
+      description="Tell us how you like to train."
+      onBack={() => router.back()}
+      onNext={handleSubmit(onSubmit)}
+      loading={loading}
+      saving={saving}
+    >
+      {/* Content */}
+      <View className="px-6">
+        {/* Experience Level */}
+        <Controller
+          control={control}
+          name="experienceLevel"
+          render={({ field: { onChange, value } }) => (
+            <RadioButtonGroup
+              label="Experience Level"
+              options={experienceLevelOptions}
+              value={value}
+              onChange={onChange}
+              error={errors.experienceLevel?.message}
+            />
+          )}
+        />
 
-        {/* Content */}
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View className="mb-6 mt-6">
-            <Text className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-              Exercise Preferences
-            </Text>
-            <Text className="text-base text-gray-600 dark:text-gray-400">
-              Tell us how you like to train.
-            </Text>
-          </View>
+        {/* Preferred Training Types */}
+        <Controller
+          control={control}
+          name="preferredTrainingTypes"
+          render={({ field: { onChange, value } }) => (
+            <MultiSelectChips
+              label="Preferred Training Types"
+              options={TRAINING_TYPES}
+              value={value || []}
+              onChange={onChange}
+              error={errors.preferredTrainingTypes?.message}
+            />
+          )}
+        />
 
-          {/* Experience Level */}
-          <Controller
-            control={control}
-            name="experienceLevel"
-            render={({ field: { onChange, value } }) => (
-              <RadioButtonGroup
-                label="Experience Level"
-                options={experienceLevelOptions}
-                value={value}
-                onChange={onChange}
-                error={errors.experienceLevel?.message}
-              />
-            )}
-          />
-
-          {/* Preferred Training Types */}
-          <Controller
-            control={control}
-            name="preferredTrainingTypes"
-            render={({ field: { onChange, value } }) => (
-              <MultiSelectChips
-                label="Preferred Training Types"
-                options={TRAINING_TYPES}
-                value={value || []}
-                onChange={onChange}
-                error={errors.preferredTrainingTypes?.message}
-              />
-            )}
-          />
-
-          {/* Equipment Availability */}
-          <Controller
-            control={control}
-            name="equipmentAvailability"
-            render={({ field: { onChange, value } }) => (
-              <RadioButtonGroup
-                label="Equipment Availability"
-                options={equipmentOptions}
-                value={value}
-                onChange={onChange}
-                error={errors.equipmentAvailability?.message}
-              />
-            )}
-          />
-
-          {/* Navigation Buttons */}
-          <View className="mb-6 mt-4 flex-row gap-3">
-            <View className="flex-1">
-              <Button onPress={handleBack} variant="outline">
-                Back
-              </Button>
-            </View>
-            <View className="flex-[2]">
-              <Button
-                onPress={handleSubmit(onSubmit)}
-                loading={saving}
-                variant="brand-primary"
-              >
-                Next
-              </Button>
-            </View>
-          </View>
-
-          {/* Privacy Message */}
-          <View className="mb-4 flex-row items-center justify-center gap-2">
-            <Ionicons name="lock-closed" size={16} color="#6B7280" />
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Your data is encrypted and never shared
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {/* Equipment Availability */}
+        <Controller
+          control={control}
+          name="equipmentAvailability"
+          render={({ field: { onChange, value } }) => (
+            <RadioButtonGroup
+              label="Equipment Availability"
+              options={equipmentOptions}
+              value={value}
+              onChange={onChange}
+              error={errors.equipmentAvailability?.message}
+            />
+          )}
+        />
+      </View>
+    </OnboardingStepLayout>
   );
 }
