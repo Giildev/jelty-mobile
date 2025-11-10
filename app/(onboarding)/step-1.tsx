@@ -315,11 +315,11 @@ export default function OnboardingStep1Screen() {
         // Navigate to step 2
         router.push("/(onboarding)/step-2");
       } else {
-        Alert.alert("Error", "No se pudo guardar la información");
+        Alert.alert("Error", "Could not save information");
       }
     } catch (error) {
       console.error("Error saving onboarding step 1:", error);
-      Alert.alert("Error", "Ocurrió un error al guardar la información");
+      Alert.alert("Error", "An error occurred while saving information");
     } finally {
       setSaving(false);
     }

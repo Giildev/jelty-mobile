@@ -18,7 +18,7 @@ export function ChipInput({
 }: ChipInputProps) {
   const [inputValue, setInputValue] = useState("");
 
-  // Agregar chip al presionar Enter o al hacer submit
+  // Add chip when pressing Enter or on submit
   const handleAddChip = () => {
     const trimmed = inputValue.trim();
     if (trimmed && !value.includes(trimmed)) {
@@ -27,18 +27,18 @@ export function ChipInput({
     }
   };
 
-  // Eliminar chip por índice
+  // Remove chip by index
   const handleRemoveChip = (index: number) => {
     const newValues = value.filter((_, i) => i !== index);
     onChange(newValues);
   };
 
-  // Manejar cuando el input pierde el foco (agregar automáticamente)
+  // Handle when input loses focus (add automatically)
   const handleBlur = () => {
     handleAddChip();
   };
 
-  // Manejar submit del teclado (Enter)
+  // Handle keyboard submit (Enter)
   const handleSubmitEditing = () => {
     handleAddChip();
   };
@@ -68,7 +68,7 @@ export function ChipInput({
                 <TouchableOpacity
                   onPress={() => handleRemoveChip(index)}
                   className="h-5 w-5 items-center justify-center rounded-full bg-white/30"
-                  accessibilityLabel={`Eliminar ${item}`}
+                  accessibilityLabel={`Remove ${item}`}
                 >
                   <Text className="text-xs font-bold text-white">×</Text>
                 </TouchableOpacity>
@@ -107,7 +107,7 @@ export function ChipInput({
 
       {/* Helper Text */}
       <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-        Presiona Enter o toca fuera del campo para agregar
+        Press Enter or tap outside the field to add
       </Text>
     </View>
   );

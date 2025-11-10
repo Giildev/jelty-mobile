@@ -22,7 +22,7 @@ export function ProgressIndicator({
       {/* Step text */}
       <View className="mb-3">
         <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
-          Paso {currentStep}/{totalSteps}
+          Step {currentStep}/{totalSteps}
         </Text>
       </View>
 

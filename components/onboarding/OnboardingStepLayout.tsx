@@ -30,6 +30,7 @@ interface OnboardingStepLayoutProps {
   onBack?: () => void; // undefined = no mostrar botón Back (paso 1)
   onNext: () => void;
   nextButtonText?: string; // default: "Next", paso 9: "Finalizar"
+  nextButtonColor?: string; // Custom color for next button (e.g., "#0CDA51" for success)
 
   // Estados
   loading?: boolean;
@@ -46,6 +47,7 @@ export function OnboardingStepLayout({
   onBack,
   onNext,
   nextButtonText = "Next",
+  nextButtonColor,
   loading = false,
   saving = false,
 }: OnboardingStepLayoutProps) {
@@ -150,9 +152,10 @@ export function OnboardingStepLayout({
                 <TouchableOpacity
                   onPress={onNext}
                   disabled={saving || loading}
-                  className={`flex-1 items-center rounded-xl bg-primary py-4 ${
-                    saving || loading ? "opacity-50" : ""
-                  }`}
+                  className={`flex-1 items-center rounded-xl py-4 ${
+                    nextButtonColor ? "" : "bg-primary"
+                  } ${saving || loading ? "opacity-50" : ""}`}
+                  style={nextButtonColor ? { backgroundColor: nextButtonColor } : undefined}
                   activeOpacity={0.7}
                 >
                   {saving ? (
@@ -169,9 +172,10 @@ export function OnboardingStepLayout({
               <TouchableOpacity
                 onPress={onNext}
                 disabled={saving || loading}
-                className={`items-center rounded-xl bg-primary py-4 ${
-                  saving || loading ? "opacity-50" : ""
-                }`}
+                className={`items-center rounded-xl py-4 ${
+                  nextButtonColor ? "" : "bg-primary"
+                } ${saving || loading ? "opacity-50" : ""}`}
+                style={nextButtonColor ? { backgroundColor: nextButtonColor } : undefined}
                 activeOpacity={0.7}
               >
                 {saving ? (

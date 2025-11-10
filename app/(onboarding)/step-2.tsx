@@ -165,11 +165,11 @@ export default function OnboardingStep2Screen() {
         // Navigate to step 3
         router.push("/(onboarding)/step-3");
       } else {
-        Alert.alert("Error", "No se pudo guardar la información");
+        Alert.alert("Error", "Could not save information");
       }
     } catch (error) {
       console.error("Error saving onboarding step 2:", error);
-      Alert.alert("Error", "Ocurrió un error al guardar la información");
+      Alert.alert("Error", "An error occurred while saving information");
     } finally {
       setSaving(false);
     }
@@ -179,9 +179,9 @@ export default function OnboardingStep2Screen() {
     <OnboardingStepLayout
       currentStep={2}
       totalSteps={9}
-      stepLabel="Tus Objetivos"
-      title="Objetivos de Fitness y Seguimiento"
-      description="¿Qué quieres lograr? Esto nos ayuda a diseñar tu plan personalizado."
+      stepLabel="Your Goals"
+      title="Fitness Goals & Tracking"
+      description="What do you want to achieve? This helps us design your personalized plan."
       onBack={() => router.back()}
       onNext={handleSubmit(onSubmit)}
       loading={loading}
@@ -192,7 +192,7 @@ export default function OnboardingStep2Screen() {
         {/* Fitness Goal */}
         <View className="mb-6">
             <Text className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Objetivo de Fitness
+              Fitness Goal
             </Text>
             <Controller
               control={control}

@@ -463,18 +463,23 @@ export default function OnboardingStep9Screen() {
       return;
     }
 
+    console.log("[Step 9] Starting onboarding completion for user:", userId);
     setSaving(true);
     try {
       const success = await markOnboardingComplete(userId);
 
+      console.log("[Step 9] markOnboardingComplete result:", success);
+
       if (success) {
+        console.log("[Step 9] Navigating to /(tabs)");
         // Navigate to main app (tabs)
         router.replace("/(tabs)");
       } else {
+        console.error("[Step 9] Failed to complete onboarding");
         Alert.alert("Error", "Failed to complete onboarding");
       }
     } catch (error) {
-      console.error("Error completing onboarding:", error);
+      console.error("[Step 9] Error completing onboarding:", error);
       Alert.alert("Error", "An error occurred while completing onboarding");
     } finally {
       setSaving(false);
@@ -494,7 +499,8 @@ export default function OnboardingStep9Screen() {
       description="Everything looks good? Let's get started!"
       onBack={() => router.back()}
       onNext={handleComplete}
-      nextButtonText="Finalizar"
+      nextButtonText="Finish Setup"
+      nextButtonColor="#0CDA51"
       loading={loading}
       saving={saving}
     >

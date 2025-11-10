@@ -137,16 +137,26 @@ export async function markOnboardingComplete(
   clerkUserId: string
 ): Promise<boolean> {
   try {
-    const { data: user } = await supabaseAdmin
+    console.log("[markOnboardingComplete] Starting for Clerk user:", clerkUserId);
+
+    const { data: user, error: userError } = await supabaseAdmin
       .from("user_user")
       .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
+    if (userError) {
+      console.error("[markOnboardingComplete] Error fetching user:", userError);
+      throw new Error(`User fetch error: ${userError.message}`);
+    }
+
     if (!user) {
+      console.error("[markOnboardingComplete] User not found");
       throw new Error("User not found");
     }
+
+    console.log("[markOnboardingComplete] Found user with Supabase ID:", user.id);
 
     const { error } = await supabaseAdmin
       .from("user_profile")
@@ -157,12 +167,14 @@ export async function markOnboardingComplete(
       .eq("user_id", user.id);
 
     if (error) {
+      console.error("[markOnboardingComplete] Error updating profile:", error);
       throw new Error(`Failed to mark onboarding complete: ${error.message}`);
     }
 
+    console.log("[markOnboardingComplete] Successfully marked onboarding as complete");
     return true;
   } catch (error) {
-    console.error("Error marking onboarding complete:", error);
+    console.error("[markOnboardingComplete] Error:", error);
     return false;
   }
 }
@@ -177,27 +189,58 @@ export async function isOnboardingComplete(
   clerkUserId: string
 ): Promise<boolean> {
   try {
-    const { data: user } = await supabase
+    console.log("[isOnboardingComplete] ========== START ==========");
+    console.log("[isOnboardingComplete] Checking for Clerk user:", clerkUserId);
+    console.log("[isOnboardingComplete] clerkUserId type:", typeof clerkUserId);
+    console.log("[isOnboardingComplete] clerkUserId length:", clerkUserId?.length);
+
+    // Use supabaseAdmin to bypass RLS and access user tables
+    // Join user_user with user_profile directly to get onboarding_completed
+    const { data, error } = await supabaseAdmin
       .from("user_user")
-      .select("id")
+      .select(`
+        id,
+        clerk_user_id,
+        user_profile!inner(onboarding_completed)
+      `)
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
+      .is("user_profile.deleted_at", null)
       .single();
 
-    if (!user) {
+    if (error) {
+      console.error("[isOnboardingComplete] Error fetching user with profile:", error);
+
+      // Try alternative: fetch all users to debug
+      const { data: allUsers } = await supabaseAdmin
+        .from("user_user")
+        .select("id, clerk_user_id")
+        .is("deleted_at", null)
+        .limit(5);
+
+      console.log("[isOnboardingComplete] Sample users in DB:", allUsers);
       return false;
     }
 
-    const { data: profile } = await supabase
-      .from("user_profile")
-      .select("onboarding_completed")
-      .eq("user_id", user.id)
-      .is("deleted_at", null)
-      .single();
+    if (!data) {
+      console.log("[isOnboardingComplete] User not found");
+      return false;
+    }
 
-    return profile?.onboarding_completed ?? false;
+    console.log("[isOnboardingComplete] Found user:", {
+      id: data.id,
+      clerk_user_id: data.clerk_user_id,
+      profile: data.user_profile
+    });
+
+    // @ts-ignore - Supabase typing for nested relations
+    const completed = data.user_profile?.onboarding_completed ?? false;
+    console.log("[isOnboardingComplete] Onboarding status:", completed);
+    console.log("[isOnboardingComplete] ========== END ==========");
+
+    return completed;
   } catch (error) {
-    console.error("Error checking onboarding completion:", error);
+    console.error("[isOnboardingComplete] Unexpected error:", error);
     return false;
   }
 }

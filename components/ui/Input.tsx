@@ -26,9 +26,8 @@ export function Input({
       )}
       <TextInput
         className={`
-          rounded-xl border bg-white px-4 text-base leading-5
-          ${disabled ? "text-gray-500" : "text-gray-900 dark:text-white"}
-          ${disabled ? "dark:bg-white" : "dark:bg-gray-800"}
+          rounded-xl border px-4 text-base leading-5
+          ${disabled ? "cursor-not-allowed bg-gray-50 text-gray-500 dark:bg-gray-700 dark:text-gray-400" : "bg-white text-gray-900 dark:bg-gray-800 dark:text-white"}
           ${
             error
               ? "border-red-500"
@@ -40,7 +39,7 @@ export function Input({
         editable={!disabled}
         {...textInputProps}
       />
-      {error && <Text className="mt-1 text-sm text-red-500">{error}</Text>}
+      {error && <Text className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</Text>}
     </View>
   );
 }

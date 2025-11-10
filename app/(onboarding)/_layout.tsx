@@ -41,6 +41,41 @@ export default function OnboardingLayout() {
           title: "",
         }}
       />
+      <Stack.Screen
+        name="step-5"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="step-6"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="step-7"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="step-8"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="step-9"
+        options={{
+          headerShown: false,
+          title: "",
+        }}
+      />
     </Stack>
   );
 }
