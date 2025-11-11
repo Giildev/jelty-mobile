@@ -3,7 +3,7 @@
  * This will be replaced with real API data in the future
  */
 
-import { Meal } from "@/types/nutrition";
+import { Meal, ScheduledMeal, WeeklyMealPlan } from "@/types/nutrition";
 import { Exercise } from "@/types/workout";
 import { DailyProgress, Streak } from "@/types/progress";
 
@@ -115,4 +115,270 @@ export const MOCK_STREAK: Streak = {
   currentStreak: 5,
   longestStreak: 12,
   lastActiveDate: new Date().toISOString(),
+};
+
+// Mock Scheduled Meals for Meal Plan Calendar
+export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
+  // Monday, Nov 3, 2025
+  {
+    id: "m1-1",
+    name: "Oatmeal with Berries",
+    calories: 320,
+    macros: { carbs: 45, protein: 12, fat: 8 },
+    date: "2025-11-03",
+    time: "08:00",
+    type: "breakfast",
+  },
+  {
+    id: "m1-2",
+    name: "Greek Yogurt & Nuts",
+    calories: 180,
+    macros: { carbs: 12, protein: 15, fat: 8 },
+    date: "2025-11-03",
+    time: "10:30",
+    type: "morning_snack",
+  },
+  {
+    id: "m1-3",
+    name: "Grilled Chicken Salad",
+    calories: 450,
+    macros: { carbs: 15, protein: 35, fat: 28 },
+    date: "2025-11-03",
+    time: "13:00",
+    type: "lunch",
+  },
+  {
+    id: "m1-4",
+    name: "Salmon with Quinoa",
+    calories: 520,
+    macros: { carbs: 35, protein: 40, fat: 22 },
+    date: "2025-11-03",
+    time: "19:00",
+    type: "dinner",
+  },
+
+  // Tuesday, Nov 4, 2025
+  {
+    id: "m2-1",
+    name: "Oatmeal with Berries",
+    calories: 320,
+    macros: { carbs: 45, protein: 12, fat: 8 },
+    date: "2025-11-04",
+    time: "08:00",
+    type: "breakfast",
+  },
+  {
+    id: "m2-2",
+    name: "Apple with Almond Butter",
+    calories: 200,
+    macros: { carbs: 25, protein: 5, fat: 12 },
+    date: "2025-11-04",
+    time: "10:30",
+    type: "morning_snack",
+  },
+  {
+    id: "m2-3",
+    name: "Grilled Chicken Salad",
+    calories: 450,
+    macros: { carbs: 15, protein: 35, fat: 28 },
+    date: "2025-11-04",
+    time: "13:00",
+    type: "lunch",
+  },
+  {
+    id: "m2-4",
+    name: "Protein Smoothie",
+    calories: 280,
+    macros: { carbs: 30, protein: 25, fat: 8 },
+    date: "2025-11-04",
+    time: "16:00",
+    type: "afternoon_snack",
+  },
+  {
+    id: "m2-5",
+    name: "Salmon with Quinoa",
+    calories: 520,
+    macros: { carbs: 35, protein: 40, fat: 22 },
+    date: "2025-11-04",
+    time: "19:00",
+    type: "dinner",
+  },
+
+  // Wednesday, Nov 5, 2025
+  {
+    id: "m3-1",
+    name: "Scrambled Eggs & Toast",
+    calories: 380,
+    macros: { carbs: 35, protein: 20, fat: 18 },
+    date: "2025-11-05",
+    time: "08:00",
+    type: "breakfast",
+  },
+  {
+    id: "m3-2",
+    name: "Turkey & Avocado Wrap",
+    calories: 480,
+    macros: { carbs: 40, protein: 32, fat: 20 },
+    date: "2025-11-05",
+    time: "13:00",
+    type: "lunch",
+  },
+  {
+    id: "m3-3",
+    name: "Steak with Sweet Potato",
+    calories: 580,
+    macros: { carbs: 45, protein: 42, fat: 24 },
+    date: "2025-11-05",
+    time: "19:00",
+    type: "dinner",
+  },
+
+  // Thursday, Nov 6, 2025
+  {
+    id: "m4-1",
+    name: "Protein Pancakes",
+    calories: 350,
+    macros: { carbs: 42, protein: 28, fat: 10 },
+    date: "2025-11-06",
+    time: "08:00",
+    type: "breakfast",
+  },
+  {
+    id: "m4-2",
+    name: "Chicken Rice Bowl",
+    calories: 520,
+    macros: { carbs: 55, protein: 38, fat: 16 },
+    date: "2025-11-06",
+    time: "13:00",
+    type: "lunch",
+  },
+  {
+    id: "m4-3",
+    name: "Hummus & Veggies",
+    calories: 180,
+    macros: { carbs: 18, protein: 6, fat: 10 },
+    date: "2025-11-06",
+    time: "16:00",
+    type: "afternoon_snack",
+  },
+  {
+    id: "m4-4",
+    name: "Baked Cod with Vegetables",
+    calories: 420,
+    macros: { carbs: 25, protein: 45, fat: 12 },
+    date: "2025-11-06",
+    time: "19:00",
+    type: "dinner",
+  },
+
+  // Friday, Nov 7, 2025
+  {
+    id: "m5-1",
+    name: "Oatmeal with Berries",
+    calories: 320,
+    macros: { carbs: 45, protein: 12, fat: 8 },
+    date: "2025-11-07",
+    time: "08:00",
+    type: "breakfast",
+  },
+  {
+    id: "m5-2",
+    name: "Tuna Salad",
+    calories: 380,
+    macros: { carbs: 12, protein: 35, fat: 20 },
+    date: "2025-11-07",
+    time: "13:00",
+    type: "lunch",
+  },
+  {
+    id: "m5-3",
+    name: "Cottage Cheese & Fruit",
+    calories: 220,
+    macros: { carbs: 28, protein: 18, fat: 4 },
+    date: "2025-11-07",
+    time: "16:00",
+    type: "afternoon_snack",
+  },
+  {
+    id: "m5-4",
+    name: "Chicken Stir Fry",
+    calories: 480,
+    macros: { carbs: 38, protein: 42, fat: 18 },
+    date: "2025-11-07",
+    time: "19:00",
+    type: "dinner",
+  },
+
+  // Saturday, Nov 8, 2025
+  {
+    id: "m6-1",
+    name: "Breakfast Burrito",
+    calories: 450,
+    macros: { carbs: 48, protein: 25, fat: 18 },
+    date: "2025-11-08",
+    time: "09:00",
+    type: "breakfast",
+  },
+  {
+    id: "m6-2",
+    name: "Grilled Chicken Salad",
+    calories: 450,
+    macros: { carbs: 15, protein: 35, fat: 28 },
+    date: "2025-11-08",
+    time: "13:30",
+    type: "lunch",
+  },
+  {
+    id: "m6-3",
+    name: "Protein Bar",
+    calories: 250,
+    macros: { carbs: 30, protein: 20, fat: 8 },
+    date: "2025-11-08",
+    time: "16:30",
+    type: "afternoon_snack",
+  },
+  {
+    id: "m6-4",
+    name: "Salmon with Quinoa",
+    calories: 520,
+    macros: { carbs: 35, protein: 40, fat: 22 },
+    date: "2025-11-08",
+    time: "20:00",
+    type: "dinner",
+  },
+
+  // Sunday, Nov 9, 2025
+  {
+    id: "m7-1",
+    name: "French Toast",
+    calories: 420,
+    macros: { carbs: 52, protein: 15, fat: 16 },
+    date: "2025-11-09",
+    time: "09:30",
+    type: "breakfast",
+  },
+  {
+    id: "m7-2",
+    name: "Caesar Salad with Chicken",
+    calories: 480,
+    macros: { carbs: 20, protein: 38, fat: 28 },
+    date: "2025-11-09",
+    time: "14:00",
+    type: "lunch",
+  },
+  {
+    id: "m7-3",
+    name: "Beef Tacos",
+    calories: 550,
+    macros: { carbs: 42, protein: 35, fat: 26 },
+    date: "2025-11-09",
+    time: "19:30",
+    type: "dinner",
+  },
+];
+
+// Mock Weekly Meal Plan
+export const MOCK_WEEKLY_MEAL_PLAN: WeeklyMealPlan = {
+  weekStart: "2025-11-03", // Monday
+  meals: MOCK_SCHEDULED_MEALS,
 };
