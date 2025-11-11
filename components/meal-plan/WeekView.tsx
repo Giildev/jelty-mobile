@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Dimensions } from "react-native";
 import {
   format,
   startOfWeek,
@@ -22,14 +22,24 @@ export function WeekView({ meals, currentDate }: WeekViewProps) {
   // Generate array of 7 days starting from Monday
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
+  // Calculate day width to show 2.3 days
+  const screenWidth = Dimensions.get("window").width;
+  const horizontalPadding = 16; // px-4 = 16px
+  const gapBetweenDays = 12; // gap-3 = 12px
+  const availableWidth = screenWidth - horizontalPadding * 2;
+  const dayWidth = (availableWidth - gapBetweenDays * 2.3) / 2.3;
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       className="flex-1"
-      contentContainerClassName="px-2"
+      contentContainerClassName="px-4"
+      decelerationRate="fast"
+      snapToInterval={dayWidth + gapBetweenDays}
+      snapToAlignment="start"
     >
-      <View className="flex-row gap-2 py-4">
+      <View className="flex-row gap-3 py-4">
         {weekDays.map((day, index) => {
           const dateString = format(day, "yyyy-MM-dd");
           const dayMeals = meals
@@ -39,10 +49,10 @@ export function WeekView({ meals, currentDate }: WeekViewProps) {
           const isCurrentDay = isToday(day);
 
           return (
-            <View key={index} className="w-[130px]">
+            <View key={index} style={{ width: dayWidth }}>
               {/* Day Header */}
               <View
-                className={`mb-2 items-center rounded-lg py-2 ${
+                className={`mb-3 items-center rounded-lg py-2 ${
                   isCurrentDay
                     ? "bg-primary"
                     : "bg-gray-100 dark:bg-gray-800"
