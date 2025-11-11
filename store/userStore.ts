@@ -31,6 +31,16 @@ export interface User {
 }
 
 /**
+ * Cached basic profile data for instant loading
+ */
+export interface CachedProfileData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  memberSince: string | null;
+}
+
+/**
  * User preferences
  */
 export interface UserPreferences {
@@ -45,10 +55,13 @@ export interface UserPreferences {
 interface UserState {
   user: User | null;
   preferences: UserPreferences;
+  cachedProfile: CachedProfileData | null;
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
   updatePreferences: (prefs: Partial<UserPreferences>) => void;
+  setCachedProfile: (profile: CachedProfileData) => void;
+  clearCachedProfile: () => void;
 }
 
 /**
@@ -63,6 +76,7 @@ export const useUserStore = create<UserState>()(
         notifications: true,
         language: "es",
       },
+      cachedProfile: null,
       setUser: user => set({ user }),
       updateUser: updates =>
         set(state => ({
@@ -73,14 +87,17 @@ export const useUserStore = create<UserState>()(
         set({
           preferences: { ...get().preferences, ...prefs },
         }),
+      setCachedProfile: profile => set({ cachedProfile: profile }),
+      clearCachedProfile: () => set({ cachedProfile: null }),
     }),
     {
       name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      // Solo persistir ciertos campos si es necesario
+      // Persistir preferences y cachedProfile (datos básicos no sensibles)
       partialize: state => ({
         preferences: state.preferences,
-        // user no se persiste por seguridad
+        cachedProfile: state.cachedProfile,
+        // user no se persiste por seguridad (datos completos sensibles)
       }),
     }
   )
