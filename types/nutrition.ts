@@ -2,6 +2,8 @@
  * Nutrition and Meal Types
  */
 
+import { Ingredient } from "./grocery";
+
 export interface Macros {
   carbs: number; // grams
   protein: number; // grams
@@ -15,6 +17,7 @@ export interface Meal {
   macros: Macros;
   imageUrl?: string; // Optional for future use
   time?: string; // Optional meal time
+  ingredients?: Ingredient[]; // Optional list of ingredients
 }
 
 export type MealType =
