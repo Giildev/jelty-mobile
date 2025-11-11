@@ -96,7 +96,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#1F024B", // Primary Purple
         tabBarInactiveTintColor: "#9ca3af", // Gray-400
-        headerShown: true,
+        headerShown: false, // Hide headers for all tabs
         tabBarStyle: {
           backgroundColor: "#ffffff",
           borderTopColor: "#e5e7eb",

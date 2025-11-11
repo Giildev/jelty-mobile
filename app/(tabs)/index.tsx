@@ -1,23 +1,25 @@
-import { View, Text, ActivityIndicator } from "react-native";
-import { router } from "expo-router";
-import { useAuth, useUser, useClerk } from "@clerk/clerk-expo";
+import { ScrollView, ActivityIndicator, View } from "react-native";
+import { useAuth } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from "react";
 import { getUserByClerkId } from "@/services/supabase/users";
-import { Ionicons } from "@expo/vector-icons";
+
+// Home components
+import { WelcomeHeader } from "@/components/home/WelcomeHeader";
+import { MealsList } from "@/components/home/MealsList";
+import { WorkoutsList } from "@/components/home/WorkoutsList";
+
+// Mock data
+import { MOCK_MEALS, MOCK_EXERCISES } from "@/constants/mockData";
 
 /**
  * Home Screen
- * Displays personalized welcome message and sign-out functionality
+ * Displays personalized dashboard with daily meals, workouts, and progress
  */
 export default function HomeScreen() {
   const { userId } = useAuth();
-  const { user } = useUser();
-  const clerk = useClerk();
   const [loading, setLoading] = useState(true);
-  const [signingOut, setSigningOut] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>("User");
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -29,12 +31,8 @@ export default function HomeScreen() {
       try {
         const userData = await getUserByClerkId(userId);
 
-        if (userData?.profile) {
-          const { first_name, last_name } = userData.profile;
-
-          if (first_name) {
-            setUserName(first_name);
-          }
+        if (userData?.profile?.first_name) {
+          setUserName(userData.profile.first_name);
         }
       } catch (error) {
         console.error("Error loading user data:", error);
@@ -46,62 +44,32 @@ export default function HomeScreen() {
     loadUserData();
   }, [userId]);
 
-  const handleSignOut = async () => {
-    setSigningOut(true);
-
-    try {
-      // Sign out from Clerk
-      await clerk.signOut();
-
-      // Navigate to sign-in screen
-      router.replace("/(auth)/sign-in");
-    } catch (error) {
-      console.error("Error signing out:", error);
-      setSigningOut(false);
-    }
-  };
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#1F024B" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
-      <View className="flex-1 items-center justify-center px-6">
-        {loading ? (
-          <ActivityIndicator size="large" color="#1F024B" />
-        ) : (
-          <>
-            {/* Welcome Message */}
-            <View className="mb-8 items-center">
-              <View className="mb-4">
-                <Ionicons name="fitness" size={64} color="#1F024B" />
-              </View>
-              <Text className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-                Welcome{userName ? `, ${userName}` : ""}!
-              </Text>
-              {user?.primaryEmailAddress && (
-                <Text className="text-base text-gray-600 dark:text-gray-400">
-                  {user.primaryEmailAddress.emailAddress}
-                </Text>
-              )}
-            </View>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        {/* Welcome Header */}
+        <WelcomeHeader userName={userName} />
 
-            {/* Success Message */}
-            <View className="mb-6 w-full max-w-sm rounded-xl bg-[#0CDA51]/10 px-4 py-3">
-              <Text className="text-center text-sm text-[#0CDA51]">
-                Your profile is complete! Ready to start your fitness journey.
-              </Text>
-            </View>
+        {/* Today's Meals */}
+        <MealsList meals={MOCK_MEALS} />
 
-            {/* Sign Out Button */}
-            <Button
-              onPress={handleSignOut}
-              loading={signingOut}
-              variant="danger"
-              className="w-full max-w-sm"
-            >
-              Sign Out
-            </Button>
-          </>
-        )}
-      </View>
+        {/* Today's Workouts */}
+        <WorkoutsList exercises={MOCK_EXERCISES} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
