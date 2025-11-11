@@ -300,12 +300,11 @@ export default function EditStep1Screen() {
             render={({ field: { onChange, value } }) => (
               <NumberInput
                 label="Height"
-                value={value}
-                onChange={onChange}
+                value={value?.toString() ?? ""}
+                onChange={(text) => onChange(text ? parseFloat(text) : undefined)}
                 error={errors.height_cm?.message}
-                unit={measurementSystem === "metric" ? "cm" : "ft/in"}
                 measurementSystem={measurementSystem}
-                valueType="height"
+                type="height"
               />
             )}
           />
@@ -316,12 +315,11 @@ export default function EditStep1Screen() {
             render={({ field: { onChange, value } }) => (
               <NumberInput
                 label="Weight"
-                value={value}
-                onChange={onChange}
+                value={value?.toString() ?? ""}
+                onChange={(text) => onChange(text ? parseFloat(text) : undefined)}
                 error={errors.weight_kg?.message}
-                unit={measurementSystem === "metric" ? "kg" : "lbs"}
                 measurementSystem={measurementSystem}
-                valueType="weight"
+                type="weight"
               />
             )}
           />
@@ -331,13 +329,13 @@ export default function EditStep1Screen() {
             name="bodyfat_percentage"
             render={({ field: { onChange, value } }) => (
               <NumberInput
-                label="Body Fat Percentage (Optional)"
-                value={value}
-                onChange={onChange}
+                label="Body Fat Percentage"
+                value={value?.toString() ?? ""}
+                onChange={(text) => onChange(text ? parseFloat(text) : undefined)}
                 error={errors.bodyfat_percentage?.message}
-                unit="%"
                 measurementSystem={measurementSystem}
-                valueType="percentage"
+                type="bodyfat"
+                optional
               />
             )}
           />
@@ -347,6 +345,7 @@ export default function EditStep1Screen() {
             name="activity_level"
             render={({ field: { onChange, value } }) => (
               <ActivityLevelDropdown
+                label="Activity Level"
                 value={value}
                 onChange={onChange}
                 error={errors.activity_level?.message}
