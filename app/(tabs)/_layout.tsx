@@ -94,8 +94,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#3b82f6",
-        tabBarInactiveTintColor: "#9ca3af",
+        tabBarActiveTintColor: "#1F024B", // Primary Purple
+        tabBarInactiveTintColor: "#9ca3af", // Gray-400
         headerShown: true,
         tabBarStyle: {
           backgroundColor: "#ffffff",
@@ -111,20 +111,40 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="meal-plan"
         options={{
-          title: "Perfil",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          title: "Meal Plan",
+          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="workout"
         options={{
-          title: "Configuración",
-          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
+          title: "Workout",
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
         }}
       />
-      {/* Ocultar la ruta "two" del tab existente */}
+      <Tabs.Screen
+        name="grocery"
+        options={{
+          title: "Grocery",
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+        }}
+      />
+      {/* Ocultar tabs antiguos */}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: null, // Oculta el tab
+        }}
+      />
       <Tabs.Screen
         name="two"
         options={{
