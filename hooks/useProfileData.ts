@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { getUserByClerkId } from "@/services/supabase/users";
+import { useMemo } from "react";
+import { useUserData } from "@/hooks/useUserData";
 import { useUserStore } from "@/store/userStore";
 
 export interface BasicProfileData {
@@ -13,12 +13,16 @@ interface UseProfileDataReturn {
   data: BasicProfileData;
   loading: boolean;
   error: Error | null;
-  refetch: () => Promise<void>;
+  refetch: () => void;
 }
 
 /**
  * Custom hook to load basic user profile data for Profile screen header
- * Uses cached data for instant loading (stale-while-revalidate pattern)
+ *
+ * OPTIMIZACIÓN:
+ * - Usa useUserData (React Query) para caché automático
+ * - Fix Issue #4: Removidas dependencias problemáticas que causaban re-renders infinitos
+ * - Simplificado: useUserData maneja el caché, no necesitamos lógica manual
  *
  * @param clerkUserId - The Clerk user ID
  * @param clerkEmail - Email from Clerk (fallback)
@@ -33,82 +37,39 @@ export function useProfileData(
   clerkEmail: string | null | undefined,
   clerkCreatedAt: number | null | undefined
 ): UseProfileDataReturn {
-  const cachedProfile = useUserStore((state) => state.cachedProfile);
   const setCachedProfile = useUserStore((state) => state.setCachedProfile);
 
-  // Initialize with cached data if available (instant)
-  const [data, setData] = useState<BasicProfileData>(() => {
-    if (cachedProfile) {
-      return {
-        firstName: cachedProfile.firstName,
-        lastName: cachedProfile.lastName,
-        email: cachedProfile.email,
-        createdAt: cachedProfile.memberSince,
-      };
-    }
-    return {
-      firstName: "",
-      lastName: "",
-      email: clerkEmail || "",
-      createdAt: clerkCreatedAt ? new Date(clerkCreatedAt).toISOString() : null,
+  // Usar useUserData para obtener datos con React Query (caché automático)
+  const { userData, loading, error, refetch } = useUserData(clerkUserId);
+
+  // Transform data to BasicProfileData format
+  const data = useMemo<BasicProfileData>(() => {
+    const profileData: BasicProfileData = {
+      firstName: userData?.profile?.first_name || "",
+      lastName: userData?.profile?.last_name || "",
+      email: clerkEmail || userData?.user?.email || "",
+      createdAt: clerkCreatedAt
+        ? new Date(clerkCreatedAt).toISOString()
+        : userData?.user?.created_at || null,
     };
-  });
 
-  // Only show loading if no cached data
-  const [loading, setLoading] = useState(!cachedProfile);
-  const [error, setError] = useState<Error | null>(null);
-
-  const loadData = useCallback(async () => {
-    if (!clerkUserId) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Don't show loading if we have cached data (background refresh)
-      if (!cachedProfile) {
-        setLoading(true);
-      }
-      setError(null);
-
-      // Fetch fresh data from database
-      const userResult = await getUserByClerkId(clerkUserId);
-
-      const freshData: BasicProfileData = {
-        firstName: userResult?.profile?.first_name || "",
-        lastName: userResult?.profile?.last_name || "",
-        email: clerkEmail || userResult?.user?.email || "",
-        createdAt: clerkCreatedAt
-          ? new Date(clerkCreatedAt).toISOString()
-          : userResult?.user?.created_at || null,
-      };
-
-      // Update state with fresh data
-      setData(freshData);
-
-      // Update cache for next time
+    // Update Zustand cache for legacy compatibility (ProfileHeader, etc.)
+    if (userData && profileData.firstName) {
       setCachedProfile({
-        firstName: freshData.firstName,
-        lastName: freshData.lastName,
-        email: freshData.email,
-        memberSince: freshData.createdAt,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        email: profileData.email,
+        memberSince: profileData.createdAt,
       });
-    } catch (err) {
-      console.error("Error loading basic profile data:", err);
-      setError(err instanceof Error ? err : new Error("Failed to load profile data"));
-    } finally {
-      setLoading(false);
     }
-  }, [clerkUserId, clerkEmail, clerkCreatedAt, cachedProfile, setCachedProfile]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+    return profileData;
+  }, [userData, clerkEmail, clerkCreatedAt, setCachedProfile]);
 
   return {
     data,
     loading,
-    error,
-    refetch: loadData,
+    error: error as Error | null,
+    refetch,
   };
 }

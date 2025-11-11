@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import "../global.css";
 import { tokenCache } from "@/services/storage/secureStorage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -33,6 +34,24 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+/**
+ * React Query client con configuración optimizada
+ * - staleTime: 5 minutos - datos se consideran frescos por 5min
+ * - gcTime: 10 minutos - datos se mantienen en caché por 10min
+ * - refetchOnWindowFocus: false - no refetch al volver a la app
+ */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos (antes cacheTime)
+      retry: 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -65,17 +84,19 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <ClerkLoaded>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-          <Stack.Screen name="(profile-edit)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        </Stack>
-      </ClerkLoaded>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <ClerkLoaded>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+            <Stack.Screen name="(profile-edit)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          </Stack>
+        </ClerkLoaded>
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 }

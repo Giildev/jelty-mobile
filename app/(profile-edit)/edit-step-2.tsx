@@ -24,15 +24,21 @@ import {
   saveOnboardingStep2,
   loadOnboardingStep2,
 } from "@/services/supabase/onboarding";
-import { getUserByClerkId } from "@/services/supabase/users";
+import { useUserData } from "@/hooks/useUserData";
 
 /**
  * Edit Step 2: Fitness Goals & Progress Tracking
  * Allows editing of fitness goals and current body measurements from profile screen
+ *
+ * OPTIMIZACIÓN: Usa useUserData (React Query) para obtener measurement_system
+ * del cache compartido, evitando query redundante a BD.
  */
 export default function EditStep2Screen() {
   const router = useRouter();
   const { userId } = useAuth();
+
+  // Usar React Query para cargar datos con caché
+  const { userData, loading: loadingUser } = useUserData(userId);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,23 +68,24 @@ export default function EditStep2Screen() {
     },
   });
 
-  // Load user data and measurement system on mount
+  // Load measurement system from userData (React Query cache)
   useEffect(() => {
-    loadUserData();
+    if (userData?.profile) {
+      const system = userData.profile.measurement_system || "metric";
+      setMeasurementSystem(system as "metric" | "imperial");
+    }
+  }, [userData]);
+
+  // Load existing step 2 data on mount
+  useEffect(() => {
+    loadStep2Data();
   }, []);
 
-  const loadUserData = async () => {
+  const loadStep2Data = async () => {
     try {
       if (!userId) {
         setLoading(false);
         return;
-      }
-
-      // Load user profile to get measurement system
-      const userData = await getUserByClerkId(userId);
-      if (userData?.profile) {
-        const system = userData.profile.measurement_system || "metric";
-        setMeasurementSystem(system as "metric" | "imperial");
       }
 
       // Load existing step 2 data if available

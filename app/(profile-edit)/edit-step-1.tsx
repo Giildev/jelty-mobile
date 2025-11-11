@@ -24,12 +24,15 @@ import { NumberInput } from "@/components/onboarding/NumberInput";
 
 // Services
 import { saveOnboardingStep1 } from "@/services/supabase/onboarding";
-import { getUserByClerkId } from "@/services/supabase/users";
 import { useUserStore } from "@/store/userStore";
+import { useUserData, useInvalidateUserData } from "@/hooks/useUserData";
 
 /**
  * Edit Step 1: Personal Information
  * Allows editing of personal information from profile screen
+ *
+ * OPTIMIZACIÓN: Usa useUserData (React Query) para caché automático
+ * y useInvalidateUserData para invalidar caché después de guardar.
  */
 export default function EditStep1Screen() {
   const router = useRouter();
@@ -37,7 +40,10 @@ export default function EditStep1Screen() {
   const { user: clerkUser } = useUser();
   const setCachedProfile = useUserStore((state) => state.setCachedProfile);
 
-  const [loading, setLoading] = useState(true);
+  // Usar React Query para cargar datos con caché
+  const { userData, loading, error } = useUserData(userId);
+  const invalidateUserData = useInvalidateUserData();
+
   const [saving, setSaving] = useState(false);
   const [measurementSystem, setMeasurementSystem] =
     useState<MeasurementSystem>("metric");
@@ -70,63 +76,64 @@ export default function EditStep1Screen() {
     },
   });
 
-  // Load user data from database on mount
+  // Load user data into form when userData is available
   useEffect(() => {
-    loadUserData();
-  }, []);
+    if (!userData || !userData.profile) return;
 
-  const loadUserData = async () => {
-    if (!userId) return;
+    const profile = userData.profile;
 
-    try {
-      setLoading(true);
-      const userData = await getUserByClerkId(userId);
+    // Set form values from loaded data
+    setValue("first_name", profile.first_name || "");
+    setValue("last_name", profile.last_name || "");
+    setValue("email", clerkUser?.primaryEmailAddress?.emailAddress || "");
+    setValue("phone", profile.phone || "");
+    setValue("birth_date", profile.birth_date || "");
+    setValue("gender", (profile.gender as Gender) || "male");
+    setValue(
+      "measurement_system",
+      (profile.measurement_system as MeasurementSystem) || "metric"
+    );
 
-      if (userData && userData.profile) {
-        const profile = userData.profile;
+    // Handle numeric fields - may already be numbers
+    const heightValue = profile.height_cm
+      ? typeof profile.height_cm === "number"
+        ? profile.height_cm
+        : parseFloat(profile.height_cm.toString())
+      : undefined;
+    const weightValue = profile.weight_kg
+      ? typeof profile.weight_kg === "number"
+        ? profile.weight_kg
+        : parseFloat(profile.weight_kg.toString())
+      : undefined;
+    const bodyfatValue = profile.bodyfat_percentage
+      ? typeof profile.bodyfat_percentage === "number"
+        ? profile.bodyfat_percentage
+        : parseFloat(profile.bodyfat_percentage.toString())
+      : undefined;
 
-        // Set form values from loaded data
-        setValue("first_name", profile.first_name || "");
-        setValue("last_name", profile.last_name || "");
-        setValue("email", clerkUser?.primaryEmailAddress?.emailAddress || "");
-        setValue("phone", profile.phone || "");
-        setValue("birth_date", profile.birth_date || "");
-        setValue("gender", (profile.gender as Gender) || "male");
-        setValue(
-          "measurement_system",
-          (profile.measurement_system as MeasurementSystem) || "metric"
-        );
-        const heightValue = profile.height_cm ? parseFloat(profile.height_cm) : undefined;
-        const weightValue = profile.weight_kg ? parseFloat(profile.weight_kg) : undefined;
-        const bodyfatValue = profile.bodyfat_percentage ? parseFloat(profile.bodyfat_percentage) : undefined;
-
-        if (heightValue !== undefined && !isNaN(heightValue)) {
-          setValue("height_cm", heightValue);
-        }
-        if (weightValue !== undefined && !isNaN(weightValue)) {
-          setValue("weight_kg", weightValue);
-        }
-        if (bodyfatValue !== undefined && !isNaN(bodyfatValue)) {
-          setValue("bodyfat_percentage", bodyfatValue);
-        }
-        setValue("activity_level", (profile.activity_level as ActivityLevel) || "moderately_active");
-        setValue("country", profile.country || "");
-        setValue("country_code", profile.country_code || "");
-        setValue("city", profile.city || "");
-        setValue("address", profile.address || "");
-        setValue("zip_code", profile.zip_code || "");
-
-        setMeasurementSystem(
-          (profile.measurement_system as MeasurementSystem) || "metric"
-        );
-      }
-    } catch (error) {
-      console.error("Error loading user data:", error);
-      Alert.alert("Error", "Failed to load profile data");
-    } finally {
-      setLoading(false);
+    if (heightValue !== undefined && !isNaN(heightValue)) {
+      setValue("height_cm", heightValue);
     }
-  };
+    if (weightValue !== undefined && !isNaN(weightValue)) {
+      setValue("weight_kg", weightValue);
+    }
+    if (bodyfatValue !== undefined && !isNaN(bodyfatValue)) {
+      setValue("bodyfat_percentage", bodyfatValue);
+    }
+    setValue(
+      "activity_level",
+      (profile.activity_level as ActivityLevel) || "moderately_active"
+    );
+    setValue("country", profile.country || "");
+    setValue("country_code", profile.country_code || "");
+    setValue("city", profile.city || "");
+    setValue("address", profile.address || "");
+    setValue("zip_code", profile.zip_code || "");
+
+    setMeasurementSystem(
+      (profile.measurement_system as MeasurementSystem) || "metric"
+    );
+  }, [userData, clerkUser, setValue]);
 
   const onSubmit = async (data: PersonalInfoFormData) => {
     if (!userId) {
@@ -141,7 +148,10 @@ export default function EditStep1Screen() {
       const success = await saveOnboardingStep1(userId, data);
 
       if (success) {
-        // Update cache with new data
+        // OPTIMIZACIÓN: Invalidar caché de React Query para refetch en próximo acceso
+        invalidateUserData(userId);
+
+        // Update Zustand cache for legacy compatibility
         setCachedProfile({
           firstName: data.first_name,
           lastName: data.last_name,

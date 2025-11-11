@@ -6,13 +6,13 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { useUser, useAuth } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { GenerateNewPlanModal } from "@/components/profile/GenerateNewPlanModal";
 import { useProfileData } from "@/hooks/useProfileData";
-import { useUserStore } from "@/store/userStore";
+import { useLogout } from "@/hooks/useLogout";
 
 /**
  * User profile screen
@@ -20,10 +20,8 @@ import { useUserStore } from "@/store/userStore";
  */
 export default function ProfileScreen() {
   const { user } = useUser();
-  const { signOut } = useAuth();
   const router = useRouter();
-  const clearUser = useUserStore((state) => state.clearUser);
-  const clearCachedProfile = useUserStore((state) => state.clearCachedProfile);
+  const logout = useLogout();
   const [showGeneratePlanModal, setShowGeneratePlanModal] = useState(false);
 
   // Load basic profile data (first name, last name only)
@@ -43,11 +41,9 @@ export default function ProfileScreen() {
 
   const handleSignOut = async () => {
     try {
-      // Clear Zustand store (user and cached profile)
-      clearUser();
-      clearCachedProfile();
-      // Sign out from Clerk
-      await signOut();
+      // OPTIMIZACIÓN: usa useLogout que limpia ambos caches (Zustand + React Query)
+      // para prevenir leak de datos entre usuarios
+      await logout();
       // Navigate to sign-in
       router.replace("/(auth)/sign-in");
     } catch (error) {
