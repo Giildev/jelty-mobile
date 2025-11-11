@@ -1,9 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, Redirect, useFocusEffect } from "expo-router";
+import { Tabs, Redirect } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { View, ActivityIndicator } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import { isOnboardingComplete } from "@/services/supabase/onboarding";
+import { useUserStore } from "@/store/userStore";
 
 /**
  * Tab bar icon component
@@ -18,15 +19,26 @@ function TabBarIcon(props: {
 /**
  * Layout de tabs - Punto de entrada protegido de la app
  * Requiere autenticación para acceder
+ *
+ * OPTIMIZACIÓN: Cachea el estado de onboarding en Zustand para evitar
+ * queries redundantes a Supabase en cada navegación.
  */
 export default function TabLayout() {
   const { isSignedIn, isLoaded, userId } = useAuth();
-  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
-  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(false);
 
-  // Verificar si el usuario completó el onboarding
+  // Leer estado de onboarding desde cache (Zustand)
+  const cachedOnboardingCompleted = useUserStore(state => state.onboardingCompleted);
+  const setOnboardingCompleted = useUserStore(state => state.setOnboardingCompleted);
+
+  // Usar cache como estado local (fallback a false si es null)
+  const [onboardingCompleted, setLocalOnboardingCompleted] = useState(
+    cachedOnboardingCompleted ?? false
+  );
+
+  // Verificar si el usuario completó el onboarding (solo si cache es null)
   const checkOnboarding = useCallback(async () => {
-    console.log("[TabLayout] checkOnboarding called - isLoaded:", isLoaded, "isSignedIn:", isSignedIn, "userId:", userId);
+    console.log("[TabLayout] checkOnboarding called - cached:", cachedOnboardingCompleted);
 
     if (!isLoaded) {
       console.log("[TabLayout] Auth not loaded yet, waiting...");
@@ -34,43 +46,44 @@ export default function TabLayout() {
     }
 
     if (!isSignedIn || !userId) {
-      console.log("[TabLayout] User not signed in or userId missing, skipping onboarding check");
+      console.log("[TabLayout] User not signed in, skipping onboarding check");
       setCheckingOnboarding(false);
       return;
     }
 
+    // OPTIMIZACIÓN: Solo verificar si NO tenemos el valor cacheado
+    if (cachedOnboardingCompleted !== null) {
+      console.log("[TabLayout] Using cached onboarding status:", cachedOnboardingCompleted);
+      setLocalOnboardingCompleted(cachedOnboardingCompleted);
+      setCheckingOnboarding(false);
+      return;
+    }
+
+    // Primera vez o cache invalidado - verificar con BD
     setCheckingOnboarding(true);
     try {
-      console.log("[TabLayout] Checking onboarding status for userId:", userId);
-      console.log("[TabLayout] userId type:", typeof userId);
+      console.log("[TabLayout] Fetching onboarding status from DB for userId:", userId);
       const completed = await isOnboardingComplete(userId);
       console.log("[TabLayout] Onboarding completed:", completed);
+
+      // Guardar en cache Y estado local
       setOnboardingCompleted(completed);
+      setLocalOnboardingCompleted(completed);
     } catch (error) {
       console.error("[TabLayout] Error checking onboarding:", error);
       // En caso de error, asumimos que NO ha completado onboarding
       setOnboardingCompleted(false);
+      setLocalOnboardingCompleted(false);
     } finally {
       setCheckingOnboarding(false);
     }
-  }, [isLoaded, isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId, cachedOnboardingCompleted, setOnboardingCompleted]);
 
   // Check onboarding on mount and when auth state changes
   useEffect(() => {
     console.log("[TabLayout] useEffect triggered - checking onboarding");
     checkOnboarding();
-  }, [isLoaded, isSignedIn, userId]);
-
-  // Re-check onboarding status whenever this screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      console.log("[TabLayout] useFocusEffect triggered - re-checking onboarding");
-      // Only re-check if auth is loaded
-      if (isLoaded && isSignedIn && userId) {
-        checkOnboarding();
-      }
-    }, [isLoaded, isSignedIn, userId, checkOnboarding])
-  );
+  }, [checkOnboarding]);
 
   // Mostrar loading mientras se verifica el estado de autenticación y onboarding
   if (!isLoaded || checkingOnboarding) {
@@ -94,9 +107,9 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#3b82f6",
-        tabBarInactiveTintColor: "#9ca3af",
-        headerShown: true,
+        tabBarActiveTintColor: "#1F024B", // Primary Purple
+        tabBarInactiveTintColor: "#9ca3af", // Gray-400
+        headerShown: false, // Hide headers for all tabs
         tabBarStyle: {
           backgroundColor: "#ffffff",
           borderTopColor: "#e5e7eb",
@@ -111,20 +124,40 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="meal-plan"
         options={{
-          title: "Perfil",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          title: "Meal Plan",
+          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="workout"
         options={{
-          title: "Configuración",
-          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
+          title: "Workout",
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
         }}
       />
-      {/* Ocultar la ruta "two" del tab existente */}
+      <Tabs.Screen
+        name="grocery"
+        options={{
+          title: "Grocery",
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+        }}
+      />
+      {/* Ocultar tabs antiguos */}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: null, // Oculta el tab
+        }}
+      />
       <Tabs.Screen
         name="two"
         options={{
