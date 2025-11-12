@@ -209,7 +209,7 @@ export function encryptUserFields(
   userSalt: string,
   userId: string
 ): Record<string, any> {
-  const encryptedData = { ...userData };
+  const encryptedData: Record<string, any> = {};
 
   // Lista de campos a encriptar
   const fieldsToEncrypt = [
@@ -227,9 +227,27 @@ export function encryptUserFields(
     "country_code",
   ];
 
+  // Lista de campos NO encriptados que pertenecen a user_profile
+  const nonEncryptedFields = [
+    "gender",
+    "age_years",
+    "measurement_system",
+    "activity_level",
+    "onboarding_completed",
+    "notes",
+  ];
+
+  // Encriptar campos sensibles
   fieldsToEncrypt.forEach((field) => {
     if (field in userData) {
       encryptedData[field] = encryptData(userData[field], userSalt, userId);
+    }
+  });
+
+  // Copiar campos no encriptados que pertenecen a user_profile
+  nonEncryptedFields.forEach((field) => {
+    if (field in userData) {
+      encryptedData[field] = userData[field];
     }
   });
 
