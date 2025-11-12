@@ -82,6 +82,79 @@ module.exports = {
         warning: '#FBB040',
         error: '#EF4444',
         info: '#147BFE',
+
+        // ============================================
+        // MEAL TAG COLORS - Neon/Bright Palette
+        // ============================================
+        'meal-breakfast': {
+          light: '#FFF4E6',
+          DEFAULT: '#FF6B00',
+          dark: '#FF8C42',
+        },
+        'meal-morning-snack': {
+          light: '#E8F8F0',
+          DEFAULT: '#0CDA51',
+          dark: '#10F55E',
+        },
+        'meal-lunch': {
+          light: '#E0F2FE',
+          DEFAULT: '#00A3FF',
+          dark: '#3BB9FF',
+        },
+        'meal-afternoon-snack': {
+          light: '#2D1B69',
+          DEFAULT: '#5B21B6',
+          dark: '#7C3AED',
+        },
+        'meal-dinner': {
+          light: '#F5F3FF',
+          DEFAULT: '#B457FF',
+          dark: '#C97DFF',
+        },
+        'meal-evening-snack': {
+          light: '#F3F4F6',
+          DEFAULT: '#00D9FF',
+          dark: '#3DE4FF',
+        },
+
+        // ============================================
+        // WORKOUT TAG COLORS - Neon/Bright Palette
+        // ============================================
+        'workout-warm-up': {
+          light: '#FEF3E8',
+          DEFAULT: '#FF9500',
+          dark: '#FFB347',
+        },
+        'workout-main': {
+          light: '#E8E5FE',
+          DEFAULT: '#8B3DFF',
+          dark: '#A666FF',
+        },
+        'workout-stretch': {
+          light: '#1E3A8A',
+          DEFAULT: '#1E40AF',
+          dark: '#2563EB',
+        },
+        'workout-cardio': {
+          light: '#FFEDE5',
+          DEFAULT: '#FF3D00',
+          dark: '#FF6B3D',
+        },
+        'workout-strength': {
+          light: '#EDE9FE',
+          DEFAULT: '#D946FF',
+          dark: '#E56FFF',
+        },
+        'workout-flexibility': {
+          light: '#D1FAE5',
+          DEFAULT: '#00F566',
+          dark: '#3DFF88',
+        },
+        'workout-yoga': {
+          light: '#FCE7F3',
+          DEFAULT: '#F4006E',
+          dark: '#FF3D95',
+        },
       },
 
       // ============================================

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { ScheduledExercise } from "@/types/workout";
+import { WorkoutTag } from "@/components/ui/WorkoutTag";
 
 interface ExerciseMiniCardProps {
   exercise: ScheduledExercise;
@@ -47,20 +48,6 @@ export function ExerciseMiniCard({
     );
   }
 
-  // Map exercise types to display labels
-  const getExerciseTypeLabel = () => {
-    switch (exercise.type) {
-      case "warm-up":
-        return "Warm-Up";
-      case "main":
-        return "Main";
-      case "stretch":
-        return "Stretch";
-      default:
-        return "Exercise";
-    }
-  };
-
   // Regular mini card for week/day views
   return (
     <Pressable onPress={handlePress} className="active:opacity-70">
@@ -68,47 +55,30 @@ export function ExerciseMiniCard({
         {/* Image Placeholder */}
         <View className="relative h-32 w-full bg-gray-300 dark:bg-gray-700">
           {/* Exercise Type Tag */}
-          <View className="absolute right-2 top-2 rounded bg-black/60 px-2 py-0.5">
-            <Text className="text-[9px] font-semibold uppercase text-white">
-              {getExerciseTypeLabel()}
-            </Text>
+          <View className="absolute right-2 top-2">
+            <WorkoutTag type={exercise.type} />
           </View>
         </View>
 
-        {/* Content - 2 Column Layout */}
-        <View className="flex-row gap-3 p-3">
-          {/* Column 1: Name, Sets x Reps, Details */}
-          <View className="flex-1">
-            {/* Name */}
-            <Text
-              className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
-              numberOfLines={2}
-            >
-              {exercise.name}
-            </Text>
+        {/* Content - Single Column Layout */}
+        <View className="p-3">
+          {/* Name */}
+          <Text
+            className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
+            numberOfLines={2}
+          >
+            {exercise.name}
+          </Text>
 
-            {/* Sets x Reps */}
-            <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-              {exercise.sets} sets × {exercise.reps} reps
-            </Text>
+          {/* Sets x Reps */}
+          <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+            {exercise.sets} sets × {exercise.reps} reps
+          </Text>
 
-            {/* Exercise Details */}
-            <Text className="text-[10px] text-gray-600 dark:text-gray-400">
-              RIR: {exercise.rir} • Rest: {exercise.restTime}s
-            </Text>
-          </View>
-
-          {/* Column 2: Description */}
-          {exercise.description && (
-            <View className="flex-1">
-              <Text
-                className="text-xs text-gray-600 dark:text-gray-400"
-                numberOfLines={4}
-              >
-                {exercise.description}
-              </Text>
-            </View>
-          )}
+          {/* Exercise Details */}
+          <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+            RIR: {exercise.rir} • Rest: {exercise.restTime}s
+          </Text>
         </View>
       </View>
     </Pressable>

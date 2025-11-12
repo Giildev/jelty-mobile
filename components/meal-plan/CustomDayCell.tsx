@@ -90,15 +90,15 @@ export function CustomDayCell({
   );
 }
 
-// Helper function to get color for meal type
+// Helper function to get color for meal type - Neon/Bright colors aligned with brand
 function getMealColor(mealType: string): string {
   const colors: Record<string, string> = {
-    breakfast: "#f59e0b", // amber
-    morning_snack: "#10b981", // emerald
-    lunch: "#3b82f6", // blue
-    afternoon_snack: "#8b5cf6", // violet
-    dinner: "#ef4444", // red
-    evening_snack: "#ec4899", // pink
+    breakfast: "#FF6B00", // Neon orange (energizing morning)
+    morning_snack: "#0CDA51", // Neon green (healthy, light)
+    lunch: "#00A3FF", // Neon blue (main meal of the day)
+    afternoon_snack: "#5B21B6", // Purple (afternoon snack)
+    dinner: "#B457FF", // Neon purple (evening main meal)
+    evening_snack: "#00D9FF", // Neon cyan (light night snack)
   };
   return colors[mealType] || "#6b7280"; // gray as fallback
 }

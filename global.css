@@ -54,6 +54,65 @@
     @apply px-6 py-4;
   }
 
+  /* Tag Base Styles - Very small and compact */
+  .tag-base {
+    @apply rounded-full px-1.5 py-0.5 text-[4px] font-semibold uppercase text-white;
+  }
+
+  /* Meal Tags - Solid bright backgrounds with white text */
+  .tag-breakfast {
+    @apply tag-base bg-meal-breakfast text-white;
+  }
+
+  .tag-morning-snack {
+    @apply tag-base bg-meal-morning-snack text-white;
+  }
+
+  .tag-lunch {
+    @apply tag-base bg-meal-lunch text-white;
+  }
+
+  .tag-afternoon-snack {
+    @apply tag-base bg-meal-afternoon-snack text-white;
+  }
+
+  .tag-dinner {
+    @apply tag-base bg-meal-dinner text-white;
+  }
+
+  .tag-evening-snack {
+    @apply tag-base bg-meal-evening-snack text-white;
+  }
+
+  /* Workout Tags - Solid bright backgrounds with white text */
+  .tag-warm-up {
+    @apply tag-base bg-workout-warm-up text-white;
+  }
+
+  .tag-main {
+    @apply tag-base bg-workout-main text-white;
+  }
+
+  .tag-stretch {
+    @apply tag-base bg-workout-stretch text-white;
+  }
+
+  .tag-cardio {
+    @apply tag-base bg-workout-cardio text-white;
+  }
+
+  .tag-strength {
+    @apply tag-base bg-workout-strength text-white;
+  }
+
+  .tag-flexibility {
+    @apply tag-base bg-workout-flexibility text-white;
+  }
+
+  .tag-yoga {
+    @apply tag-base bg-workout-yoga text-white;
+  }
+
   /* Nota: Para sombras personalizadas en React Native, usar los objetos
      de constants/tokens/shadows.ts con StyleSheet.create() */
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { ScheduledMeal } from "@/types/nutrition";
+import { MealTag } from "@/components/ui/MealTag";
 
 interface MealMiniCardProps {
   meal: ScheduledMeal;
@@ -44,24 +45,6 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
     );
   }
 
-  // Map meal types to display labels
-  const getMealTypeLabel = () => {
-    switch (meal.type) {
-      case "breakfast":
-        return "Breakfast";
-      case "morning_snack":
-        return "Snack";
-      case "lunch":
-        return "Lunch";
-      case "afternoon_snack":
-        return "Late Snack";
-      case "dinner":
-        return "Dinner";
-      default:
-        return "Meal";
-    }
-  };
-
   // Regular mini card for week/day views
   return (
     <Pressable
@@ -71,48 +54,31 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
       {/* Image Placeholder */}
       <View className="relative h-32 w-full bg-gray-300 dark:bg-gray-700">
         {/* Meal Type Tag */}
-        <View className="absolute right-2 top-2 rounded bg-black/60 px-2 py-0.5">
-          <Text className="text-[9px] font-semibold uppercase text-white">
-            {getMealTypeLabel()}
-          </Text>
+        <View className="absolute right-2 top-2">
+          <MealTag type={meal.type} />
         </View>
       </View>
 
-      {/* Content - 2 Column Layout */}
-      <View className="flex-row gap-3 p-3">
-        {/* Column 1: Name, Calories, Macros */}
-        <View className="flex-1">
-          {/* Name */}
-          <Text
-            className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
-            numberOfLines={2}
-          >
-            {meal.name}
-          </Text>
+      {/* Content - Single Column Layout */}
+      <View className="p-3">
+        {/* Name */}
+        <Text
+          className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
+          numberOfLines={2}
+        >
+          {meal.name}
+        </Text>
 
-          {/* Calories */}
-          <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-            {meal.calories} kcal
-          </Text>
+        {/* Calories */}
+        <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+          {meal.calories} kcal
+        </Text>
 
-          {/* Macros */}
-          <Text className="text-[10px] text-gray-600 dark:text-gray-400">
-            C: {meal.macros.carbs}g • P: {meal.macros.protein}g • F:{" "}
-            {meal.macros.fat}g
-          </Text>
-        </View>
-
-        {/* Column 2: Description */}
-        {meal.description && (
-          <View className="flex-1">
-            <Text
-              className="text-xs text-gray-600 dark:text-gray-400"
-              numberOfLines={4}
-            >
-              {meal.description}
-            </Text>
-          </View>
-        )}
+        {/* Macros */}
+        <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+          C: {meal.macros.carbs}g • P: {meal.macros.protein}g • F:{" "}
+          {meal.macros.fat}g
+        </Text>
       </View>
     </Pressable>
   );
