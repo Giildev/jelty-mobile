@@ -4,7 +4,12 @@
  */
 
 import { Meal, ScheduledMeal, WeeklyMealPlan, MealDetail } from "@/types/nutrition";
-import { Exercise, ScheduledExercise, WeeklyWorkoutPlan } from "@/types/workout";
+import {
+  Exercise,
+  ScheduledExercise,
+  WeeklyWorkoutPlan,
+  ExerciseDetail,
+} from "@/types/workout";
 import { DailyProgress, Streak } from "@/types/progress";
 import { GroceryItem } from "@/types/grocery";
 
@@ -2826,6 +2831,632 @@ export const MEAL_DETAILS_MOCK: MealDetail[] = [
         stepNumber: 4,
         instruction: "Top with sliced chicken. Squeeze lemon over the top and serve immediately.",
       },
+    ],
+  },
+];
+
+// Mock Exercise Details for Exercise Detail View
+export const EXERCISE_DETAILS_MOCK: ExerciseDetail[] = [
+  // Warm-up Exercises
+  {
+    id: "e1-1",
+    name: "Arm Circles",
+    sets: 2,
+    reps: 15,
+    rir: 5,
+    restTime: 30,
+    description:
+      "A dynamic warm-up exercise that mobilizes the shoulder joints and increases blood flow to the upper body. Perfect for preparing your shoulders for any upper body workout.",
+    primaryMuscle: "Shoulders",
+    equipment: "None (Bodyweight)",
+    category: "warm-up",
+    muscleGroup: "Shoulders",
+    gallery: [
+      {
+        id: "media-e1-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
+        role: "primary",
+        altText: "Person performing arm circles exercise",
+        sortIndex: 1,
+      },
+      {
+        id: "media-e1-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80",
+        role: "gallery",
+        altText: "Arm circles starting position",
+        sortIndex: 2,
+      },
+    ],
+    instructions: {
+      sets: 2,
+      repsMin: 15,
+      repsMax: 15,
+      rir: 5,
+      restTimeSeconds: 30,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-1-1",
+        orderIndex: 1,
+        instruction:
+          "Stand with your feet shoulder-width apart and extend your arms straight out to the sides at shoulder height.",
+      },
+      {
+        id: "step-e1-1-2",
+        orderIndex: 2,
+        instruction:
+          "Begin making small circular motions with your arms, gradually increasing the size of the circles.",
+      },
+      {
+        id: "step-e1-1-3",
+        orderIndex: 3,
+        instruction:
+          "After 15 circles forward, reverse direction and perform 15 circles backward.",
+      },
+    ],
+    tips: [
+      "Keep your core engaged throughout the movement",
+      "Start with small circles and gradually increase the diameter",
+      "Maintain steady breathing - don't hold your breath",
+    ],
+  },
+  {
+    id: "e1-2",
+    name: "Band Pull-Aparts",
+    sets: 2,
+    reps: 20,
+    rir: 5,
+    restTime: 30,
+    description:
+      "An excellent warm-up and prehab exercise that activates the rear deltoids and upper back muscles. Helps improve posture and shoulder health.",
+    primaryMuscle: "Rear Deltoids",
+    equipment: "Resistance Band",
+    category: "warm-up",
+    muscleGroup: "Shoulders",
+    gallery: [
+      {
+        id: "media-e1-2-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+        role: "primary",
+        altText: "Person performing band pull-aparts",
+        sortIndex: 1,
+      },
+    ],
+    instructions: {
+      sets: 2,
+      repsMin: 20,
+      repsMax: 20,
+      rir: 5,
+      restTimeSeconds: 30,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-2-1",
+        orderIndex: 1,
+        instruction:
+          "Hold a resistance band in front of you at shoulder height with arms extended and hands about shoulder-width apart.",
+      },
+      {
+        id: "step-e1-2-2",
+        orderIndex: 2,
+        instruction:
+          "Pull the band apart by moving your hands outward, squeezing your shoulder blades together.",
+      },
+      {
+        id: "step-e1-2-3",
+        orderIndex: 3,
+        instruction:
+          "Control the return to starting position and repeat for the desired number of reps.",
+      },
+    ],
+    tips: [
+      "Focus on squeezing your shoulder blades together",
+      "Keep your elbows slightly bent throughout",
+      "Use a lighter band to focus on muscle activation",
+    ],
+  },
+
+  // Main Exercises
+  {
+    id: "e1-3",
+    name: "Bench Press",
+    sets: 4,
+    reps: 8,
+    rir: 2,
+    restTime: 120,
+    description:
+      "The king of chest exercises. A compound movement that builds strength and size in the chest, shoulders, and triceps. Essential for upper body development.",
+    primaryMuscle: "Chest",
+    equipment: "Barbell, Bench",
+    category: "main",
+    muscleGroup: "Chest",
+    gallery: [
+      {
+        id: "media-e1-3-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800&q=80",
+        role: "primary",
+        altText: "Person performing bench press",
+        sortIndex: 1,
+      },
+      {
+        id: "media-e1-3-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?w=800&q=80",
+        role: "gallery",
+        altText: "Bench press starting position",
+        sortIndex: 2,
+      },
+      {
+        id: "media-e1-3-3",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=800&q=80",
+        role: "demonstration",
+        altText: "Proper bench press form",
+        sortIndex: 3,
+      },
+    ],
+    instructions: {
+      sets: 4,
+      repsMin: 8,
+      repsMax: 8,
+      rir: 2,
+      restTimeSeconds: 120,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-3-1",
+        orderIndex: 1,
+        instruction:
+          "Lie flat on the bench with your feet firmly on the ground. Grip the barbell slightly wider than shoulder-width.",
+      },
+      {
+        id: "step-e1-3-2",
+        orderIndex: 2,
+        instruction:
+          "Unrack the bar and position it over your chest with arms fully extended.",
+      },
+      {
+        id: "step-e1-3-3",
+        orderIndex: 3,
+        instruction:
+          "Lower the bar in a controlled manner until it lightly touches your mid-chest, keeping your elbows at about 45 degrees.",
+      },
+      {
+        id: "step-e1-3-4",
+        orderIndex: 4,
+        instruction:
+          "Press the bar back up powerfully to the starting position, fully extending your arms.",
+      },
+    ],
+    tips: [
+      "Keep your shoulder blades retracted and depressed throughout",
+      "Maintain a slight arch in your lower back",
+      "Drive through your feet for leg drive and stability",
+      "Always use a spotter when lifting heavy",
+    ],
+  },
+  {
+    id: "e1-4",
+    name: "Incline Dumbbell Press",
+    sets: 4,
+    reps: 10,
+    rir: 2,
+    restTime: 90,
+    description:
+      "Targets the upper portion of the chest with dumbbells allowing for greater range of motion. Excellent for building a well-rounded chest.",
+    primaryMuscle: "Upper Chest",
+    equipment: "Dumbbells, Incline Bench",
+    category: "main",
+    muscleGroup: "Chest",
+    gallery: [
+      {
+        id: "media-e1-4-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80",
+        role: "primary",
+        altText: "Person performing incline dumbbell press",
+        sortIndex: 1,
+      },
+      {
+        id: "media-e1-4-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80",
+        role: "gallery",
+        altText: "Incline dumbbell press setup",
+        sortIndex: 2,
+      },
+    ],
+    instructions: {
+      sets: 4,
+      repsMin: 10,
+      repsMax: 10,
+      rir: 2,
+      restTimeSeconds: 90,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-4-1",
+        orderIndex: 1,
+        instruction:
+          "Set the bench to a 30-45 degree incline. Sit with your back flat against the bench holding dumbbells at shoulder height.",
+      },
+      {
+        id: "step-e1-4-2",
+        orderIndex: 2,
+        instruction:
+          "Press the dumbbells up and slightly together until your arms are fully extended above your upper chest.",
+      },
+      {
+        id: "step-e1-4-3",
+        orderIndex: 3,
+        instruction:
+          "Lower the dumbbells in a controlled manner back to shoulder height, feeling a stretch in your chest.",
+      },
+    ],
+    tips: [
+      "Don't set the incline too steep (over 45 degrees shifts focus to shoulders)",
+      "Keep your wrists neutral and stable",
+      "Control the negative portion of the movement",
+    ],
+  },
+  {
+    id: "e1-5",
+    name: "Cable Flyes",
+    sets: 3,
+    reps: 12,
+    rir: 1,
+    restTime: 60,
+    description:
+      "An isolation exercise that provides constant tension on the chest muscles throughout the entire range of motion. Perfect for chest development and muscle definition.",
+    primaryMuscle: "Chest",
+    equipment: "Cable Machine",
+    category: "main",
+    muscleGroup: "Chest",
+    gallery: [
+      {
+        id: "media-e1-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1623874228601-f4193c7b1818?w=800&q=80",
+        role: "primary",
+        altText: "Person performing cable flyes",
+        sortIndex: 1,
+      },
+    ],
+    instructions: {
+      sets: 3,
+      repsMin: 12,
+      repsMax: 12,
+      rir: 1,
+      restTimeSeconds: 60,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-5-1",
+        orderIndex: 1,
+        instruction:
+          "Set the pulleys to chest height. Stand in the center with one foot forward for stability, grasping a handle in each hand.",
+      },
+      {
+        id: "step-e1-5-2",
+        orderIndex: 2,
+        instruction:
+          "With a slight bend in your elbows, bring the handles together in front of your chest in a wide arc motion.",
+      },
+      {
+        id: "step-e1-5-3",
+        orderIndex: 3,
+        instruction:
+          "Squeeze your chest at the peak contraction, then slowly return to the starting position with control.",
+      },
+    ],
+    tips: [
+      "Maintain a slight bend in the elbows throughout the movement",
+      "Focus on squeezing the chest rather than just moving weight",
+      "Keep your core engaged to prevent swaying",
+    ],
+  },
+  {
+    id: "e1-6",
+    name: "Overhead Press",
+    sets: 4,
+    reps: 8,
+    rir: 2,
+    restTime: 90,
+    description:
+      "A fundamental compound movement for shoulder development. Builds strength in the shoulders, upper chest, and triceps while improving overall pressing power.",
+    primaryMuscle: "Shoulders",
+    equipment: "Barbell",
+    category: "main",
+    muscleGroup: "Shoulders",
+    gallery: [
+      {
+        id: "media-e1-6-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&q=80",
+        role: "primary",
+        altText: "Person performing overhead press",
+        sortIndex: 1,
+      },
+      {
+        id: "media-e1-6-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&q=80",
+        role: "gallery",
+        altText: "Overhead press starting position",
+        sortIndex: 2,
+      },
+    ],
+    instructions: {
+      sets: 4,
+      repsMin: 8,
+      repsMax: 8,
+      rir: 2,
+      restTimeSeconds: 90,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-6-1",
+        orderIndex: 1,
+        instruction:
+          "Stand with feet shoulder-width apart. Hold the barbell at shoulder height with hands just wider than shoulders.",
+      },
+      {
+        id: "step-e1-6-2",
+        orderIndex: 2,
+        instruction:
+          "Press the bar overhead in a straight line, slightly moving your head back to avoid hitting your chin.",
+      },
+      {
+        id: "step-e1-6-3",
+        orderIndex: 3,
+        instruction:
+          "Lock out your arms fully at the top, then lower the bar back to shoulder height with control.",
+      },
+    ],
+    tips: [
+      "Keep your core tight to avoid excessive back arch",
+      "Press the bar in a vertical path, not forward",
+      "Breathe out as you press up, breathe in as you lower",
+    ],
+  },
+  {
+    id: "e1-7",
+    name: "Lateral Raises",
+    sets: 3,
+    reps: 15,
+    rir: 1,
+    restTime: 60,
+    description:
+      "An isolation exercise targeting the medial deltoids. Essential for building wider, more rounded shoulders and improving shoulder aesthetics.",
+    primaryMuscle: "Medial Deltoids",
+    equipment: "Dumbbells",
+    category: "main",
+    muscleGroup: "Shoulders",
+    gallery: [
+      {
+        id: "media-e1-7-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1598266663439-2056815d3c81?w=800&q=80",
+        role: "primary",
+        altText: "Person performing lateral raises",
+        sortIndex: 1,
+      },
+    ],
+    instructions: {
+      sets: 3,
+      repsMin: 15,
+      repsMax: 15,
+      rir: 1,
+      restTimeSeconds: 60,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-7-1",
+        orderIndex: 1,
+        instruction:
+          "Stand with feet hip-width apart, holding dumbbells at your sides with palms facing your body.",
+      },
+      {
+        id: "step-e1-7-2",
+        orderIndex: 2,
+        instruction:
+          "Raise the dumbbells out to the sides with a slight bend in your elbows until they reach shoulder height.",
+      },
+      {
+        id: "step-e1-7-3",
+        orderIndex: 3,
+        instruction:
+          "Lower the weights back down slowly to the starting position with control.",
+      },
+    ],
+    tips: [
+      "Don't swing or use momentum - use strict form",
+      "Lead with your elbows, not your hands",
+      "Keep a slight bend in your elbows throughout",
+      "Avoid raising above shoulder height",
+    ],
+  },
+  {
+    id: "e1-8",
+    name: "Tricep Dips",
+    sets: 3,
+    reps: 12,
+    rir: 2,
+    restTime: 60,
+    description:
+      "A bodyweight exercise that targets the triceps, chest, and shoulders. Excellent for building upper body pushing strength and muscle mass.",
+    primaryMuscle: "Triceps",
+    equipment: "Dip Station or Parallel Bars",
+    category: "main",
+    muscleGroup: "Triceps",
+    gallery: [
+      {
+        id: "media-e1-8-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1599058917727-a3021f1c779d?w=800&q=80",
+        role: "primary",
+        altText: "Person performing tricep dips",
+        sortIndex: 1,
+      },
+    ],
+    instructions: {
+      sets: 3,
+      repsMin: 12,
+      repsMax: 12,
+      rir: 2,
+      restTimeSeconds: 60,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-8-1",
+        orderIndex: 1,
+        instruction:
+          "Grip the parallel bars and support your body weight with arms fully extended, legs slightly bent.",
+      },
+      {
+        id: "step-e1-8-2",
+        orderIndex: 2,
+        instruction:
+          "Lower your body by bending your elbows until your upper arms are roughly parallel to the ground.",
+      },
+      {
+        id: "step-e1-8-3",
+        orderIndex: 3,
+        instruction:
+          "Push back up to the starting position, fully extending your arms and squeezing your triceps.",
+      },
+    ],
+    tips: [
+      "Keep your body upright to focus on triceps (leaning forward shifts focus to chest)",
+      "Don't lock out your elbows too hard at the top",
+      "Control the descent - don't drop too fast",
+    ],
+  },
+
+  // Stretch Exercise
+  {
+    id: "e1-9",
+    name: "Chest Doorway Stretch",
+    sets: 2,
+    reps: 30,
+    rir: 5,
+    restTime: 30,
+    description:
+      "A static stretch that helps relieve tightness in the chest and front shoulders after a workout. Improves flexibility and aids in recovery.",
+    primaryMuscle: "Chest",
+    equipment: "Doorway",
+    category: "stretch",
+    muscleGroup: "Chest",
+    gallery: [
+      {
+        id: "media-e1-9-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+        role: "primary",
+        altText: "Person performing chest doorway stretch",
+        sortIndex: 1,
+      },
+    ],
+    instructions: {
+      sets: 2,
+      repsMin: 30,
+      repsMax: 30,
+      rir: 5,
+      restTimeSeconds: 30,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e1-9-1",
+        orderIndex: 1,
+        instruction:
+          "Stand in a doorway with your forearm placed against the door frame at shoulder height, elbow bent at 90 degrees.",
+      },
+      {
+        id: "step-e1-9-2",
+        orderIndex: 2,
+        instruction:
+          "Step forward with the leg on the same side as your raised arm, gently leaning forward.",
+      },
+      {
+        id: "step-e1-9-3",
+        orderIndex: 3,
+        instruction:
+          "Hold the stretch for 30 seconds, feeling the stretch across your chest and front shoulder.",
+      },
+    ],
+    tips: [
+      "Breathe deeply and relax into the stretch",
+      "Don't push too hard - stretch should be comfortable",
+      "Perform on both sides",
+    ],
+  },
+  {
+    id: "e2-1",
+    name: "Barbell Squat",
+    sets: 4,
+    reps: 10,
+    rir: 2,
+    restTime: 180,
+    description:
+      "The king of leg exercises. A compound movement that targets the quadriceps, hamstrings, glutes, and core. Essential for building lower body strength and overall athleticism.",
+    primaryMuscle: "Quadriceps",
+    equipment: "Barbell, Squat Rack",
+    category: "main",
+    muscleGroup: "Legs",
+    gallery: [
+      {
+        id: "media-e2-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80",
+        role: "primary",
+        altText: "Person performing barbell squat",
+        sortIndex: 1,
+      },
+      {
+        id: "media-e2-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1605296867424-35fc25c9212a?w=800&q=80",
+        role: "gallery",
+        altText: "Barbell squat bottom position",
+        sortIndex: 2,
+      },
+    ],
+    instructions: {
+      sets: 4,
+      repsMin: 10,
+      repsMax: 12,
+      rir: 2,
+      restTimeSeconds: 180,
+    },
+    howToPerformSteps: [
+      {
+        id: "step-e2-1-1",
+        orderIndex: 1,
+        instruction:
+          "Set your stance shoulder-width apart. Place the barbell on your upper back, gripping it firmly with hands just outside shoulders.",
+      },
+      {
+        id: "step-e2-1-2",
+        orderIndex: 2,
+        instruction:
+          "Keep your chest up and lower into a controlled squat. Break at the hips and knees simultaneously until thighs are parallel to the ground or lower.",
+      },
+      {
+        id: "step-e2-1-3",
+        orderIndex: 3,
+        instruction:
+          "Drive up through the heels and repeat. Keep your core braced throughout the movement.",
+      },
+    ],
+    tips: [
+      "Keep your knees tracking over your toes",
+      "Maintain a neutral spine - don't round your back",
+      "Drive through your heels, not your toes",
+      "Take a deep breath and brace your core before each rep",
     ],
   },
 ];
