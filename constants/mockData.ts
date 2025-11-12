@@ -3,7 +3,7 @@
  * This will be replaced with real API data in the future
  */
 
-import { Meal, ScheduledMeal, WeeklyMealPlan } from "@/types/nutrition";
+import { Meal, ScheduledMeal, WeeklyMealPlan, MealDetail } from "@/types/nutrition";
 import { Exercise, ScheduledExercise, WeeklyWorkoutPlan } from "@/types/workout";
 import { DailyProgress, Streak } from "@/types/progress";
 import { GroceryItem } from "@/types/grocery";
@@ -1755,5 +1755,1077 @@ export const MOCK_GROCERY_ITEMS: GroceryItem[] = [
     isChecked: false,
     isCustom: false,
     mealSources: ["m3-4", "m6-4"],
+  },
+];
+
+/**
+ * Detailed Meal Information with Gallery, Ingredients, and Preparation Steps
+ * Used for the meal detail modal screen
+ */
+export const MEAL_DETAILS_MOCK: MealDetail[] = [
+  // Grilled Chicken Salad
+  {
+    id: "m1-3",
+    name: "Grilled Chicken Salad",
+    calories: 450,
+    macros: { carbs: 15, protein: 35, fat: 28 },
+    description: "Fresh mixed greens with seasoned grilled chicken breast and vegetables",
+    type: "lunch",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 15,
+    gallery: [
+      {
+        id: "img-m1-3-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+      },
+      {
+        id: "img-m1-3-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800",
+      },
+      {
+        id: "vid-m1-3-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Chicken Breast", quantity: 150, unit: "g", icon: "🍗" },
+      { id: "ing-2", name: "Mixed Greens", quantity: 100, unit: "g", icon: "🥬" },
+      { id: "ing-3", name: "Cherry Tomatoes", quantity: 80, unit: "g", icon: "🍅" },
+      { id: "ing-4", name: "Cucumber", quantity: 60, unit: "g", icon: "🥒" },
+      { id: "ing-5", name: "Olive Oil", quantity: 1, unit: "tbsp", icon: "🫒" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Season chicken breast with salt, pepper, and herbs. Grill for 6-8 minutes per side until cooked through.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Wash and chop mixed greens, cherry tomatoes, and cucumber into bite-sized pieces.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Slice grilled chicken and arrange over salad. Drizzle with olive oil and serve immediately.",
+      },
+    ],
+  },
+
+  // Salmon with Quinoa
+  {
+    id: "m1-5",
+    name: "Salmon with Quinoa",
+    calories: 520,
+    macros: { carbs: 35, protein: 40, fat: 22 },
+    description: "Pan-seared salmon fillet served over fluffy quinoa with roasted vegetables",
+    type: "dinner",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 25,
+    gallery: [
+      {
+        id: "img-m1-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
+      },
+      {
+        id: "img-m1-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=800",
+      },
+      {
+        id: "img-m1-5-3",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Salmon Fillet", quantity: 150, unit: "g", icon: "🐟" },
+      { id: "ing-2", name: "Quinoa", quantity: 80, unit: "g", icon: "🌾" },
+      { id: "ing-3", name: "Broccoli", quantity: 100, unit: "g", icon: "🥦" },
+      { id: "ing-4", name: "Lemon", quantity: 1, unit: "pieces", icon: "🍋" },
+      { id: "ing-5", name: "Olive Oil", quantity: 1, unit: "tbsp", icon: "🫒" },
+      { id: "ing-6", name: "Garlic", quantity: 2, unit: "cloves", icon: "🧄" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Rinse quinoa and cook in 1.5 cups water for 15 minutes. Let sit covered for 5 minutes, then fluff with fork.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Season salmon with salt, pepper, and minced garlic. Heat olive oil in a pan over medium-high heat.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Sear salmon skin-side down for 4-5 minutes, then flip and cook for another 3-4 minutes until cooked through.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Steam broccoli for 5-6 minutes until tender. Plate quinoa, top with salmon and broccoli. Squeeze lemon over the top.",
+      },
+    ],
+  },
+
+  // Oatmeal with Berries
+  {
+    id: "m1-1",
+    name: "Oatmeal with Berries",
+    calories: 320,
+    macros: { carbs: 45, protein: 12, fat: 8 },
+    description: "Creamy oatmeal topped with fresh berries and a drizzle of honey",
+    type: "breakfast",
+    servings: 1,
+    prepTime: 5,
+    cookTime: 10,
+    gallery: [
+      {
+        id: "img-m1-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=800",
+      },
+      {
+        id: "img-m1-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Rolled Oats", quantity: 60, unit: "g", icon: "🌾" },
+      { id: "ing-2", name: "Milk", quantity: 250, unit: "ml", icon: "🥛" },
+      { id: "ing-3", name: "Mixed Berries", quantity: 100, unit: "g", icon: "🫐" },
+      { id: "ing-4", name: "Honey", quantity: 1, unit: "tbsp", icon: "🍯" },
+      { id: "ing-5", name: "Cinnamon", quantity: 1, unit: "tsp", icon: "🌰" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Combine oats and milk in a pot. Bring to a simmer over medium heat, stirring occasionally.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Cook for 5-7 minutes until oats are tender and creamy. Stir in cinnamon.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Pour into bowl, top with fresh berries and drizzle with honey. Serve warm.",
+      },
+    ],
+  },
+
+  // Greek Yogurt & Nuts
+  {
+    id: "m1-2",
+    name: "Greek Yogurt & Nuts",
+    calories: 180,
+    macros: { carbs: 12, protein: 15, fat: 8 },
+    description: "Protein-rich Greek yogurt with crunchy mixed nuts and a touch of honey",
+    type: "morning_snack",
+    servings: 1,
+    prepTime: 3,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m1-2-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Greek Yogurt", quantity: 150, unit: "g", icon: "🥛" },
+      { id: "ing-2", name: "Mixed Nuts", quantity: 30, unit: "g", icon: "🥜" },
+      { id: "ing-3", name: "Honey", quantity: 0.5, unit: "tbsp", icon: "🍯" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Spoon Greek yogurt into a bowl.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Top with mixed nuts and drizzle honey over the top. Serve immediately.",
+      },
+    ],
+  },
+
+  // Apple with Almond Butter
+  {
+    id: "m1-4",
+    name: "Apple with Almond Butter",
+    calories: 200,
+    macros: { carbs: 25, protein: 5, fat: 12 },
+    description: "Crisp apple slices paired with creamy almond butter",
+    type: "afternoon_snack",
+    servings: 1,
+    prepTime: 5,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m1-4-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Apple", quantity: 1, unit: "pieces", icon: "🍎" },
+      { id: "ing-2", name: "Almond Butter", quantity: 2, unit: "tbsp", icon: "🥜" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Wash apple and slice into 8 wedges, removing the core.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Arrange apple slices on a plate and serve with almond butter for dipping.",
+      },
+    ],
+  },
+
+  // Scrambled Eggs & Toast
+  {
+    id: "m2-1",
+    name: "Scrambled Eggs & Toast",
+    calories: 380,
+    macros: { carbs: 35, protein: 20, fat: 18 },
+    description: "Fluffy scrambled eggs served with whole wheat toast",
+    type: "breakfast",
+    servings: 1,
+    prepTime: 5,
+    cookTime: 10,
+    gallery: [
+      {
+        id: "img-m2-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800",
+      },
+      {
+        id: "vid-m2-1-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Eggs", quantity: 3, unit: "pieces", icon: "🥚" },
+      { id: "ing-2", name: "Whole Wheat Bread", quantity: 2, unit: "slices", icon: "🍞" },
+      { id: "ing-3", name: "Butter", quantity: 1, unit: "tbsp", icon: "🧈" },
+      { id: "ing-4", name: "Milk", quantity: 2, unit: "tbsp", icon: "🥛" },
+      { id: "ing-5", name: "Cheese", quantity: 30, unit: "g", icon: "🧀" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Crack eggs into a bowl, add milk, salt, and pepper. Whisk until well combined.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Heat butter in a non-stick pan over medium heat. Pour in egg mixture.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Gently stir eggs as they cook. Add cheese when almost set. Cook until fluffy, about 3-4 minutes.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Toast bread slices until golden. Serve eggs with toast.",
+      },
+    ],
+  },
+
+  // Protein Smoothie
+  {
+    id: "m2-2",
+    name: "Protein Smoothie",
+    calories: 280,
+    macros: { carbs: 30, protein: 25, fat: 8 },
+    description: "Refreshing protein-packed smoothie with banana, berries, and protein powder",
+    type: "morning_snack",
+    servings: 1,
+    prepTime: 5,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m2-2-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=800",
+      },
+      {
+        id: "img-m2-2-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1638176066666-ffb2f013c297?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Banana", quantity: 1, unit: "pieces", icon: "🍌" },
+      { id: "ing-2", name: "Mixed Berries", quantity: 100, unit: "g", icon: "🫐" },
+      { id: "ing-3", name: "Protein Powder", quantity: 30, unit: "g", icon: "💪" },
+      { id: "ing-4", name: "Milk", quantity: 250, unit: "ml", icon: "🥛" },
+      { id: "ing-5", name: "Ice", quantity: 5, unit: "cubes", icon: "🧊" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Add all ingredients to a blender: banana, berries, protein powder, milk, and ice.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Blend on high speed for 60 seconds until smooth and creamy.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Pour into a glass and serve immediately.",
+      },
+    ],
+  },
+
+  // Turkey & Avocado Wrap
+  {
+    id: "m2-3",
+    name: "Turkey & Avocado Wrap",
+    calories: 480,
+    macros: { carbs: 40, protein: 32, fat: 20 },
+    description: "Whole wheat wrap filled with sliced turkey, creamy avocado, and fresh vegetables",
+    type: "lunch",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m2-3-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800",
+      },
+      {
+        id: "img-m2-3-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Turkey Breast", quantity: 100, unit: "g", icon: "🦃" },
+      { id: "ing-2", name: "Avocado", quantity: 1, unit: "pieces", icon: "🥑" },
+      { id: "ing-3", name: "Whole Wheat Tortilla", quantity: 1, unit: "pieces", icon: "🌯" },
+      { id: "ing-4", name: "Lettuce", quantity: 30, unit: "g", icon: "🥬" },
+      { id: "ing-5", name: "Tomato", quantity: 1, unit: "pieces", icon: "🍅" },
+      { id: "ing-6", name: "Mustard", quantity: 1, unit: "tsp", icon: "🍯" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Lay tortilla flat. Spread mustard evenly across the center.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Layer turkey slices, sliced avocado, lettuce, and tomato on the tortilla.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Fold in the sides, then roll tightly from bottom to top. Slice in half diagonally and serve.",
+      },
+    ],
+  },
+
+  // Hummus & Veggies
+  {
+    id: "m2-4",
+    name: "Hummus & Veggies",
+    calories: 180,
+    macros: { carbs: 18, protein: 6, fat: 10 },
+    description: "Creamy hummus served with colorful fresh vegetable sticks",
+    type: "afternoon_snack",
+    servings: 1,
+    prepTime: 8,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m2-4-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1611688863699-b41d6f1073ee?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Hummus", quantity: 80, unit: "g", icon: "🥙" },
+      { id: "ing-2", name: "Carrots", quantity: 100, unit: "g", icon: "🥕" },
+      { id: "ing-3", name: "Cucumber", quantity: 80, unit: "g", icon: "🥒" },
+      { id: "ing-4", name: "Bell Pepper", quantity: 80, unit: "g", icon: "🫑" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Wash and cut carrots, cucumber, and bell pepper into sticks.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Arrange vegetables on a plate with hummus in the center for dipping. Serve fresh.",
+      },
+    ],
+  },
+
+  // Steak with Sweet Potato
+  {
+    id: "m2-5",
+    name: "Steak with Sweet Potato",
+    calories: 580,
+    macros: { carbs: 45, protein: 42, fat: 24 },
+    description: "Grilled beef steak with roasted sweet potato and sautéed vegetables",
+    type: "dinner",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 30,
+    gallery: [
+      {
+        id: "img-m2-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=800",
+      },
+      {
+        id: "img-m2-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1504973960431-1c467e159aa4?w=800",
+      },
+      {
+        id: "vid-m2-5-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=400",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Beef Steak", quantity: 150, unit: "g", icon: "🥩" },
+      { id: "ing-2", name: "Sweet Potato", quantity: 200, unit: "g", icon: "🍠" },
+      { id: "ing-3", name: "Asparagus", quantity: 100, unit: "g", icon: "🌱" },
+      { id: "ing-4", name: "Garlic", quantity: 3, unit: "cloves", icon: "🧄" },
+      { id: "ing-5", name: "Butter", quantity: 2, unit: "tbsp", icon: "🧈" },
+      { id: "ing-6", name: "Rosemary", quantity: 1, unit: "sprig", icon: "🌿" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Preheat oven to 200°C (400°F). Cut sweet potato into wedges, toss with oil, salt, and pepper. Roast for 25-30 minutes.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Season steak with salt, pepper, and minced garlic. Let rest at room temperature for 10 minutes.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Heat a cast iron skillet over high heat. Sear steak 3-4 minutes per side for medium-rare. Add butter and rosemary in final minute, basting steak.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Sauté asparagus in remaining butter for 5 minutes. Let steak rest 5 minutes before slicing. Serve together.",
+      },
+    ],
+  },
+
+  // Protein Pancakes
+  {
+    id: "m3-1",
+    name: "Protein Pancakes",
+    calories: 350,
+    macros: { carbs: 42, protein: 28, fat: 10 },
+    description: "Fluffy protein-packed pancakes topped with fresh berries and maple syrup",
+    type: "breakfast",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 15,
+    gallery: [
+      {
+        id: "img-m3-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800",
+      },
+      {
+        id: "img-m3-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Protein Powder", quantity: 40, unit: "g", icon: "💪" },
+      { id: "ing-2", name: "Oat Flour", quantity: 60, unit: "g", icon: "🌾" },
+      { id: "ing-3", name: "Eggs", quantity: 2, unit: "pieces", icon: "🥚" },
+      { id: "ing-4", name: "Banana", quantity: 1, unit: "pieces", icon: "🍌" },
+      { id: "ing-5", name: "Milk", quantity: 100, unit: "ml", icon: "🥛" },
+      { id: "ing-6", name: "Berries", quantity: 80, unit: "g", icon: "🫐" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Mash banana in a bowl. Add eggs, milk, protein powder, and oat flour. Mix until smooth batter forms.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Heat a non-stick pan over medium heat. Pour 1/4 cup batter per pancake.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Cook 2-3 minutes until bubbles form, then flip. Cook another 2 minutes until golden.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Stack pancakes on a plate, top with fresh berries, and serve warm.",
+      },
+    ],
+  },
+
+  // Chicken Rice Bowl
+  {
+    id: "m3-3",
+    name: "Chicken Rice Bowl",
+    calories: 520,
+    macros: { carbs: 55, protein: 38, fat: 16 },
+    description: "Seasoned grilled chicken over brown rice with roasted vegetables",
+    type: "lunch",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 30,
+    gallery: [
+      {
+        id: "img-m3-3-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?w=800",
+      },
+      {
+        id: "img-m3-3-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800",
+      },
+      {
+        id: "vid-m3-3-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?w=400",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Chicken Breast", quantity: 150, unit: "g", icon: "🍗" },
+      { id: "ing-2", name: "Brown Rice", quantity: 100, unit: "g", icon: "🍚" },
+      { id: "ing-3", name: "Broccoli", quantity: 100, unit: "g", icon: "🥦" },
+      { id: "ing-4", name: "Carrots", quantity: 80, unit: "g", icon: "🥕" },
+      { id: "ing-5", name: "Soy Sauce", quantity: 2, unit: "tbsp", icon: "🍶" },
+      { id: "ing-6", name: "Sesame Oil", quantity: 1, unit: "tsp", icon: "🫒" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Cook brown rice according to package instructions. Fluff and set aside.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Season chicken with salt and pepper. Grill or pan-sear for 6-7 minutes per side until cooked through.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Roast broccoli and carrots at 200°C (400°F) for 15-20 minutes until tender.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Slice chicken. Assemble bowl with rice, vegetables, and chicken. Drizzle with soy sauce and sesame oil.",
+      },
+    ],
+  },
+
+  // Baked Cod with Vegetables
+  {
+    id: "m3-5",
+    name: "Baked Cod with Vegetables",
+    calories: 420,
+    macros: { carbs: 25, protein: 45, fat: 12 },
+    description: "Herb-crusted baked cod with a medley of roasted Mediterranean vegetables",
+    type: "dinner",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 25,
+    gallery: [
+      {
+        id: "img-m3-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800",
+      },
+      {
+        id: "img-m3-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Cod Fillet", quantity: 180, unit: "g", icon: "🐟" },
+      { id: "ing-2", name: "Zucchini", quantity: 100, unit: "g", icon: "🥒" },
+      { id: "ing-3", name: "Bell Peppers", quantity: 100, unit: "g", icon: "🫑" },
+      { id: "ing-4", name: "Cherry Tomatoes", quantity: 80, unit: "g", icon: "🍅" },
+      { id: "ing-5", name: "Lemon", quantity: 1, unit: "pieces", icon: "🍋" },
+      { id: "ing-6", name: "Olive Oil", quantity: 1.5, unit: "tbsp", icon: "🫒" },
+      { id: "ing-7", name: "Thyme", quantity: 1, unit: "tsp", icon: "🌿" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Preheat oven to 200°C (400°F). Chop vegetables and toss with 1 tbsp olive oil, salt, and pepper.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Arrange vegetables on a baking sheet. Place cod fillet on top. Drizzle with remaining oil and season with thyme.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Bake for 20-25 minutes until cod flakes easily with a fork.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Squeeze fresh lemon juice over the top and serve immediately.",
+      },
+    ],
+  },
+
+  // Breakfast Burrito
+  {
+    id: "m5-1",
+    name: "Breakfast Burrito",
+    calories: 450,
+    macros: { carbs: 48, protein: 25, fat: 18 },
+    description: "Hearty burrito filled with scrambled eggs, black beans, cheese, and salsa",
+    type: "breakfast",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 15,
+    gallery: [
+      {
+        id: "img-m5-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800",
+      },
+      {
+        id: "img-m5-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1641959989593-cecb3e3dcdcf?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Large Tortilla", quantity: 1, unit: "pieces", icon: "🌯" },
+      { id: "ing-2", name: "Eggs", quantity: 2, unit: "pieces", icon: "🥚" },
+      { id: "ing-3", name: "Black Beans", quantity: 60, unit: "g", icon: "🫘" },
+      { id: "ing-4", name: "Cheese", quantity: 40, unit: "g", icon: "🧀" },
+      { id: "ing-5", name: "Salsa", quantity: 3, unit: "tbsp", icon: "🍅" },
+      { id: "ing-6", name: "Avocado", quantity: 0.5, unit: "pieces", icon: "🥑" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Scramble eggs in a pan with a little butter until fluffy. Set aside.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Warm tortilla for 20 seconds on each side. Layer scrambled eggs, black beans, cheese, and avocado in the center.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Top with salsa. Fold in sides, then roll tightly from bottom to top.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Optional: Toast burrito seam-side down in pan for 2 minutes until golden. Slice in half and serve.",
+      },
+    ],
+  },
+
+  // Chicken Stir Fry
+  {
+    id: "m4-5",
+    name: "Chicken Stir Fry",
+    calories: 480,
+    macros: { carbs: 38, protein: 42, fat: 18 },
+    description: "Wok-tossed chicken with colorful vegetables in savory Asian sauce",
+    type: "dinner",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 15,
+    gallery: [
+      {
+        id: "img-m4-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1603073263788-64268e752bdb?w=800",
+      },
+      {
+        id: "vid-m4-5-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1603073263788-64268e752bdb?w=400",
+      },
+      {
+        id: "img-m4-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Chicken Breast", quantity: 150, unit: "g", icon: "🍗" },
+      { id: "ing-2", name: "Bell Peppers", quantity: 100, unit: "g", icon: "🫑" },
+      { id: "ing-3", name: "Broccoli", quantity: 100, unit: "g", icon: "🥦" },
+      { id: "ing-4", name: "Snap Peas", quantity: 80, unit: "g", icon: "🫛" },
+      { id: "ing-5", name: "Soy Sauce", quantity: 2, unit: "tbsp", icon: "🍶" },
+      { id: "ing-6", name: "Ginger", quantity: 1, unit: "tbsp", icon: "🫚" },
+      { id: "ing-7", name: "Garlic", quantity: 3, unit: "cloves", icon: "🧄" },
+      { id: "ing-8", name: "Sesame Oil", quantity: 1, unit: "tbsp", icon: "🫒" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Slice chicken into thin strips. Marinate with 1 tbsp soy sauce for 10 minutes.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Chop all vegetables into bite-sized pieces. Mince garlic and ginger.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Heat sesame oil in wok over high heat. Stir-fry chicken 5-6 minutes until cooked. Remove and set aside.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Add vegetables, garlic, and ginger to wok. Stir-fry 4-5 minutes. Return chicken, add remaining soy sauce. Toss and serve.",
+      },
+    ],
+  },
+
+  // Tuna Salad
+  {
+    id: "m4-3",
+    name: "Tuna Salad",
+    calories: 380,
+    macros: { carbs: 12, protein: 35, fat: 20 },
+    description: "Light and refreshing tuna salad with crisp vegetables and olive oil dressing",
+    type: "lunch",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m4-3-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Canned Tuna", quantity: 120, unit: "g", icon: "🐟" },
+      { id: "ing-2", name: "Mixed Greens", quantity: 100, unit: "g", icon: "🥬" },
+      { id: "ing-3", name: "Cherry Tomatoes", quantity: 80, unit: "g", icon: "🍅" },
+      { id: "ing-4", name: "Cucumber", quantity: 60, unit: "g", icon: "🥒" },
+      { id: "ing-5", name: "Red Onion", quantity: 30, unit: "g", icon: "🧅" },
+      { id: "ing-6", name: "Olive Oil", quantity: 2, unit: "tbsp", icon: "🫒" },
+      { id: "ing-7", name: "Lemon Juice", quantity: 1, unit: "tbsp", icon: "🍋" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Drain tuna and place in a bowl. Wash and chop all vegetables.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Combine mixed greens, tomatoes, cucumber, and thinly sliced red onion in a large bowl.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Top with tuna. Whisk olive oil and lemon juice, drizzle over salad. Season with salt and pepper. Toss and serve.",
+      },
+    ],
+  },
+
+  // French Toast
+  {
+    id: "m6-1",
+    name: "French Toast",
+    calories: 420,
+    macros: { carbs: 52, protein: 15, fat: 16 },
+    description: "Classic cinnamon French toast with maple syrup and fresh berries",
+    type: "breakfast",
+    servings: 1,
+    prepTime: 10,
+    cookTime: 10,
+    gallery: [
+      {
+        id: "img-m6-1-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=800",
+      },
+      {
+        id: "img-m6-1-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Bread", quantity: 3, unit: "slices", icon: "🍞" },
+      { id: "ing-2", name: "Eggs", quantity: 2, unit: "pieces", icon: "🥚" },
+      { id: "ing-3", name: "Milk", quantity: 60, unit: "ml", icon: "🥛" },
+      { id: "ing-4", name: "Cinnamon", quantity: 1, unit: "tsp", icon: "🌰" },
+      { id: "ing-5", name: "Butter", quantity: 1, unit: "tbsp", icon: "🧈" },
+      { id: "ing-6", name: "Maple Syrup", quantity: 2, unit: "tbsp", icon: "🍯" },
+      { id: "ing-7", name: "Berries", quantity: 80, unit: "g", icon: "🫐" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Whisk eggs, milk, and cinnamon in a shallow dish.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Dip each bread slice in egg mixture, coating both sides well.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Heat butter in a pan over medium heat. Cook bread 2-3 minutes per side until golden brown.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Stack on a plate, top with fresh berries and drizzle with maple syrup.",
+      },
+    ],
+  },
+
+  // Cottage Cheese & Fruit
+  {
+    id: "m3-2",
+    name: "Cottage Cheese & Fruit",
+    calories: 220,
+    macros: { carbs: 28, protein: 18, fat: 4 },
+    description: "Creamy cottage cheese paired with sweet fresh fruit",
+    type: "morning_snack",
+    servings: 1,
+    prepTime: 5,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m3-2-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1571212515710-7b135fe18bbf?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Cottage Cheese", quantity: 150, unit: "g", icon: "🥛" },
+      { id: "ing-2", name: "Mixed Fruit", quantity: 120, unit: "g", icon: "🍓" },
+      { id: "ing-3", name: "Honey", quantity: 0.5, unit: "tbsp", icon: "🍯" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Spoon cottage cheese into a bowl.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Top with mixed fresh fruit and drizzle with honey. Serve chilled.",
+      },
+    ],
+  },
+
+  // Protein Bar
+  {
+    id: "m3-4",
+    name: "Protein Bar",
+    calories: 250,
+    macros: { carbs: 30, protein: 20, fat: 8 },
+    description: "Convenient high-protein bar for on-the-go nutrition",
+    type: "afternoon_snack",
+    servings: 1,
+    prepTime: 1,
+    cookTime: 0,
+    gallery: [
+      {
+        id: "img-m3-4-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1622484211736-e0b7f7e38b65?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Protein Bar", quantity: 1, unit: "pieces", icon: "💪" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Unwrap protein bar and enjoy.",
+      },
+    ],
+  },
+
+  // Beef Tacos
+  {
+    id: "m7-5",
+    name: "Beef Tacos",
+    calories: 550,
+    macros: { carbs: 42, protein: 35, fat: 26 },
+    description: "Seasoned ground beef tacos with fresh toppings and soft tortillas",
+    type: "dinner",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 20,
+    gallery: [
+      {
+        id: "img-m7-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=800",
+      },
+      {
+        id: "img-m7-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800",
+      },
+      {
+        id: "vid-m7-5-1",
+        type: "video",
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        thumbnail: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Ground Beef", quantity: 120, unit: "g", icon: "🥩" },
+      { id: "ing-2", name: "Soft Tortillas", quantity: 3, unit: "pieces", icon: "🌮" },
+      { id: "ing-3", name: "Lettuce", quantity: 40, unit: "g", icon: "🥬" },
+      { id: "ing-4", name: "Tomato", quantity: 1, unit: "pieces", icon: "🍅" },
+      { id: "ing-5", name: "Cheese", quantity: 40, unit: "g", icon: "🧀" },
+      { id: "ing-6", name: "Sour Cream", quantity: 2, unit: "tbsp", icon: "🥛" },
+      { id: "ing-7", name: "Taco Seasoning", quantity: 1, unit: "tbsp", icon: "🌶️" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Brown ground beef in a pan over medium-high heat, breaking it up as it cooks.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Add taco seasoning and 1/4 cup water. Simmer 5 minutes until thickened.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Warm tortillas. Chop lettuce and tomato.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Assemble tacos with beef, lettuce, tomato, cheese, and sour cream. Serve immediately.",
+      },
+    ],
+  },
+
+  // Caesar Salad with Chicken
+  {
+    id: "m6-5",
+    name: "Caesar Salad with Chicken",
+    calories: 480,
+    macros: { carbs: 20, protein: 38, fat: 28 },
+    description: "Classic Caesar salad with grilled chicken, parmesan, and croutons",
+    type: "dinner",
+    servings: 1,
+    prepTime: 15,
+    cookTime: 15,
+    gallery: [
+      {
+        id: "img-m6-5-1",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=800",
+      },
+      {
+        id: "img-m6-5-2",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1604909052743-94e838986d24?w=800",
+      },
+    ],
+    ingredients: [
+      { id: "ing-1", name: "Chicken Breast", quantity: 150, unit: "g", icon: "🍗" },
+      { id: "ing-2", name: "Romaine Lettuce", quantity: 150, unit: "g", icon: "🥬" },
+      { id: "ing-3", name: "Parmesan Cheese", quantity: 30, unit: "g", icon: "🧀" },
+      { id: "ing-4", name: "Croutons", quantity: 40, unit: "g", icon: "🍞" },
+      { id: "ing-5", name: "Caesar Dressing", quantity: 3, unit: "tbsp", icon: "🥗" },
+      { id: "ing-6", name: "Lemon", quantity: 0.5, unit: "pieces", icon: "🍋" },
+    ],
+    preparationSteps: [
+      {
+        id: "step-1",
+        stepNumber: 1,
+        instruction: "Season and grill chicken breast 6-7 minutes per side until cooked through. Let rest 5 minutes, then slice.",
+      },
+      {
+        id: "step-2",
+        stepNumber: 2,
+        instruction: "Chop romaine lettuce into bite-sized pieces. Wash and dry thoroughly.",
+      },
+      {
+        id: "step-3",
+        stepNumber: 3,
+        instruction: "Toss lettuce with Caesar dressing until well coated. Add croutons and shaved parmesan.",
+      },
+      {
+        id: "step-4",
+        stepNumber: 4,
+        instruction: "Top with sliced chicken. Squeeze lemon over the top and serve immediately.",
+      },
+    ],
   },
 ];

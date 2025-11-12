@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 import { ScheduledMeal } from "@/types/nutrition";
 
 interface MealMiniCardProps {
@@ -8,6 +9,15 @@ interface MealMiniCardProps {
 }
 
 export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push({
+      pathname: "/meal-detail",
+      params: { id: meal.id },
+    });
+  };
+
   // Truncate name if too long
   const displayName =
     meal.name.length > (compact ? 12 : 18)
@@ -17,7 +27,10 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
   if (compact) {
     // Ultra-compact version for month view
     return (
-      <View className="mb-0.5 rounded bg-white p-1 dark:bg-gray-800">
+      <Pressable
+        onPress={handlePress}
+        className="mb-0.5 rounded bg-white p-1 active:opacity-70 dark:bg-gray-800"
+      >
         <Text
           className="text-[10px] font-semibold text-gray-900 dark:text-white"
           numberOfLines={1}
@@ -27,7 +40,7 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
         <Text className="text-[9px] text-gray-600 dark:text-gray-400">
           {meal.calories} cal
         </Text>
-      </View>
+      </Pressable>
     );
   }
 
@@ -51,7 +64,10 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
 
   // Regular mini card for week/day views
   return (
-    <View className="mb-3 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
+    <Pressable
+      onPress={handlePress}
+      className="mb-3 overflow-hidden rounded-xl bg-white shadow-sm active:opacity-70 dark:bg-gray-800"
+    >
       {/* Image Placeholder */}
       <View className="relative h-32 w-full bg-gray-300 dark:bg-gray-700">
         {/* Meal Type Tag */}
@@ -83,6 +99,6 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
           {meal.macros.fat}g
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
