@@ -5,6 +5,7 @@
 export interface Exercise {
   id: string;
   name: string;
+  description?: string; // Brief description of the exercise
   sets: number;
   reps: number;
   rir: number; // Reps in Reserve

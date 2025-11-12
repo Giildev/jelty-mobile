@@ -75,25 +75,40 @@ export function ExerciseMiniCard({
           </View>
         </View>
 
-        {/* Content */}
-        <View className="p-3">
-          {/* Name */}
-          <Text
-            className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
-            numberOfLines={1}
-          >
-            {displayName}
-          </Text>
+        {/* Content - 2 Column Layout */}
+        <View className="flex-row gap-3 p-3">
+          {/* Column 1: Name, Sets x Reps, Details */}
+          <View className="flex-1">
+            {/* Name */}
+            <Text
+              className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
+              numberOfLines={2}
+            >
+              {exercise.name}
+            </Text>
 
-          {/* Sets x Reps */}
-          <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-            {exercise.sets} sets × {exercise.reps} reps
-          </Text>
+            {/* Sets x Reps */}
+            <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+              {exercise.sets} sets × {exercise.reps} reps
+            </Text>
 
-          {/* Exercise Details */}
-          <Text className="text-[10px] text-gray-600 dark:text-gray-400">
-            RIR: {exercise.rir} • Rest: {exercise.restTime}s
-          </Text>
+            {/* Exercise Details */}
+            <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+              RIR: {exercise.rir} • Rest: {exercise.restTime}s
+            </Text>
+          </View>
+
+          {/* Column 2: Description */}
+          {exercise.description && (
+            <View className="flex-1">
+              <Text
+                className="text-xs text-gray-600 dark:text-gray-400"
+                numberOfLines={4}
+              >
+                {exercise.description}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </Pressable>

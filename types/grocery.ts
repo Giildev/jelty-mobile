@@ -68,6 +68,7 @@ export interface Ingredient {
  * Grocery item (ingredient + UI state)
  */
 export interface GroceryItem extends Ingredient {
+  ingredientId?: string; // Reference to meal_ingredient.id in database
   isChecked: boolean;
   isCustom: boolean; // User-added vs. from meal plan
   mealSources?: string[]; // IDs of meals that use this ingredient

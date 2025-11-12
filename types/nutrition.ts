@@ -13,6 +13,7 @@ export interface Macros {
 export interface Meal {
   id: string;
   name: string;
+  description?: string; // Brief description of the meal
   calories: number;
   macros: Macros;
   imageUrl?: string; // Optional for future use

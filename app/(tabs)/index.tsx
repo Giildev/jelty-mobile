@@ -2,9 +2,11 @@ import { ScrollView, ActivityIndicator, View } from "react-native";
 import { useAuth } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUserData } from "@/hooks/useUserData";
+import { useDailyMessage } from "@/hooks/useDailyMessage";
 
 // Home components
 import { WelcomeHeader } from "@/components/home/WelcomeHeader";
+import { MotivationalBanner } from "@/components/home/MotivationalBanner";
 import { MealsList } from "@/components/home/MealsList";
 import { WorkoutsList } from "@/components/home/WorkoutsList";
 
@@ -23,6 +25,9 @@ export default function HomeScreen() {
 
   // Usar hook con React Query para caché automático
   const { userData, loading, error } = useUserData(userId);
+
+  // Obtener mensaje motivacional del día
+  const { message, loading: messageLoading } = useDailyMessage();
 
   // Extraer nombre del usuario (con fallback)
   const userName = userData?.profile?.first_name || "User";
@@ -46,6 +51,12 @@ export default function HomeScreen() {
       >
         {/* Welcome Header */}
         <WelcomeHeader userName={userName} />
+
+        {/* Daily Motivational Banner */}
+        <MotivationalBanner
+          message={message?.message_text || ""}
+          loading={messageLoading}
+        />
 
         {/* Today's Meals */}
         <MealsList meals={MOCK_MEALS} />

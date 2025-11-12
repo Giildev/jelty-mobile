@@ -133,6 +133,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m1-1",
     name: "Oatmeal with Berries",
+    description: "Warm oatmeal topped with fresh mixed berries and a drizzle of honey",
     calories: 320,
     macros: { carbs: 45, protein: 12, fat: 8 },
     date: "2025-11-10",
@@ -142,6 +143,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m1-2",
     name: "Greek Yogurt & Nuts",
+    description: "Creamy Greek yogurt with almonds and walnuts",
     calories: 180,
     macros: { carbs: 12, protein: 15, fat: 8 },
     date: "2025-11-10",
@@ -151,6 +153,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m1-3",
     name: "Grilled Chicken Salad",
+    description: "Fresh mixed greens with grilled chicken breast, cherry tomatoes, and balsamic dressing",
     calories: 450,
     macros: { carbs: 15, protein: 35, fat: 28 },
     date: "2025-11-10",
@@ -160,6 +163,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m1-4",
     name: "Apple with Almond Butter",
+    description: "Sliced apple with natural almond butter",
     calories: 200,
     macros: { carbs: 25, protein: 5, fat: 12 },
     date: "2025-11-10",
@@ -169,6 +173,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m1-5",
     name: "Salmon with Quinoa",
+    description: "Pan-seared salmon fillet served with fluffy quinoa and roasted vegetables",
     calories: 520,
     macros: { carbs: 35, protein: 40, fat: 22 },
     date: "2025-11-10",
@@ -180,6 +185,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m2-1",
     name: "Scrambled Eggs & Toast",
+    description: "Fluffy scrambled eggs with whole grain toast and avocado",
     calories: 380,
     macros: { carbs: 35, protein: 20, fat: 18 },
     date: "2025-11-11",
@@ -189,6 +195,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m2-2",
     name: "Protein Smoothie",
+    description: "Banana, spinach, protein powder, and almond milk blend",
     calories: 280,
     macros: { carbs: 30, protein: 25, fat: 8 },
     date: "2025-11-11",
@@ -198,6 +205,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m2-3",
     name: "Turkey & Avocado Wrap",
+    description: "Whole wheat wrap with sliced turkey, avocado, lettuce, and tomato",
     calories: 480,
     macros: { carbs: 40, protein: 32, fat: 20 },
     date: "2025-11-11",
@@ -207,6 +215,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m2-4",
     name: "Hummus & Veggies",
+    description: "Classic hummus with carrot sticks, cucumber, and bell peppers",
     calories: 180,
     macros: { carbs: 18, protein: 6, fat: 10 },
     date: "2025-11-11",
@@ -216,6 +225,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m2-5",
     name: "Steak with Sweet Potato",
+    description: "Grilled ribeye steak with baked sweet potato and green beans",
     calories: 580,
     macros: { carbs: 45, protein: 42, fat: 24 },
     date: "2025-11-11",
@@ -227,6 +237,7 @@ export const MOCK_SCHEDULED_MEALS: ScheduledMeal[] = [
   {
     id: "m3-1",
     name: "Protein Pancakes",
+    description: "High-protein pancakes with fresh blueberries and sugar-free syrup",
     calories: 350,
     macros: { carbs: 42, protein: 28, fat: 10 },
     date: "2025-11-12",
@@ -471,6 +482,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-1",
     name: "Arm Circles",
+    description: "Dynamic shoulder warm-up with controlled circular movements",
     sets: 2,
     reps: 15,
     rir: 5,
@@ -482,6 +494,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-2",
     name: "Band Pull-Aparts",
+    description: "Resistance band exercise to activate rear delts and upper back",
     sets: 2,
     reps: 20,
     rir: 5,
@@ -493,6 +506,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-3",
     name: "Bench Press",
+    description: "Compound chest exercise using barbell for upper body strength",
     sets: 4,
     reps: 8,
     rir: 2,
@@ -505,6 +519,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-4",
     name: "Incline Dumbbell Press",
+    description: "Incline press targeting upper chest with dumbbells for full range of motion",
     sets: 4,
     reps: 10,
     rir: 2,
@@ -517,6 +532,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-5",
     name: "Cable Flyes",
+    description: "Isolation movement for chest with constant tension throughout the motion",
     sets: 3,
     reps: 12,
     rir: 1,
@@ -529,6 +545,7 @@ export const MOCK_SCHEDULED_EXERCISES: ScheduledExercise[] = [
   {
     id: "e1-6",
     name: "Overhead Press",
+    description: "Standing barbell press for shoulder strength and stability",
     sets: 4,
     reps: 8,
     rir: 2,

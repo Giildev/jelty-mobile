@@ -78,26 +78,41 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
         </View>
       </View>
 
-      {/* Content */}
-      <View className="p-3">
-        {/* Name */}
-        <Text
-          className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
-          numberOfLines={1}
-        >
-          {displayName}
-        </Text>
+      {/* Content - 2 Column Layout */}
+      <View className="flex-row gap-3 p-3">
+        {/* Column 1: Name, Calories, Macros */}
+        <View className="flex-1">
+          {/* Name */}
+          <Text
+            className="mb-1.5 text-sm font-bold text-gray-900 dark:text-white"
+            numberOfLines={2}
+          >
+            {meal.name}
+          </Text>
 
-        {/* Calories */}
-        <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-          {meal.calories} kcal
-        </Text>
+          {/* Calories */}
+          <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+            {meal.calories} kcal
+          </Text>
 
-        {/* Macros */}
-        <Text className="text-[10px] text-gray-600 dark:text-gray-400">
-          C: {meal.macros.carbs}g • P: {meal.macros.protein}g • F:{" "}
-          {meal.macros.fat}g
-        </Text>
+          {/* Macros */}
+          <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+            C: {meal.macros.carbs}g • P: {meal.macros.protein}g • F:{" "}
+            {meal.macros.fat}g
+          </Text>
+        </View>
+
+        {/* Column 2: Description */}
+        {meal.description && (
+          <View className="flex-1">
+            <Text
+              className="text-xs text-gray-600 dark:text-gray-400"
+              numberOfLines={4}
+            >
+              {meal.description}
+            </Text>
+          </View>
+        )}
       </View>
     </Pressable>
   );
