@@ -1,15 +1,38 @@
-import { View, Text } from "react-native";
-import { Exercise } from "@/types/workout";
+import { View, Text, Pressable, Image } from "react-native";
+import { useRouter } from "expo-router";
+import { ScheduledExercise } from "@/types/workout";
+import { getExerciseImageUrl } from "@/utils/mockDataHelpers";
 
 interface WorkoutCardProps {
-  exercise: Exercise;
+  exercise: ScheduledExercise;
 }
 
 export function WorkoutCard({ exercise }: WorkoutCardProps) {
+  const router = useRouter();
+  const imageUrl = getExerciseImageUrl(exercise.id);
+
+  const handlePress = () => {
+    router.push({
+      pathname: "/exercise-detail",
+      params: { id: exercise.id },
+    });
+  };
+
   return (
-    <View className="mb-2 flex-row items-center rounded-lg bg-white dark:bg-gray-800 p-3 shadow-sm">
-      {/* Placeholder Image */}
-      <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+    <Pressable
+      onPress={handlePress}
+      className="mb-2 flex-row items-center rounded-lg bg-white dark:bg-gray-800 p-3 shadow-sm active:opacity-70"
+    >
+      {/* Exercise Image */}
+      {imageUrl ? (
+        <Image
+          source={{ uri: imageUrl }}
+          className="h-12 w-12 rounded-lg"
+          resizeMode="cover"
+        />
+      ) : (
+        <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+      )}
 
       {/* Exercise Info */}
       <View className="ml-3 flex-1">
@@ -25,6 +48,6 @@ export function WorkoutCard({ exercise }: WorkoutCardProps) {
           </Text>
         )}
       </View>
-    </View>
+    </Pressable>
   );
 }

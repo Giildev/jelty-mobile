@@ -1,6 +1,7 @@
 import { ScrollView, ActivityIndicator, View } from "react-native";
 import { useAuth } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { format } from "date-fns";
 import { useUserData } from "@/hooks/useUserData";
 import { useDailyMessage } from "@/hooks/useDailyMessage";
 
@@ -11,7 +12,7 @@ import { MealsList } from "@/components/home/MealsList";
 import { WorkoutsList } from "@/components/home/WorkoutsList";
 
 // Mock data
-import { MOCK_MEALS, MOCK_EXERCISES } from "@/constants/mockData";
+import { MOCK_SCHEDULED_MEALS, MOCK_SCHEDULED_EXERCISES } from "@/constants/mockData";
 
 /**
  * Home Screen
@@ -31,6 +32,16 @@ export default function HomeScreen() {
 
   // Extraer nombre del usuario (con fallback)
   const userName = userData?.profile?.first_name || "User";
+
+  // Filter meals and exercises for today
+  const today = format(new Date(), "yyyy-MM-dd");
+  const todayMeals = MOCK_SCHEDULED_MEALS
+    .filter((meal) => meal.date === today)
+    .sort((a, b) => a.time.localeCompare(b.time));
+
+  const todayExercises = MOCK_SCHEDULED_EXERCISES
+    .filter((exercise) => exercise.date === today)
+    .sort((a, b) => a.time.localeCompare(b.time));
 
   if (loading) {
     return (
@@ -59,10 +70,10 @@ export default function HomeScreen() {
         />
 
         {/* Today's Meals */}
-        <MealsList meals={MOCK_MEALS} />
+        <MealsList meals={todayMeals} />
 
         {/* Today's Workouts */}
-        <WorkoutsList exercises={MOCK_EXERCISES} />
+        <WorkoutsList exercises={todayExercises} />
       </ScrollView>
     </SafeAreaView>
   );

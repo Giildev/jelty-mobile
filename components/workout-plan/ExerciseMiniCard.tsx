@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { ScheduledExercise } from "@/types/workout";
 import { WorkoutTag } from "@/components/ui/WorkoutTag";
+import { getExerciseImageUrl } from "@/utils/mockDataHelpers";
 
 interface ExerciseMiniCardProps {
   exercise: ScheduledExercise;
@@ -14,6 +15,7 @@ export function ExerciseMiniCard({
   compact = false,
 }: ExerciseMiniCardProps) {
   const router = useRouter();
+  const imageUrl = getExerciseImageUrl(exercise.id);
 
   // Navigate to exercise detail
   const handlePress = () => {
@@ -52,8 +54,17 @@ export function ExerciseMiniCard({
   return (
     <Pressable onPress={handlePress} className="active:opacity-70">
       <View className="mb-3 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
-        {/* Image Placeholder */}
-        <View className="relative h-32 w-full bg-gray-300 dark:bg-gray-700">
+        {/* Exercise Image */}
+        <View className="relative h-32 w-full">
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              className="h-32 w-full"
+              resizeMode="cover"
+            />
+          ) : (
+            <View className="h-32 w-full bg-gray-300 dark:bg-gray-700" />
+          )}
           {/* Exercise Type Tag */}
           <View className="absolute right-2 top-2">
             <WorkoutTag type={exercise.type} />

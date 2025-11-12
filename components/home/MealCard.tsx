@@ -1,13 +1,15 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { Meal } from "@/types/nutrition";
+import { ScheduledMeal } from "@/types/nutrition";
+import { getMealImageUrl } from "@/utils/mockDataHelpers";
 
 interface MealCardProps {
-  meal: Meal;
+  meal: ScheduledMeal;
 }
 
 export function MealCard({ meal }: MealCardProps) {
   const router = useRouter();
+  const imageUrl = getMealImageUrl(meal.id);
 
   const handlePress = () => {
     router.push({
@@ -21,8 +23,16 @@ export function MealCard({ meal }: MealCardProps) {
       onPress={handlePress}
       className="mb-2 flex-row items-center rounded-lg bg-white p-3 shadow-sm active:opacity-70 dark:bg-gray-800"
     >
-      {/* Placeholder Image */}
-      <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+      {/* Meal Image */}
+      {imageUrl ? (
+        <Image
+          source={{ uri: imageUrl }}
+          className="h-12 w-12 rounded-lg"
+          resizeMode="cover"
+        />
+      ) : (
+        <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+      )}
 
       {/* Meal Info */}
       <View className="ml-3 flex-1">

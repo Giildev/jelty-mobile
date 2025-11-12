@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { ScheduledMeal } from "@/types/nutrition";
 import { MealTag } from "@/components/ui/MealTag";
+import { getMealImageUrl } from "@/utils/mockDataHelpers";
 
 interface MealMiniCardProps {
   meal: ScheduledMeal;
@@ -11,6 +12,7 @@ interface MealMiniCardProps {
 
 export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
   const router = useRouter();
+  const imageUrl = getMealImageUrl(meal.id);
 
   const handlePress = () => {
     router.push({
@@ -51,8 +53,17 @@ export function MealMiniCard({ meal, compact = false }: MealMiniCardProps) {
       onPress={handlePress}
       className="mb-3 overflow-hidden rounded-xl bg-white shadow-sm active:opacity-70 dark:bg-gray-800"
     >
-      {/* Image Placeholder */}
-      <View className="relative h-32 w-full bg-gray-300 dark:bg-gray-700">
+      {/* Meal Image */}
+      <View className="relative h-32 w-full">
+        {imageUrl ? (
+          <Image
+            source={{ uri: imageUrl }}
+            className="h-32 w-full"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="h-32 w-full bg-gray-300 dark:bg-gray-700" />
+        )}
         {/* Meal Type Tag */}
         <View className="absolute right-2 top-2">
           <MealTag type={meal.type} />
