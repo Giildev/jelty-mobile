@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, ScrollView, Dimensions } from "react-native";
 import {
   format,
@@ -6,6 +6,7 @@ import {
   addDays,
   isSameDay,
   isToday,
+  differenceInDays,
 } from "date-fns";
 import { ScheduledMeal } from "@/types/nutrition";
 import { MealMiniCard } from "./MealMiniCard";
@@ -16,6 +17,8 @@ interface WeekViewProps {
 }
 
 export function WeekView({ meals, currentDate }: WeekViewProps) {
+  const scrollViewRef = useRef<ScrollView>(null);
+
   // Get the start of the week (Monday)
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
 
@@ -29,8 +32,31 @@ export function WeekView({ meals, currentDate }: WeekViewProps) {
   const availableWidth = screenWidth - horizontalPadding * 2;
   const dayWidth = (availableWidth - gapBetweenDays * 2.3) / 2.3;
 
+  // Auto-scroll to today when component mounts or week changes
+  useEffect(() => {
+    const today = new Date();
+    const todayIndex = weekDays.findIndex((day) => isToday(day));
+
+    if (todayIndex !== -1 && scrollViewRef.current) {
+      // Calculate scroll position to center today's column
+      // For early days (Mon-Wed), scroll to start to keep them visible
+      // For later days (Thu-Sun), scroll to show them centered/visible
+      const scrollPosition = todayIndex * (dayWidth + gapBetweenDays);
+
+      // Use a small delay to ensure ScrollView is rendered
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({
+          x: scrollPosition,
+          y: 0,
+          animated: true,
+        });
+      }, 100);
+    }
+  }, [currentDate, weekDays, dayWidth, gapBetweenDays]);
+
   return (
     <ScrollView
+      ref={scrollViewRef}
       horizontal
       showsHorizontalScrollIndicator={false}
       className="flex-1"

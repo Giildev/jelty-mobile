@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollView, useColorScheme, StyleSheet } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ScheduledExercise } from "@/types/workout";
 import { CustomDayCell } from "./CustomDayCell";
 
@@ -28,7 +28,9 @@ export function MonthView({ exercises, currentDate, onDayPress }: MonthViewProps
 
   const handleDayPress = (day: DateData) => {
     if (onDayPress) {
-      const selectedDate = new Date(day.timestamp);
+      // Use dateString to avoid timezone issues
+      // dateString format is 'yyyy-MM-dd'
+      const selectedDate = parseISO(day.dateString);
       onDayPress(selectedDate);
     }
   };

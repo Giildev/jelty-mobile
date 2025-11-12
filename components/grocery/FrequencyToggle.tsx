@@ -27,12 +27,9 @@ export function FrequencyToggle({ value, onChange }: FrequencyToggleProps) {
           <Pressable
             key={mode.value}
             onPress={() => onChange(mode.value)}
-            className={`flex-1 rounded-full px-6 py-2.5 ${
-              isActive
-                ? "bg-white dark:bg-gray-700"
-                : "bg-transparent"
-            }`}
+            className={`flex-1 rounded-full px-6 py-2.5`}
             style={{
+              backgroundColor: isActive ? "#1F024B" : "transparent",
               shadowColor: isActive ? "#000" : "transparent",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: isActive ? 0.1 : 0,
@@ -43,7 +40,7 @@ export function FrequencyToggle({ value, onChange }: FrequencyToggleProps) {
             <Text
               className={`text-center text-sm font-semibold ${
                 isActive
-                  ? "text-gray-900 dark:text-white"
+                  ? "text-white"
                   : "text-gray-500 dark:text-gray-400"
               }`}
             >

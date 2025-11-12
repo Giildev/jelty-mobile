@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   buttonSelected: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#1F024B",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonSelectedDark: {
-    backgroundColor: "#374151",
+    backgroundColor: "#1F024B",
   },
   text: {
     fontSize: 14,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
   },
   textSelected: {
-    color: "#1F024B",
+    color: "#ffffff",
   },
   textSelectedDark: {
     color: "#ffffff",

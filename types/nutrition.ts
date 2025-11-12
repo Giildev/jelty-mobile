@@ -13,6 +13,7 @@ export interface Macros {
 export interface Meal {
   id: string;
   name: string;
+  description?: string; // Brief description of the meal
   calories: number;
   macros: Macros;
   imageUrl?: string; // Optional for future use
@@ -54,3 +55,52 @@ export interface WeeklyMealPlan {
  * View mode for meal plan calendar
  */
 export type MealPlanViewMode = "day" | "week" | "month";
+
+/**
+ * Media item type (image or video)
+ */
+export type MediaType = "image" | "video";
+
+/**
+ * Media item for meal gallery
+ */
+export interface MediaItem {
+  id: string;
+  type: MediaType;
+  url: string;
+  thumbnail?: string; // Optional thumbnail for videos
+}
+
+/**
+ * Meal ingredient (simplified for display)
+ */
+export interface MealIngredient {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string; // "g", "ml", "tbsp", "cups", etc.
+  icon?: string; // Emoji icon for visual representation
+}
+
+/**
+ * Preparation step
+ */
+export interface PreparationStep {
+  id: string;
+  stepNumber: number;
+  instruction: string;
+}
+
+/**
+ * Detailed meal information for the detail view
+ */
+export interface MealDetail extends Meal {
+  description: string;
+  type: MealType; // breakfast, lunch, dinner, etc.
+  gallery: MediaItem[];
+  ingredients: MealIngredient[];
+  preparationSteps: PreparationStep[];
+  servings: number;
+  prepTime: number; // minutes
+  cookTime: number; // minutes
+}

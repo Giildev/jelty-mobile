@@ -1,22 +1,45 @@
-import { View, Text } from "react-native";
-import { Meal } from "@/types/nutrition";
+import { View, Text, Pressable, Image } from "react-native";
+import { useRouter } from "expo-router";
+import { ScheduledMeal } from "@/types/nutrition";
+import { getMealImageUrl } from "@/utils/mockDataHelpers";
 
 interface MealCardProps {
-  meal: Meal;
+  meal: ScheduledMeal;
 }
 
 export function MealCard({ meal }: MealCardProps) {
+  const router = useRouter();
+  const imageUrl = getMealImageUrl(meal.id);
+
+  const handlePress = () => {
+    router.push({
+      pathname: "/meal-detail",
+      params: { id: meal.id },
+    });
+  };
+
   return (
-    <View className="mb-2 flex-row items-center rounded-lg bg-white dark:bg-gray-800 p-3 shadow-sm">
-      {/* Placeholder Image */}
-      <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+    <Pressable
+      onPress={handlePress}
+      className="mb-2 flex-row items-center rounded-lg bg-white p-3 shadow-sm active:opacity-70 dark:bg-gray-800"
+    >
+      {/* Meal Image */}
+      {imageUrl ? (
+        <Image
+          source={{ uri: imageUrl }}
+          className="h-12 w-12 rounded-lg"
+          resizeMode="cover"
+        />
+      ) : (
+        <View className="h-12 w-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+      )}
 
       {/* Meal Info */}
       <View className="ml-3 flex-1">
-        <Text className="text-sm font-roboto-bold text-gray-900 dark:text-white">
+        <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
           {meal.name}
         </Text>
-        <Text className="mt-0.5 text-xs font-roboto-regular text-gray-600 dark:text-gray-400">
+        <Text className="font-roboto-regular mt-0.5 text-xs text-gray-600 dark:text-gray-400">
           C: {meal.macros.carbs}g | P: {meal.macros.protein}g | F:{" "}
           {meal.macros.fat}g
         </Text>
@@ -24,10 +47,10 @@ export function MealCard({ meal }: MealCardProps) {
 
       {/* Calories */}
       <View className="items-end">
-        <Text className="text-sm font-roboto-bold text-gray-900 dark:text-white">
+        <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
           {meal.calories} cal
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }

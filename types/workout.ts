@@ -5,6 +5,7 @@
 export interface Exercise {
   id: string;
   name: string;
+  description?: string; // Brief description of the exercise
   sets: number;
   reps: number;
   rir: number; // Reps in Reserve
@@ -49,3 +50,62 @@ export interface WeeklyWorkoutPlan {
  * View mode for workout plan calendar
  */
 export type WorkoutPlanViewMode = "day" | "week" | "month";
+
+/**
+ * Media type for exercise gallery
+ */
+export type ExerciseMediaType = "image" | "video";
+
+/**
+ * Media role for exercise content
+ */
+export type ExerciseMediaRole = "primary" | "gallery" | "demonstration";
+
+/**
+ * Media item for exercise gallery
+ */
+export interface ExerciseMediaItem {
+  id: string;
+  type: ExerciseMediaType;
+  url: string;
+  role: ExerciseMediaRole;
+  thumbnail?: string; // Optional thumbnail for videos
+  posterPath?: string; // Optional poster for videos
+  altText?: string; // Accessibility description
+  caption?: string; // Optional caption
+  sortIndex: number; // Order in gallery
+}
+
+/**
+ * Exercise instructions summary (aggregated from workout_set)
+ */
+export interface ExerciseInstructions {
+  sets: number; // Total number of sets
+  repsMin: number; // Minimum reps
+  repsMax: number; // Maximum reps
+  rir: number; // Reps in Reserve
+  restTimeSeconds: number; // Rest time between sets in seconds
+}
+
+/**
+ * How to perform step
+ */
+export interface HowToPerformStep {
+  id: string;
+  orderIndex: number;
+  instruction: string;
+}
+
+/**
+ * Detailed exercise information for the detail view
+ */
+export interface ExerciseDetail extends Exercise {
+  description: string; // Detailed description of the exercise
+  primaryMuscle: string; // Primary muscle group targeted
+  equipment: string; // Equipment needed
+  category: ExerciseType; // warm-up, main, or stretch
+  gallery: ExerciseMediaItem[]; // Images/videos of the exercise
+  instructions: ExerciseInstructions; // Sets, reps, RIR, rest time summary
+  howToPerformSteps: HowToPerformStep[]; // Step-by-step instructions
+  tips?: string[]; // Optional form tips or safety notes
+}
