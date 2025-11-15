@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from "date-fns";
 import { MealPlanViewMode } from "@/types/nutrition";
-import { MOCK_SCHEDULED_MEALS } from "@/constants/mockData";
+import { useUserRecipes } from "@/hooks/useUserRecipes";
 import { ViewModeSelector } from "@/components/meal-plan/ViewModeSelector";
 import { MonthNavigationHeader } from "@/components/meal-plan/MonthNavigationHeader";
 import { DayView } from "@/components/meal-plan/DayView";
@@ -17,6 +17,14 @@ import { MonthView } from "@/components/meal-plan/MonthView";
 export default function MealPlanScreen() {
   const [viewMode, setViewMode] = useState<MealPlanViewMode>("week");
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Fetch user recipes/meals with React Query cache
+  const { recipes, isLoading, error } = useUserRecipes();
+
+  // Handle errors
+  if (error) {
+    console.error("[MealPlanScreen] Error fetching recipes:", error);
+  }
 
   // Navigation handlers based on view mode
   const handlePrevious = () => {
@@ -39,6 +47,17 @@ export default function MealPlanScreen() {
     setCurrentDate(date);
     setViewMode("day");
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#1F024B" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
@@ -66,16 +85,16 @@ export default function MealPlanScreen() {
       {/* Content - Conditional based on view mode */}
       <View className="flex-1">
         {viewMode === "day" && (
-          <DayView meals={MOCK_SCHEDULED_MEALS} currentDate={currentDate} />
+          <DayView meals={recipes} currentDate={currentDate} />
         )}
 
         {viewMode === "week" && (
-          <WeekView meals={MOCK_SCHEDULED_MEALS} currentDate={currentDate} />
+          <WeekView meals={recipes} currentDate={currentDate} />
         )}
 
         {viewMode === "month" && (
           <MonthView
-            meals={MOCK_SCHEDULED_MEALS}
+            meals={recipes}
             currentDate={currentDate}
             onDayPress={handleDayPress}
           />

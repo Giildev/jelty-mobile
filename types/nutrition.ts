@@ -29,6 +29,30 @@ export type MealType =
   | "dinner"
   | "evening_snack";
 
+/**
+ * Display labels for meal types
+ */
+export enum MealTypeLabel {
+  breakfast = "Breakfast",
+  morning_snack = "Snack",
+  lunch = "Lunch",
+  afternoon_snack = "Late Snack",
+  dinner = "Dinner",
+  evening_snack = "Evening Snack",
+}
+
+/**
+ * Micronutrients (vitamins and minerals)
+ */
+export interface Micros {
+  potassium?: number; // mg
+  calcium?: number; // mg
+  iron?: number; // mg
+  vitaminD?: number; // mcg
+  vitaminB12?: number; // mcg
+  omega3?: number; // g
+}
+
 export interface DailyMealPlan {
   date: string; // ISO date string
   meals: Meal[];
@@ -103,4 +127,6 @@ export interface MealDetail extends Meal {
   servings: number;
   prepTime: number; // minutes
   cookTime: number; // minutes
+  micros?: Micros; // micronutrients (optional)
+  totalTime?: number; // total time in minutes (optional)
 }

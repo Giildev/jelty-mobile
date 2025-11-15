@@ -1,6 +1,19 @@
 /**
  * Mock Data for Home Screen Development
- * This will be replaced with real API data in the future
+ *
+ * ⚠️ DEPRECATED - This file is being phased out
+ *
+ * Meal-related mock data (MOCK_SCHEDULED_MEALS, MEAL_DETAILS_MOCK) has been
+ * replaced with real API calls. These exports are kept temporarily for:
+ * - Backward compatibility during testing
+ * - Workout data (MOCK_SCHEDULED_EXERCISES) which still uses mocks
+ *
+ * New code should use:
+ * - useUserRecipes() hook for meal/recipe data
+ * - useMealDetail(id) hook for detailed meal information
+ *
+ * TODO: Remove meal-related exports after confirming API integration works
+ * TODO: Migrate workout data to use real API calls
  */
 
 import { Meal, ScheduledMeal, WeeklyMealPlan, MealDetail } from "@/types/nutrition";

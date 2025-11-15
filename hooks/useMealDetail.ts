@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMealById } from "@/services/mealService";
+import { fetchRecipeDetail } from "@/services/api/recipesService";
+import { mapApiRecipeToMealDetail } from "@/utils/recipeMappers";
 import type { MealDetail } from "@/types/nutrition";
 
 /**
@@ -29,19 +30,24 @@ export function useMealDetail(mealId: string | null | undefined) {
     // Query key: ['meal', mealId] - unique per meal
     queryKey: ["meal", mealId],
 
-    // Query function: call getMealById
-    queryFn: async () => {
+    // Query function: fetch from API and map to MealDetail
+    queryFn: async (): Promise<MealDetail> => {
       if (!mealId) {
         throw new Error("Meal ID is required");
       }
       console.log("[useMealDetail] Fetching meal data for:", mealId);
-      const data = await getMealById(mealId);
 
-      if (!data) {
+      // Fetch from API
+      const response = await fetchRecipeDetail(mealId);
+
+      if (!response.success || !response.data) {
         throw new Error("Meal not found");
       }
 
-      return data;
+      // Map API response to MealDetail
+      const mappedMeal = mapApiRecipeToMealDetail(response.data);
+
+      return mappedMeal;
     },
 
     // Only execute if we have mealId
@@ -106,7 +112,13 @@ export function usePrefetchMealDetail() {
   return (mealId: string) => {
     queryClient.prefetchQuery({
       queryKey: ["meal", mealId],
-      queryFn: () => getMealById(mealId),
+      queryFn: async () => {
+        const response = await fetchRecipeDetail(mealId);
+        if (!response.success || !response.data) {
+          throw new Error("Meal not found");
+        }
+        return mapApiRecipeToMealDetail(response.data);
+      },
       staleTime: 10 * 60 * 1000,
     });
   };

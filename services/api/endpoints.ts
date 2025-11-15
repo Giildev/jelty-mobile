@@ -27,4 +27,10 @@ export const API_ENDPOINTS = {
     update: (id: string) => `/posts/${id}`,
     delete: (id: string) => `/posts/${id}`,
   },
+
+  // Chef/Recipes
+  chef: {
+    recipes: "/api/v1/agents/chef/recipes", // POST with userId
+    recipeDetail: (recipeId: string) => `/api/v1/agents/chef/recipe/${recipeId}`, // GET
+  },
 } as const;

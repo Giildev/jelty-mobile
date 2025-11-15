@@ -1,5 +1,20 @@
 /**
  * Helper functions to work with mock data
+ *
+ * ⚠️ DEPRECATED - This file is being phased out
+ *
+ * These helpers were used with MEAL_DETAILS_MOCK and EXERCISE_DETAILS_MOCK.
+ * Meal-related functionality has been replaced with real API calls.
+ *
+ * New code should:
+ * - Use useMealDetail(id) hook which returns imageUrl directly
+ * - Access meal.imageUrl from the ScheduledMeal objects
+ *
+ * Still in use for:
+ * - Exercise helpers (getExerciseImageUrl) until workout API is implemented
+ *
+ * TODO: Remove after confirming all meal references are migrated
+ * TODO: Migrate exercise helpers when workout API is ready
  */
 
 import { MEAL_DETAILS_MOCK, EXERCISE_DETAILS_MOCK } from "@/constants/mockData";
