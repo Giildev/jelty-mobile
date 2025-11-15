@@ -4,6 +4,27 @@
  */
 
 import type { ApiRecipe, ApiRecipeDetail } from "@/types/api";
+
+/**
+ * Fix malformed Supabase URLs from backend
+ * Converts: https://meal-media.supabase.co/storage/v1/object/public/xxx/yyy.png
+ * To: https://zsrjmwciovzfssluorqi.supabase.co/storage/v1/object/public/meal-media/xxx/yyy.png
+ */
+function fixSupabaseImageUrl(url: string): string {
+  if (!url) return url;
+
+  // Check if URL is malformed (missing project ID)
+  if (url.includes("meal-media.supabase.co")) {
+    // Replace with correct Supabase project URL
+    return url.replace(
+      "https://meal-media.supabase.co/storage/v1/object/public/",
+      "https://zsrjmwciovzfssluorqi.supabase.co/storage/v1/object/public/meal-media/"
+    );
+  }
+
+  return url;
+}
+
 import type {
   ScheduledMeal,
   MealDetail,
@@ -35,7 +56,7 @@ export function mapApiRecipeToScheduledMeal(
     date: apiRecipe.dayDate.split("T")[0], // Extract just the date part
     time: getTimeFromSlotIndex(apiRecipe.slotIndex),
     type: apiRecipe.mealType,
-    imageUrl: apiRecipe.image,
+    imageUrl: fixSupabaseImageUrl(apiRecipe.image),
   };
 }
 
@@ -75,12 +96,25 @@ export function mapApiRecipeToMealDetail(
   }));
 
   // Map media/gallery
-  const gallery: MediaItem[] = apiDetail.media.map((media, index) => ({
-    id: media.id || `media-${index}`,
-    type: media.type,
-    url: media.url,
-    thumbnail: media.thumbnail,
-  }));
+  // If media array is empty but image exists, use image as first gallery item
+  const gallery: MediaItem[] =
+    apiDetail.media.length > 0
+      ? apiDetail.media.map((media, index) => ({
+          id: media.id || `media-${index}`,
+          type: media.type,
+          url: fixSupabaseImageUrl(media.url),
+          thumbnail: media.thumbnail ? fixSupabaseImageUrl(media.thumbnail) : undefined,
+        }))
+      : apiDetail.image
+        ? [
+            {
+              id: `${apiDetail.id}-main-image`,
+              type: "image" as const,
+              url: fixSupabaseImageUrl(apiDetail.image),
+              thumbnail: fixSupabaseImageUrl(apiDetail.image),
+            },
+          ]
+        : [];
 
   // Map micros
   const micros: Micros = {
@@ -103,7 +137,7 @@ export function mapApiRecipeToMealDetail(
       fat: apiDetail.macrosPerServing.fats,
     },
     type: apiDetail.mealType,
-    imageUrl: apiDetail.image,
+    imageUrl: fixSupabaseImageUrl(apiDetail.image),
     gallery,
     ingredients,
     preparationSteps,
