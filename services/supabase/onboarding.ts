@@ -29,6 +29,30 @@ import type { HealthInfoData } from "@/types/supabase";
  */
 
 /**
+ * Calculates age in years from birth date
+ *
+ * @param birthDateString - Birth date in ISO format (YYYY-MM-DD)
+ * @returns Age in years
+ *
+ * @example
+ * const age = calculateAge('1990-01-15'); // Returns age based on current date
+ */
+function calculateAge(birthDateString: string): number {
+  const birthDate = new Date(birthDateString);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  // Adjust age if birthday hasn't occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+/**
  * Saves Step 1 data (Personal Information) to user profile
  *
  * @param clerkUserId - The Clerk user ID
@@ -67,14 +91,21 @@ export async function saveOnboardingStep1(
       throw new Error("User encryption salt not found");
     }
 
+    // Calculate age from birth_date if provided
+    let ageYears: number | undefined = undefined;
+    if (data.birth_date) {
+      ageYears = calculateAge(data.birth_date);
+    }
+
     // Encrypt sensitive data before saving
     const encryptedData = encryptUserFields(data, user.encryption_salt, clerkUserId);
 
-    // Update profile with ENCRYPTED step 1 data
+    // Update profile with ENCRYPTED step 1 data + age_years
     const { error } = await supabaseAdmin
       .from("user_profile")
       .update({
         ...encryptedData,
+        ...(ageYears !== undefined && { age_years: ageYears }),
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id);
@@ -494,125 +525,212 @@ export async function saveOnboardingStep3(
       throw new Error("User encryption salt not found");
     }
 
-    // 1. Medical Conditions
-    // Soft delete existing conditions
-    await supabaseAdmin
+    // 1. Medical Conditions - Intelligent Update
+    const encryptedConditions = healthData.medicalConditions && healthData.medicalConditions.length > 0
+      ? encryptHealthConditions(healthData.medicalConditions, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingConditions } = await supabaseAdmin
       .from("user_medical_condition")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name, details")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new conditions if any
-    if (healthData.medicalConditions && healthData.medicalConditions.length > 0) {
-      const encryptedConditions = encryptHealthConditions(
-        healthData.medicalConditions,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingConditionNames = existingConditions?.map((c) => c.name) || [];
+    const newConditionNames = encryptedConditions.map((c) => c.name);
 
-      const conditionsToInsert = encryptedConditions.map((condition) => ({
+    // Soft delete conditions no longer in the list
+    const conditionsToDelete = existingConditionNames.filter((name) => !newConditionNames.includes(name));
+    if (conditionsToDelete.length > 0) {
+      const idsToDelete = existingConditions?.filter((c) => conditionsToDelete.includes(c.name)).map((c) => c.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_medical_condition")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Update existing conditions if details changed
+    for (const newCondition of encryptedConditions) {
+      const existing = existingConditions?.find((c) => c.name === newCondition.name);
+      if (existing && existing.details !== newCondition.details) {
+        await supabaseAdmin
+          .from("user_medical_condition")
+          .update({
+            details: newCondition.details,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+      }
+    }
+
+    // Insert new conditions
+    const conditionsToInsert = encryptedConditions.filter((c) => !existingConditionNames.includes(c.name));
+    if (conditionsToInsert.length > 0) {
+      const recordsToInsert = conditionsToInsert.map((condition) => ({
         user_id: user.id,
         name: condition.name,
         details: condition.details,
       }));
-
       const { error: conditionsError } = await supabaseAdmin
         .from("user_medical_condition")
-        .insert(conditionsToInsert);
-
+        .insert(recordsToInsert);
       if (conditionsError) {
         throw new Error(`Failed to insert medical conditions: ${conditionsError.message}`);
       }
     }
 
-    // 2. Medications
-    // Soft delete existing medications
-    await supabaseAdmin
+    // 2. Medications - Intelligent Update
+    const encryptedMedications = healthData.medications && healthData.medications.length > 0
+      ? encryptMedications(healthData.medications, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingMedications } = await supabaseAdmin
       .from("user_medication")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name, dosage, notes")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new medications if any
-    if (healthData.medications && healthData.medications.length > 0) {
-      const encryptedMedications = encryptMedications(
-        healthData.medications,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingMedicationNames = existingMedications?.map((m) => m.name) || [];
+    const newMedicationNames = encryptedMedications.map((m) => m.name);
 
-      const medicationsToInsert = encryptedMedications.map((medication) => ({
+    // Soft delete medications no longer in the list
+    const medicationsToDelete = existingMedicationNames.filter((name) => !newMedicationNames.includes(name));
+    if (medicationsToDelete.length > 0) {
+      const idsToDelete = existingMedications?.filter((m) => medicationsToDelete.includes(m.name)).map((m) => m.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_medication")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Update existing medications if dosage or notes changed
+    for (const newMed of encryptedMedications) {
+      const existing = existingMedications?.find((m) => m.name === newMed.name);
+      if (existing && (existing.dosage !== newMed.dosage || existing.notes !== newMed.notes)) {
+        await supabaseAdmin
+          .from("user_medication")
+          .update({
+            dosage: newMed.dosage,
+            notes: newMed.notes,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+      }
+    }
+
+    // Insert new medications
+    const medicationsToInsert = encryptedMedications.filter((m) => !existingMedicationNames.includes(m.name));
+    if (medicationsToInsert.length > 0) {
+      const recordsToInsert = medicationsToInsert.map((medication) => ({
         user_id: user.id,
         name: medication.name,
         dosage: medication.dosage,
         notes: medication.notes,
       }));
-
       const { error: medicationsError } = await supabaseAdmin
         .from("user_medication")
-        .insert(medicationsToInsert);
-
+        .insert(recordsToInsert);
       if (medicationsError) {
         throw new Error(`Failed to insert medications: ${medicationsError.message}`);
       }
     }
 
-    // 3. Injuries
-    // Soft delete existing injuries
-    await supabaseAdmin
+    // 3. Injuries - Intelligent Update
+    const encryptedInjuries = healthData.injuries && healthData.injuries.length > 0
+      ? encryptInjuries(healthData.injuries, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingInjuries } = await supabaseAdmin
       .from("user_injury")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name, details")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new injuries if any
-    if (healthData.injuries && healthData.injuries.length > 0) {
-      const encryptedInjuries = encryptInjuries(
-        healthData.injuries,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingInjuryNames = existingInjuries?.map((i) => i.name) || [];
+    const newInjuryNames = encryptedInjuries.map((i) => i.name);
 
-      const injuriesToInsert = encryptedInjuries.map((injury) => ({
+    // Soft delete injuries no longer in the list
+    const injuriesToDelete = existingInjuryNames.filter((name) => !newInjuryNames.includes(name));
+    if (injuriesToDelete.length > 0) {
+      const idsToDelete = existingInjuries?.filter((i) => injuriesToDelete.includes(i.name)).map((i) => i.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_injury")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Update existing injuries if details changed
+    for (const newInjury of encryptedInjuries) {
+      const existing = existingInjuries?.find((i) => i.name === newInjury.name);
+      if (existing && existing.details !== newInjury.details) {
+        await supabaseAdmin
+          .from("user_injury")
+          .update({
+            details: newInjury.details,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+      }
+    }
+
+    // Insert new injuries
+    const injuriesToInsert = encryptedInjuries.filter((i) => !existingInjuryNames.includes(i.name));
+    if (injuriesToInsert.length > 0) {
+      const recordsToInsert = injuriesToInsert.map((injury) => ({
         user_id: user.id,
         name: injury.name,
         details: injury.details,
       }));
-
       const { error: injuriesError } = await supabaseAdmin
         .from("user_injury")
-        .insert(injuriesToInsert);
-
+        .insert(recordsToInsert);
       if (injuriesError) {
         throw new Error(`Failed to insert injuries: ${injuriesError.message}`);
       }
     }
 
-    // 4. Allergies
-    // Soft delete existing allergies
-    await supabaseAdmin
+    // 4. Allergies - Intelligent Update
+    const encryptedAllergies = healthData.allergies && healthData.allergies.length > 0
+      ? encryptAllergies(healthData.allergies, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingAllergies } = await supabaseAdmin
       .from("user_allergy")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new allergies if any
-    if (healthData.allergies && healthData.allergies.length > 0) {
-      const encryptedAllergies = encryptAllergies(
-        healthData.allergies,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingAllergyNames = existingAllergies?.map((a) => a.name) || [];
+    const newAllergyNames = encryptedAllergies.map((a) => a.name);
 
-      const allergiesToInsert = encryptedAllergies.map((allergy) => ({
+    // Soft delete allergies no longer in the list
+    const allergiesToDelete = existingAllergyNames.filter((name) => !newAllergyNames.includes(name));
+    if (allergiesToDelete.length > 0) {
+      const idsToDelete = existingAllergies?.filter((a) => allergiesToDelete.includes(a.name)).map((a) => a.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_allergy")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new allergies (no update needed since only has 'name' field)
+    const allergiesToInsert = encryptedAllergies.filter((a) => !existingAllergyNames.includes(a.name));
+    if (allergiesToInsert.length > 0) {
+      const recordsToInsert = allergiesToInsert.map((allergy) => ({
         user_id: user.id,
         name: allergy.name,
       }));
-
       const { error: allergiesError } = await supabaseAdmin
         .from("user_allergy")
-        .insert(allergiesToInsert);
-
+        .insert(recordsToInsert);
       if (allergiesError) {
         throw new Error(`Failed to insert allergies: ${allergiesError.message}`);
       }
@@ -755,109 +873,159 @@ export async function saveOnboardingStep4(
       throw new Error("User encryption salt not found");
     }
 
-    // 1. Dietary Patterns (user_restriction)
-    // Soft delete existing restrictions
-    await supabaseAdmin
+    // 1. Dietary Patterns (user_restriction) - Intelligent Update
+    const newRestrictions = dietaryData.dietaryPatterns || [];
+
+    const { data: existingRestrictions } = await supabaseAdmin
       .from("user_restriction")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new dietary patterns if any
-    if (dietaryData.dietaryPatterns && dietaryData.dietaryPatterns.length > 0) {
-      const restrictionsToInsert = dietaryData.dietaryPatterns.map((pattern) => ({
-        user_id: user.id,
-        name: pattern, // NOT encrypted (predefined options)
-      }));
+    const existingRestrictionNames = existingRestrictions?.map((r) => r.name) || [];
 
+    // Soft delete restrictions no longer in the list
+    const restrictionsToDelete = existingRestrictionNames.filter((name) => !newRestrictions.includes(name));
+    if (restrictionsToDelete.length > 0) {
+      const idsToDelete = existingRestrictions?.filter((r) => restrictionsToDelete.includes(r.name)).map((r) => r.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_restriction")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new restrictions
+    const restrictionsToInsert = newRestrictions.filter((name) => !existingRestrictionNames.includes(name));
+    if (restrictionsToInsert.length > 0) {
+      const recordsToInsert = restrictionsToInsert.map((pattern) => ({
+        user_id: user.id,
+        name: pattern,
+      }));
       const { error: restrictionsError } = await supabaseAdmin
         .from("user_restriction")
-        .insert(restrictionsToInsert);
-
+        .insert(recordsToInsert);
       if (restrictionsError) {
         throw new Error(`Failed to insert dietary patterns: ${restrictionsError.message}`);
       }
     }
 
-    // 2. Preferred Cuisines (user_cuisine)
-    // Soft delete existing cuisines
-    await supabaseAdmin
+    // 2. Preferred Cuisines (user_cuisine) - Intelligent Update
+    const newCuisines = dietaryData.cuisines || [];
+
+    const { data: existingCuisines } = await supabaseAdmin
       .from("user_cuisine")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new cuisines if any
-    if (dietaryData.cuisines && dietaryData.cuisines.length > 0) {
-      const cuisinesToInsert = dietaryData.cuisines.map((cuisine) => ({
-        user_id: user.id,
-        name: cuisine, // NOT encrypted (predefined options)
-      }));
+    const existingCuisineNames = existingCuisines?.map((c) => c.name) || [];
 
+    // Soft delete cuisines no longer in the list
+    const cuisinesToDelete = existingCuisineNames.filter((name) => !newCuisines.includes(name));
+    if (cuisinesToDelete.length > 0) {
+      const idsToDelete = existingCuisines?.filter((c) => cuisinesToDelete.includes(c.name)).map((c) => c.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_cuisine")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new cuisines
+    const cuisinesToInsert = newCuisines.filter((name) => !existingCuisineNames.includes(name));
+    if (cuisinesToInsert.length > 0) {
+      const recordsToInsert = cuisinesToInsert.map((cuisine) => ({
+        user_id: user.id,
+        name: cuisine,
+      }));
       const { error: cuisinesError } = await supabaseAdmin
         .from("user_cuisine")
-        .insert(cuisinesToInsert);
-
+        .insert(recordsToInsert);
       if (cuisinesError) {
         throw new Error(`Failed to insert cuisines: ${cuisinesError.message}`);
       }
     }
 
-    // 3. Ingredients to Avoid (user_disliked_ingredient)
-    // Soft delete existing disliked ingredients
-    await supabaseAdmin
+    // 3. Ingredients to Avoid (user_disliked_ingredient) - Intelligent Update
+    const encryptedAvoid = dietaryData.ingredientsToAvoid && dietaryData.ingredientsToAvoid.length > 0
+      ? encryptIngredients(dietaryData.ingredientsToAvoid, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingDisliked } = await supabaseAdmin
       .from("user_disliked_ingredient")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new ingredients to avoid if any
-    if (dietaryData.ingredientsToAvoid && dietaryData.ingredientsToAvoid.length > 0) {
-      const encryptedAvoid = encryptIngredients(
-        dietaryData.ingredientsToAvoid,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingDislikedNames = existingDisliked?.map((d) => d.name) || [];
+    const newDislikedNames = encryptedAvoid.map((i) => i.name);
 
-      const avoidToInsert = encryptedAvoid.map((ingredient) => ({
+    // Soft delete disliked ingredients no longer in the list
+    const dislikedToDelete = existingDislikedNames.filter((name) => !newDislikedNames.includes(name));
+    if (dislikedToDelete.length > 0) {
+      const idsToDelete = existingDisliked?.filter((d) => dislikedToDelete.includes(d.name)).map((d) => d.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_disliked_ingredient")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new disliked ingredients
+    const dislikedToInsert = encryptedAvoid.filter((i) => !existingDislikedNames.includes(i.name));
+    if (dislikedToInsert.length > 0) {
+      const recordsToInsert = dislikedToInsert.map((ingredient) => ({
         user_id: user.id,
-        name: ingredient.name, // ENCRYPTED
+        name: ingredient.name,
       }));
-
       const { error: avoidError } = await supabaseAdmin
         .from("user_disliked_ingredient")
-        .insert(avoidToInsert);
-
+        .insert(recordsToInsert);
       if (avoidError) {
         throw new Error(`Failed to insert ingredients to avoid: ${avoidError.message}`);
       }
     }
 
-    // 4. Ingredients to Include (user_favorite_ingredient)
-    // Soft delete existing favorite ingredients
-    await supabaseAdmin
+    // 4. Ingredients to Include (user_favorite_ingredient) - Intelligent Update
+    const encryptedInclude = dietaryData.ingredientsToInclude && dietaryData.ingredientsToInclude.length > 0
+      ? encryptIngredients(dietaryData.ingredientsToInclude, user.encryption_salt, clerkUserId)
+      : [];
+
+    const { data: existingFavorite } = await supabaseAdmin
       .from("user_favorite_ingredient")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new ingredients to include if any
-    if (dietaryData.ingredientsToInclude && dietaryData.ingredientsToInclude.length > 0) {
-      const encryptedInclude = encryptIngredients(
-        dietaryData.ingredientsToInclude,
-        user.encryption_salt,
-        clerkUserId
-      );
+    const existingFavoriteNames = existingFavorite?.map((f) => f.name) || [];
+    const newFavoriteNames = encryptedInclude.map((i) => i.name);
 
-      const includeToInsert = encryptedInclude.map((ingredient) => ({
+    // Soft delete favorite ingredients no longer in the list
+    const favoriteToDelete = existingFavoriteNames.filter((name) => !newFavoriteNames.includes(name));
+    if (favoriteToDelete.length > 0) {
+      const idsToDelete = existingFavorite?.filter((f) => favoriteToDelete.includes(f.name)).map((f) => f.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_favorite_ingredient")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new favorite ingredients
+    const favoriteToInsert = encryptedInclude.filter((i) => !existingFavoriteNames.includes(i.name));
+    if (favoriteToInsert.length > 0) {
+      const recordsToInsert = favoriteToInsert.map((ingredient) => ({
         user_id: user.id,
-        name: ingredient.name, // ENCRYPTED
+        name: ingredient.name,
       }));
-
       const { error: includeError } = await supabaseAdmin
         .from("user_favorite_ingredient")
-        .insert(includeToInsert);
-
+        .insert(recordsToInsert);
       if (includeError) {
         throw new Error(`Failed to insert ingredients to include: ${includeError.message}`);
       }
@@ -1086,48 +1254,77 @@ export async function saveOnboardingStep5(
       }
     }
 
-    // 2. Preferred Training Types (user_exercise_preference)
-    // Soft delete existing exercise preferences
-    await supabaseAdmin
+    // 2. Preferred Training Types (user_exercise_preference) - Intelligent Update
+    const newTrainingTypes = exerciseData.preferredTrainingTypes || [];
+
+    const { data: existingExercisePrefs } = await supabaseAdmin
       .from("user_exercise_preference")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new training types if any
-    if (exerciseData.preferredTrainingTypes && exerciseData.preferredTrainingTypes.length > 0) {
-      const trainingTypesToInsert = exerciseData.preferredTrainingTypes.map((type) => ({
-        user_id: user.id,
-        name: type, // NOT encrypted (predefined options)
-      }));
+    const existingTrainingTypeNames = existingExercisePrefs?.map((e) => e.name) || [];
 
+    // Soft delete training types no longer in the list
+    const trainingTypesToDelete = existingTrainingTypeNames.filter((name) => !newTrainingTypes.includes(name));
+    if (trainingTypesToDelete.length > 0) {
+      const idsToDelete = existingExercisePrefs?.filter((e) => trainingTypesToDelete.includes(e.name)).map((e) => e.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_exercise_preference")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new training types
+    const trainingTypesToInsert = newTrainingTypes.filter((name) => !existingTrainingTypeNames.includes(name));
+    if (trainingTypesToInsert.length > 0) {
+      const recordsToInsert = trainingTypesToInsert.map((type) => ({
+        user_id: user.id,
+        name: type,
+      }));
       const { error: trainingTypesError } = await supabaseAdmin
         .from("user_exercise_preference")
-        .insert(trainingTypesToInsert);
-
+        .insert(recordsToInsert);
       if (trainingTypesError) {
         throw new Error(`Failed to insert training types: ${trainingTypesError.message}`);
       }
     }
 
-    // 3. Equipment Availability (user_equipment_access)
-    // Soft delete existing equipment access
-    await supabaseAdmin
+    // 3. Equipment Availability (user_equipment_access) - Intelligent Update
+    const { data: existingEquipment } = await supabaseAdmin
       .from("user_equipment_access")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, name")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert equipment availability
-    const { error: equipmentError } = await supabaseAdmin
-      .from("user_equipment_access")
-      .insert({
-        user_id: user.id,
-        name: exerciseData.equipmentAvailability, // NOT encrypted (predefined option)
-      });
+    const existingEquipmentNames = existingEquipment?.map((e) => e.name) || [];
 
-    if (equipmentError) {
-      throw new Error(`Failed to insert equipment availability: ${equipmentError.message}`);
+    // Soft delete equipment no longer needed
+    const equipmentToDelete = existingEquipmentNames.filter((name) => name !== exerciseData.equipmentAvailability);
+    if (equipmentToDelete.length > 0) {
+      const idsToDelete = existingEquipment?.filter((e) => equipmentToDelete.includes(e.name)).map((e) => e.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_equipment_access")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert equipment availability if it doesn't exist
+    if (!existingEquipmentNames.includes(exerciseData.equipmentAvailability)) {
+      const { error: equipmentError } = await supabaseAdmin
+        .from("user_equipment_access")
+        .insert({
+          user_id: user.id,
+          name: exerciseData.equipmentAvailability,
+        });
+
+      if (equipmentError) {
+        throw new Error(`Failed to insert equipment availability: ${equipmentError.message}`);
+      }
     }
 
     return true;
@@ -1301,25 +1498,39 @@ export async function saveOnboardingStep6(
       }
     }
 
-    // 2. Days Available (user_availability)
-    // Soft delete existing availability
-    await supabaseAdmin
+    // 2. Days Available (user_availability) - Intelligent Update
+    const newDaysAvailable = availabilityData.daysAvailable || [];
+
+    const { data: existingAvailability } = await supabaseAdmin
       .from("user_availability")
-      .update({ deleted_at: new Date().toISOString() })
+      .select("id, day_of_week")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new availability days
-    if (availabilityData.daysAvailable && availabilityData.daysAvailable.length > 0) {
-      const daysToInsert = availabilityData.daysAvailable.map((day) => ({
-        user_id: user.id,
-        day_of_week: day, // NOT encrypted (predefined options)
-      }));
+    const existingDays = existingAvailability?.map((a) => a.day_of_week) || [];
 
+    // Soft delete days no longer in the list
+    const daysToDelete = existingDays.filter((day) => !newDaysAvailable.includes(day));
+    if (daysToDelete.length > 0) {
+      const idsToDelete = existingAvailability?.filter((a) => daysToDelete.includes(a.day_of_week)).map((a) => a.id) || [];
+      if (idsToDelete.length > 0) {
+        await supabaseAdmin
+          .from("user_availability")
+          .update({ deleted_at: new Date().toISOString() })
+          .in("id", idsToDelete);
+      }
+    }
+
+    // Insert new availability days
+    const daysToInsert = newDaysAvailable.filter((day) => !existingDays.includes(day));
+    if (daysToInsert.length > 0) {
+      const recordsToInsert = daysToInsert.map((day) => ({
+        user_id: user.id,
+        day_of_week: day,
+      }));
       const { error: daysError } = await supabaseAdmin
         .from("user_availability")
-        .insert(daysToInsert);
-
+        .insert(recordsToInsert);
       if (daysError) {
         throw new Error(`Failed to insert availability days: ${daysError.message}`);
       }
