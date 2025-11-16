@@ -32,5 +32,6 @@ export const API_ENDPOINTS = {
   chef: {
     recipes: "/api/v1/agents/chef/recipes", // POST with userId
     recipeDetail: (recipeId: string) => `/api/v1/agents/chef/recipe/${recipeId}`, // GET
+    generateMonthlyPlan: "/api/v1/agents/chef/generate-monthly-plan", // POST with userId
   },
 } as const;

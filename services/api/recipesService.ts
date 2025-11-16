@@ -48,3 +48,24 @@ export async function fetchRecipeDetail(
     throw error;
   }
 }
+
+/**
+ * Generate a new monthly meal plan for a user
+ * @param userId - User's database UUID (supabase user ID)
+ * @returns Promise with generation result
+ */
+export async function generateMonthlyMealPlan(
+  userId: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.chef.generateMonthlyPlan,
+      { userId },
+      { timeout: 60000 } // 60 seconds timeout (plan generation starts in background)
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error generating monthly meal plan:", error);
+    throw error;
+  }
+}

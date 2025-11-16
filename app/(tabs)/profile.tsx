@@ -5,6 +5,7 @@ import {
   Pressable,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
@@ -13,6 +14,10 @@ import { ProfileCard } from "@/components/profile/ProfileCard";
 import { GenerateNewPlanModal } from "@/components/profile/GenerateNewPlanModal";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useLogout } from "@/hooks/useLogout";
+import { useMealPlanProgress, useInvalidateMealPlanProgress } from "@/hooks/useMealPlanProgress";
+import { useInvalidateRecipes } from "@/hooks/useUserRecipes";
+import { useUserData } from "@/hooks/useUserData";
+import { generateMonthlyMealPlan } from "@/services/api/recipesService";
 
 /**
  * User profile screen
@@ -23,6 +28,18 @@ export default function ProfileScreen() {
   const router = useRouter();
   const logout = useLogout();
   const [showGeneratePlanModal, setShowGeneratePlanModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Get Supabase user ID
+  const { userData } = useUserData(user?.id);
+  const supabaseUserId = userData?.user?.id;
+
+  // Check meal plan progress
+  const { isGenerating: isPlanGenerating } = useMealPlanProgress();
+
+  // Cache invalidation hooks
+  const invalidateProgress = useInvalidateMealPlanProgress();
+  const invalidateRecipes = useInvalidateRecipes();
 
   // Load basic profile data (first name, last name only)
   const { data, loading } = useProfileData(
@@ -52,10 +69,46 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleGenerateNewPlan = () => {
-    // TODO: Implement plan regeneration logic
-    // For now, just close the modal
-    console.log("Generate new plan confirmed");
+  const handleGenerateNewPlan = async () => {
+    if (!supabaseUserId) {
+      Alert.alert("Error", "User not found. Please try again.");
+      return;
+    }
+
+    setIsGenerating(true);
+    setShowGeneratePlanModal(false);
+
+    try {
+      console.log("[ProfileScreen] Generating new meal plan for:", supabaseUserId);
+
+      // Call the API to start plan generation
+      const result = await generateMonthlyMealPlan(supabaseUserId);
+
+      if (result.success) {
+        // Invalidate caches to trigger refetch
+        invalidateProgress();
+        invalidateRecipes();
+
+        Alert.alert(
+          "Plan Generation Started",
+          "Your meal plan is being generated. This may take several minutes. You can check the progress on the Home screen.",
+          [{ text: "OK" }]
+        );
+
+        // Navigate to home to see progress
+        router.push("/(tabs)/");
+      } else {
+        Alert.alert("Error", result.message || "Failed to start plan generation.");
+      }
+    } catch (error) {
+      console.error("[ProfileScreen] Error generating plan:", error);
+      Alert.alert(
+        "Error",
+        "Could not start plan generation. Please check your connection and try again."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -73,11 +126,25 @@ export default function ProfileScreen() {
         {/* Generate New Plan Button */}
         <Pressable
           onPress={() => setShowGeneratePlanModal(true)}
-          className="bg-blue-500 dark:bg-blue-600 rounded-xl py-4 mb-6 active:opacity-80"
+          disabled={isGenerating || isPlanGenerating}
+          className={`rounded-xl py-4 mb-6 ${
+            isGenerating || isPlanGenerating
+              ? "bg-gray-400 dark:bg-gray-600"
+              : "bg-blue-500 dark:bg-blue-600 active:opacity-80"
+          }`}
         >
-          <Text className="text-center text-base font-semibold text-white">
-            Generate New Plan
-          </Text>
+          {isGenerating ? (
+            <View className="flex-row items-center justify-center">
+              <ActivityIndicator size="small" color="white" />
+              <Text className="ml-2 text-center text-base font-semibold text-white">
+                Starting Plan Generation...
+              </Text>
+            </View>
+          ) : (
+            <Text className="text-center text-base font-semibold text-white">
+              {isPlanGenerating ? "Plan Generating..." : "Generate New Plan"}
+            </Text>
+          )}
         </Pressable>
 
         {/* Onboarding Steps Section */}
