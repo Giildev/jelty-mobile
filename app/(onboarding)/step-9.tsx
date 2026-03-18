@@ -21,6 +21,7 @@ import {
   loadOnboardingStep8,
 } from "@/services/supabase/onboarding";
 import { getUserByClerkId } from "@/services/supabase/users";
+import { useUserStore } from "@/store/userStore";
 
 interface SummarySection {
   title: string;
@@ -30,6 +31,7 @@ interface SummarySection {
 
 export default function OnboardingStep9Screen() {
   const { userId } = useAuth();
+  const setOnboardingCompleted = useUserStore((state) => state.setOnboardingCompleted);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sections, setSections] = useState<SummarySection[]>([]);
@@ -472,6 +474,8 @@ export default function OnboardingStep9Screen() {
 
       if (success) {
         console.log("[Step 9] Navigating to /(tabs)");
+        // Actualizar cache global para evitar loop de redireccionamiento
+        setOnboardingCompleted(true);
         // Navigate to main app (tabs)
         router.replace("/(tabs)");
       } else {

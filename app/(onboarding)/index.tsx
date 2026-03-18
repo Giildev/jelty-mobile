@@ -13,7 +13,7 @@ import { useUserStore } from "@/store/userStore";
  */
 export default function OnboardingIndexScreen() {
   const router = useRouter();
-  const { userId } = useAuth();
+  const { userId, signOut } = useAuth();
   const updateUser = useUserStore((state) => state.updateUser);
   const [status, setStatus] = useState<string>("Initializing...");
 
@@ -86,6 +86,13 @@ export default function OnboardingIndexScreen() {
       if (!supabaseUserId) {
         console.error("[OnboardingIndex] Failed to get user after 5 retries");
         setStatus("Error: Could not load your profile. Please try signing in again.");
+        
+        try {
+          await signOut();
+        } catch (e) {
+          console.error("[OnboardingIndex] Failed to sign out from Clerk", e);
+        }
+
         await new Promise(resolve => setTimeout(resolve, 3000));
         router.replace("/(auth)/sign-in");
         return;
