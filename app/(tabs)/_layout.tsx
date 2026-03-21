@@ -51,15 +51,8 @@ export default function TabLayout() {
       return;
     }
 
-    // OPTIMIZACIÓN: Solo verificar si NO tenemos el valor cacheado
-    if (cachedOnboardingCompleted !== null) {
-      console.log("[TabLayout] Using cached onboarding status:", cachedOnboardingCompleted);
-      setLocalOnboardingCompleted(cachedOnboardingCompleted);
-      setCheckingOnboarding(false);
-      return;
-    }
-
-    // Primera vez o cache invalidado - verificar con BD
+    // Always verify with BD on mount/refresh to ensure it's not stale (e.g. after a reset)
+    console.log("[TabLayout] Verifying onboarding status with DB for userId:", userId);
     setCheckingOnboarding(true);
     try {
       console.log("[TabLayout] Fetching onboarding status from DB for userId:", userId);
