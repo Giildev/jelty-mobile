@@ -1,15 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMealById } from "@/services/mealService";
 import type { MealDetail } from "@/types/nutrition";
+import { useDashboardStore } from "@/store/dashboardStore";
 
 /**
  * Hook to fetch meal detail data with React Query
  *
  * OPTIMIZATION:
  * - Caches meal data globally (shared across screens)
- * - Avoids redundant calls to getMealById()
+ * - Checks Dashboard Zustand store first for instant zero-latency loading
  * - staleTime: 10 minutes (data stays fresh longer)
- * - Enables instant navigation with cached data
  *
  * Usage:
  * ```tsx
@@ -20,6 +20,8 @@ import type { MealDetail } from "@/types/nutrition";
  * @returns mealDetail, loading, error, refetch
  */
 export function useMealDetail(mealId: string | null | undefined) {
+  const cachedPlan = useDashboardStore((s) => s.todayMealPlan);
+
   const {
     data: mealDetail,
     isLoading,
@@ -34,7 +36,48 @@ export function useMealDetail(mealId: string | null | undefined) {
       if (!mealId) {
         throw new Error("Meal ID is required");
       }
-      console.log("[useMealDetail] Fetching meal data for:", mealId);
+
+      // 1. Check Dashboard Store for instant load
+      if (cachedPlan?.slots) {
+        const slot = cachedPlan.slots.find((s) => s.recipe?.id === mealId);
+        if (slot?.recipe) {
+          console.log("[useMealDetail] Found meal in Zustand cache:", mealId);
+          const recipe = slot.recipe;
+          
+          // Map to MealDetail interface
+          return {
+            id: recipe.id,
+            name: recipe.name,
+            description: recipe.description || "",
+            calories: recipe.nutritionPerServing?.energyKcal || 0,
+            macros: {
+              carbs: recipe.nutritionPerServing?.carbG || 0,
+              protein: recipe.nutritionPerServing?.proteinG || 0,
+              fat: recipe.nutritionPerServing?.fatG || 0,
+            },
+            imageUrl: undefined, // Handled by fallback
+            type: (slot.mealType?.toLowerCase() || "lunch") as any,
+            gallery: [],
+            ingredients: (recipe.ingredients || []).map((ing: any) => ({
+              id: Math.random().toString(),
+              name: ing.ingredientName || "Ingredient",
+              quantity: parseFloat(ing.quantity) || 0,
+              unit: ing.unit || "g",
+            })),
+            preparationSteps: (recipe.steps || []).map((step: any) => ({
+              id: Math.random().toString(),
+              stepNumber: step.orderIndex,
+              instruction: step.instruction,
+            })),
+            servings: 1,
+            prepTime: recipe.prepTimeMinutes || 0,
+            cookTime: recipe.cookTimeMinutes || 0,
+          } as MealDetail;
+        }
+      }
+
+      // 2. Fallback to API fetch
+      console.log("[useMealDetail] Fetching meal data from API for:", mealId);
       const data = await getMealById(mealId);
 
       if (!data) {

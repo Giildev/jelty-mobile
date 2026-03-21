@@ -1,12 +1,14 @@
 import { View, Text } from "react-native";
-import { ScheduledExercise } from "@/types/workout";
+import { TodayWorkout } from "@/services/api/plans";
 import { WorkoutCard } from "./WorkoutCard";
 
 interface WorkoutsListProps {
-  exercises: ScheduledExercise[];
+  workout: TodayWorkout;
 }
 
-export function WorkoutsList({ exercises }: WorkoutsListProps) {
+export function WorkoutsList({ workout }: WorkoutsListProps) {
+  const exercises = workout?.blocks?.flatMap((block) => block.exercises) || [];
+
   if (exercises.length === 0) {
     return (
       <View className="px-6 py-3">
@@ -25,8 +27,8 @@ export function WorkoutsList({ exercises }: WorkoutsListProps) {
       <Text className="mb-3 text-lg font-roboto-bold text-gray-900 dark:text-white">
         Workout of the Day
       </Text>
-      {exercises.map((exercise) => (
-        <WorkoutCard key={exercise.id} exercise={exercise} />
+      {exercises.map((exercise, index) => (
+        <WorkoutCard key={`${exercise.exercise.name}-${index}`} exercise={exercise} />
       ))}
     </View>
   );

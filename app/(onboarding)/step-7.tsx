@@ -103,7 +103,7 @@ export default function OnboardingStep7Screen() {
             setValue("cookTimeRange", existingData.cookTimeRange as any);
           }
           if (existingData.cookingForPeople) {
-            setValue("cookingForPeople", existingData.cookingForPeople);
+            setValue("cookingForPeople", Number(existingData.cookingForPeople));
           }
           if (existingData.shoppingFrequency) {
             setValue("shoppingFrequency", existingData.shoppingFrequency as any);

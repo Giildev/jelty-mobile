@@ -1,13 +1,13 @@
 import { View, Text } from "react-native";
-import { ScheduledMeal } from "@/types/nutrition";
+import { MealSlot } from "@/services/api/plans";
 import { MealCard } from "./MealCard";
 
 interface MealsListProps {
-  meals: ScheduledMeal[];
+  slots: MealSlot[];
 }
 
-export function MealsList({ meals }: MealsListProps) {
-  if (meals.length === 0) {
+export function MealsList({ slots }: MealsListProps) {
+  if (!slots || slots.length === 0) {
     return (
       <View className="px-6 py-3">
         <Text className="mb-3 text-lg font-roboto-bold text-gray-900 dark:text-white">
@@ -25,8 +25,8 @@ export function MealsList({ meals }: MealsListProps) {
       <Text className="mb-3 text-lg font-roboto-bold text-gray-900 dark:text-white">
         Today's Meals
       </Text>
-      {meals.map((meal) => (
-        <MealCard key={meal.id} meal={meal} />
+      {slots.map((slot) => (
+        <MealCard key={slot.id} slot={slot} />
       ))}
     </View>
   );

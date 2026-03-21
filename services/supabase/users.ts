@@ -5,11 +5,7 @@ import type {
   CreateUserData,
   UpdateUserProfileData,
 } from "@/types/supabase";
-import {
-  generateUserSalt,
-  encryptUserFields,
-  decryptUserFields,
-} from "@/services/encryption/crypto";
+
 
 /**
  * User Service
@@ -42,30 +38,21 @@ export async function createUser(userData: CreateUserData): Promise<{
   profile: SupabaseUserProfile;
 }> {
   try {
-    // 1. Generate unique salt for this user
-    const userSalt = generateUserSalt();
+    const profileData = {
+      first_name: userData.first_name || "",
+      last_name: userData.last_name || "",
+      phone: userData.phone,
+      country: userData.country,
+      country_code: userData.country_code,
+    };
 
-    // 2. Encrypt sensitive profile data
-    const encryptedProfileData = encryptUserFields(
-      {
-        first_name: userData.first_name || "",
-        last_name: userData.last_name || "",
-        phone: userData.phone,
-        country: userData.country,
-        country_code: userData.country_code,
-      },
-      userSalt,
-      userData.clerk_user_id
-    );
-
-    // 3. Create user in user_user table with encryption salt
+    // 3. Create user in user_user table
     const { data: user, error: userError } = await supabaseAdmin
       .from("user_user")
       .insert({
         clerk_user_id: userData.clerk_user_id,
-        email: userData.email, // Email NOT encrypted (needed for searches)
+        email: userData.email,
         status: "active",
-        encryption_salt: userSalt, // Save salt for future encryption/decryption
         terms_accepted_at: userData.termsAccepted ? new Date().toISOString() : null,
       })
       .select()
@@ -79,16 +66,15 @@ export async function createUser(userData: CreateUserData): Promise<{
       throw new Error("User creation returned no data");
     }
 
-    // 4. Create user profile with ENCRYPTED data
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .insert({
         user_id: user.id,
-        first_name: encryptedProfileData.first_name, // ENCRYPTED
-        last_name: encryptedProfileData.last_name,   // ENCRYPTED
-        phone: encryptedProfileData.phone,           // ENCRYPTED
-        country: encryptedProfileData.country,       // ENCRYPTED
-        country_code: encryptedProfileData.country_code, // ENCRYPTED
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
+        phone: profileData.phone,
+        country: profileData.country,
+        country_code: profileData.country_code,
         onboarding_completed: false,
       })
       .select()
@@ -105,10 +91,7 @@ export async function createUser(userData: CreateUserData): Promise<{
       throw new Error("Profile creation returned no data");
     }
 
-    // 5. Decrypt profile data before returning to app
-    const decryptedProfile = decryptUserFields(profile, userSalt, userData.clerk_user_id);
-
-    return { user, profile: decryptedProfile };
+    return { user, profile };
   } catch (error) {
     console.error("Error creating user in Supabase:", error);
     throw error;
@@ -146,7 +129,7 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       return null;
     }
 
-    // Get user profile (ENCRYPTED data)
+    // Get user profile
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .select("*")
@@ -158,16 +141,7 @@ export async function getUserByClerkId(clerkUserId: string): Promise<{
       return null;
     }
 
-    // Check if user has encryption salt
-    if (!user.encryption_salt) {
-      console.warn("User has no encryption salt, data may be unencrypted (legacy user)");
-      return { user, profile };
-    }
-
-    // Decrypt profile data
-    const decryptedProfile = decryptUserFields(profile, user.encryption_salt, clerkUserId);
-
-    return { user, profile: decryptedProfile };
+    return { user, profile };
   } catch (error) {
     console.error("Error getting user by Clerk ID:", error);
     return null;
@@ -201,7 +175,7 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       return null;
     }
 
-    // Get user profile (ENCRYPTED data)
+    // Get user profile
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .select("*")
@@ -217,20 +191,7 @@ export async function getUserBySupabaseId(supabaseUserId: string): Promise<{
       return null;
     }
 
-    // Check if user has encryption salt
-    if (!user.encryption_salt) {
-      console.warn("User has no encryption salt, data may be unencrypted (legacy user)");
-      return { user, profile };
-    }
-
-    // Decrypt profile data
-    const decryptedProfile = decryptUserFields(
-      profile,
-      user.encryption_salt,
-      user.clerk_user_id
-    );
-
-    return { user, profile: decryptedProfile };
+    return { user, profile };
   } catch (error) {
     console.error("Error getting user by Supabase ID:", error);
     return null;
@@ -267,11 +228,14 @@ export async function updateUserProfile(
       throw new Error("User not found");
     }
 
+    // Prepare data to save
+    let dataToSave = { ...profileData };
+
     // Update profile (using admin client)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profile")
       .update({
-        ...profileData,
+        ...dataToSave,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id)

@@ -2,9 +2,10 @@ import { View, Text } from "react-native";
 
 interface WelcomeHeaderProps {
   userName: string;
+  isDark?: boolean;
 }
 
-export function WelcomeHeader({ userName }: WelcomeHeaderProps) {
+export function WelcomeHeader({ userName, isDark }: WelcomeHeaderProps) {
   // Get current date and time for greeting
   const now = new Date();
   const hour = now.getHours();
@@ -26,10 +27,18 @@ export function WelcomeHeader({ userName }: WelcomeHeaderProps) {
 
   return (
     <View className="px-6 pb-1 pt-2">
-      <Text className="text-2xl font-roboto-bold text-gray-900 dark:text-white">
+      <Text
+        className={`text-2xl font-roboto-bold ${
+          isDark ? "text-white" : "text-gray-900 dark:text-white"
+        }`}
+      >
         {greeting}, {userName}
       </Text>
-      <Text className="mt-0.5 text-sm font-roboto-regular text-gray-600 dark:text-gray-400">
+      <Text
+        className={`mt-0.5 text-sm font-roboto-regular ${
+          isDark ? "text-white/60" : "text-gray-600 dark:text-gray-400"
+        }`}
+      >
         {formattedDate}
       </Text>
     </View>

@@ -1,20 +1,21 @@
 import { View, Text, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { ScheduledMeal } from "@/types/nutrition";
+import { MealSlot } from "@/services/api/plans";
 import { getMealImageUrl } from "@/utils/mockDataHelpers";
 
 interface MealCardProps {
-  meal: ScheduledMeal;
+  slot: MealSlot;
 }
 
-export function MealCard({ meal }: MealCardProps) {
+export function MealCard({ slot }: MealCardProps) {
   const router = useRouter();
-  const imageUrl = getMealImageUrl(meal.id);
+  const { recipe } = slot;
+  const imageUrl = getMealImageUrl(recipe.id);
 
   const handlePress = () => {
     router.push({
       pathname: "/meal-detail",
-      params: { id: meal.id },
+      params: { id: recipe.id },
     });
   };
 
@@ -37,18 +38,22 @@ export function MealCard({ meal }: MealCardProps) {
       {/* Meal Info */}
       <View className="ml-3 flex-1">
         <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
-          {meal.name}
+          {recipe.name}
         </Text>
         <Text className="font-roboto-regular mt-0.5 text-xs text-gray-600 dark:text-gray-400">
-          C: {meal.macros.carbs}g | P: {meal.macros.protein}g | F:{" "}
-          {meal.macros.fat}g
+          C: {recipe.nutritionPerServing.carbG}g | P:{" "}
+          {recipe.nutritionPerServing.proteinG}g | F:{" "}
+          {recipe.nutritionPerServing.fatG}g
+        </Text>
+        <Text className="font-roboto-regular text-[10px] text-primary">
+          {slot.slotLabel}
         </Text>
       </View>
 
       {/* Calories */}
       <View className="items-end">
         <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
-          {meal.calories} cal
+          {recipe.nutritionPerServing.energyKcal} cal
         </Text>
       </View>
     </Pressable>

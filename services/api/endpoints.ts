@@ -12,19 +12,17 @@ export const API_ENDPOINTS = {
     refresh: "/auth/refresh",
   },
 
-  // User
-  user: {
-    profile: "/user/profile",
-    update: "/user/update",
-    delete: "/user/delete",
+  // Onboarding
+  onboarding: {
+    completed: "/onboarding/completed",
+    progress: (userId: string) => `/onboarding/progress/${userId}`,
   },
 
-  // Ejemplos adicionales
-  posts: {
-    list: "/posts",
-    create: "/posts",
-    detail: (id: string) => `/posts/${id}`,
-    update: (id: string) => `/posts/${id}`,
-    delete: (id: string) => `/posts/${id}`,
+  // Plans
+  plans: {
+    mealPlanToday: "/meal-plan/today",
+    workoutToday: "/workout/today",
+    recipeDetail: (id: string) => `/meal-plan/recipe/${id}`,
+    exerciseDetail: (id: string) => `/workout/exercise/${id}`,
   },
 } as const;

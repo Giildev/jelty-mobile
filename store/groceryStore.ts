@@ -13,7 +13,6 @@ import {
   StorageType,
   AddCustomItemFormData,
 } from "@/types/grocery";
-import { MOCK_GROCERY_ITEMS } from "@/constants/mockData";
 import { generateGroceryItemId } from "@/utils/groceryHelpers";
 
 /**
@@ -43,7 +42,7 @@ export const useGroceryStore = create<GroceryStoreState>()(
   persist(
     (set, get) => ({
       // Initial state
-      items: MOCK_GROCERY_ITEMS,
+      items: [],
       viewMode: "all",
       storageFilter: "all",
 
@@ -104,7 +103,7 @@ export const useGroceryStore = create<GroceryStoreState>()(
 
       resetItems: () => {
         set({
-          items: MOCK_GROCERY_ITEMS,
+          items: [],
           viewMode: "all",
           storageFilter: "all",
         });

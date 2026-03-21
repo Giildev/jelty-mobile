@@ -57,6 +57,7 @@ interface UserState {
   preferences: UserPreferences;
   cachedProfile: CachedProfileData | null;
   onboardingCompleted: boolean | null; // null = no verificado, true/false = verificado
+  isWaitingForPipeline: boolean;
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
   clearUser: () => void;
@@ -64,6 +65,7 @@ interface UserState {
   setCachedProfile: (profile: CachedProfileData) => void;
   clearCachedProfile: () => void;
   setOnboardingCompleted: (completed: boolean) => void;
+  setIsWaitingForPipeline: (waiting: boolean) => void;
 }
 
 /**
@@ -80,12 +82,13 @@ export const useUserStore = create<UserState>()(
       },
       cachedProfile: null,
       onboardingCompleted: null, // null por defecto = no verificado aún
+      isWaitingForPipeline: false,
       setUser: user => set({ user }),
       updateUser: updates =>
         set(state => ({
           user: state.user ? { ...state.user, ...updates } : null,
         })),
-      clearUser: () => set({ user: null, onboardingCompleted: null }), // Clear onboarding on logout
+      clearUser: () => set({ user: null, onboardingCompleted: null, isWaitingForPipeline: false }), // Clear onboarding on logout
       updatePreferences: prefs =>
         set({
           preferences: { ...get().preferences, ...prefs },
@@ -93,15 +96,17 @@ export const useUserStore = create<UserState>()(
       setCachedProfile: profile => set({ cachedProfile: profile }),
       clearCachedProfile: () => set({ cachedProfile: null }),
       setOnboardingCompleted: completed => set({ onboardingCompleted: completed }),
+      setIsWaitingForPipeline: waiting => set({ isWaitingForPipeline: waiting }),
     }),
     {
       name: "user-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      // Persistir preferences, cachedProfile y onboardingCompleted
+      // Persistir preferences, cachedProfile y onboardingCompleted e isWaitingForPipeline
       partialize: state => ({
         preferences: state.preferences,
         cachedProfile: state.cachedProfile,
         onboardingCompleted: state.onboardingCompleted,
+        isWaitingForPipeline: state.isWaitingForPipeline,
         // user no se persiste por seguridad (datos completos sensibles)
       }),
     }

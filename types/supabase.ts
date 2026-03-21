@@ -25,19 +25,19 @@ export interface SupabaseUser {
  */
 export interface SupabaseUserProfile {
   user_id: string; // UUID, foreign key to user_user.id
-  first_name: string | null; // ENCRYPTED - NULL until onboarding completed
-  last_name: string | null; // ENCRYPTED - NULL until onboarding completed
-  birth_date: string | null; // ENCRYPTED - ISO date string
+  first_name: string | null;
+  last_name: string | null;
+  birth_date: string | null;
   gender: string | null;
-  phone: string | null; // ENCRYPTED
-  country: string | null; // ENCRYPTED
-  country_code: string | null; // ENCRYPTED - Country dialing code (e.g., +1, +52, +34)
-  city: string | null; // ENCRYPTED
-  address: string | null; // ENCRYPTED
-  zip_code: string | null; // ENCRYPTED
-  height_cm: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  weight_kg: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  bodyfat_percentage: number | null; // ENCRYPTED as TEXT, parsed to number after decryption
+  phone: string | null;
+  country: string | null;
+  country_code: string | null;
+  city: string | null;
+  address: string | null;
+  zip_code: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  bodyfat_percentage: number | null;
   age_years: number | null;
   measurement_system: string | null; // 'metric' | 'imperial'
   activity_level: string | null; // 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active'
@@ -93,9 +93,9 @@ export interface SupabaseUserGoal {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
   goal_type: string; // 'lose_fat' | 'build_muscle' | 'improve_health' | 'increase_performance' | 'maintain'
-  target_weight_kg: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  target_bodyfat_pct: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  timeframe: string | null; // ENCRYPTED - e.g., '4_weeks', '8_weeks', '12_weeks', '3_months', '6_months'
+  target_weight_kg: number | null;
+  target_bodyfat_pct: number | null;
+  timeframe: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null
@@ -108,15 +108,15 @@ export interface SupabaseUserGoal {
 export interface SupabaseUserBodyGoal {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
-  chest_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  waist_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  hips_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  biceps_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  thighs_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  neck_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  shoulders_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  forearms_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
-  calves_cm: string | null; // ENCRYPTED as TEXT, parsed to number after decryption
+  chest_cm: number | null;
+  waist_cm: number | null;
+  hips_cm: number | null;
+  biceps_cm: number | null;
+  thighs_cm: number | null;
+  neck_cm: number | null;
+  shoulders_cm: number | null;
+  forearms_cm: number | null;
+  calves_cm: number | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null
@@ -177,8 +177,8 @@ export interface UpdateUserBodyGoalData {
 export interface SupabaseUserMedicalCondition {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
-  name: string; // ENCRYPTED - Name of the medical condition
-  details: string | null; // ENCRYPTED - Additional details about the condition
+  name: string;
+  details: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null (soft delete)
@@ -191,9 +191,9 @@ export interface SupabaseUserMedicalCondition {
 export interface SupabaseUserMedication {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
-  name: string; // ENCRYPTED - Name of the medication
-  dosage: string | null; // ENCRYPTED - Dosage information
-  notes: string | null; // ENCRYPTED - Additional notes
+  name: string;
+  dosage: string | null;
+  notes: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null (soft delete)
@@ -206,8 +206,8 @@ export interface SupabaseUserMedication {
 export interface SupabaseUserInjury {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
-  name: string; // ENCRYPTED - Name/type of the injury
-  details: string | null; // ENCRYPTED - Details about the injury
+  name: string;
+  details: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null (soft delete)
@@ -220,7 +220,7 @@ export interface SupabaseUserInjury {
 export interface SupabaseUserAllergy {
   id: string; // UUID
   user_id: string; // UUID, foreign key to user_user.id
-  name: string; // ENCRYPTED - Name of the allergy
+  name: string;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp or null (soft delete)
@@ -239,7 +239,7 @@ export interface HealthInfoFormData {
 
 /**
  * Health Information Data (loaded from database)
- * Returned after decryption
+ * Returned as plain text
  */
 export interface HealthInfoData {
   medicalConditions: string[];

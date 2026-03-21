@@ -65,7 +65,7 @@ export default function OnboardingStep6Screen() {
       const availabilityData = await loadOnboardingStep6(userId);
       if (availabilityData) {
         setValue("daysAvailable", availabilityData.daysAvailable || []);
-        setValue("timePerSession", availabilityData.timePerSession || 45);
+        setValue("timePerSession", availabilityData.timePerSession ? Number(availabilityData.timePerSession) : 45);
         setValue("preferredTimeOfDay", availabilityData.preferredTimeOfDay as any);
         setValue("additionalNotes", availabilityData.additionalNotes || null);
       }

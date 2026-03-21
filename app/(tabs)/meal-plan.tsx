@@ -3,7 +3,6 @@ import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from "date-fns";
 import { MealPlanViewMode } from "@/types/nutrition";
-import { MOCK_SCHEDULED_MEALS } from "@/constants/mockData";
 import { ViewModeSelector } from "@/components/meal-plan/ViewModeSelector";
 import { MonthNavigationHeader } from "@/components/meal-plan/MonthNavigationHeader";
 import { DayView } from "@/components/meal-plan/DayView";
@@ -66,16 +65,16 @@ export default function MealPlanScreen() {
       {/* Content - Conditional based on view mode */}
       <View className="flex-1">
         {viewMode === "day" && (
-          <DayView meals={MOCK_SCHEDULED_MEALS} currentDate={currentDate} />
+          <DayView meals={[]} currentDate={currentDate} />
         )}
 
         {viewMode === "week" && (
-          <WeekView meals={MOCK_SCHEDULED_MEALS} currentDate={currentDate} />
+          <WeekView meals={[]} currentDate={currentDate} />
         )}
 
         {viewMode === "month" && (
           <MonthView
-            meals={MOCK_SCHEDULED_MEALS}
+            meals={[]}
             currentDate={currentDate}
             onDayPress={handleDayPress}
           />

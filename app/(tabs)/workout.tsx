@@ -3,7 +3,6 @@ import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from "date-fns";
 import { WorkoutPlanViewMode } from "@/types/workout";
-import { MOCK_SCHEDULED_EXERCISES } from "@/constants/mockData";
 import { ViewModeSelector } from "@/components/workout-plan/ViewModeSelector";
 import { MonthNavigationHeader } from "@/components/workout-plan/MonthNavigationHeader";
 import { DayView } from "@/components/workout-plan/DayView";
@@ -66,16 +65,16 @@ export default function WorkoutScreen() {
       {/* Content - Conditional based on view mode */}
       <View className="flex-1">
         {viewMode === "day" && (
-          <DayView exercises={MOCK_SCHEDULED_EXERCISES} currentDate={currentDate} />
+          <DayView exercises={[]} currentDate={currentDate} />
         )}
 
         {viewMode === "week" && (
-          <WeekView exercises={MOCK_SCHEDULED_EXERCISES} currentDate={currentDate} />
+          <WeekView exercises={[]} currentDate={currentDate} />
         )}
 
         {viewMode === "month" && (
           <MonthView
-            exercises={MOCK_SCHEDULED_EXERCISES}
+            exercises={[]}
             currentDate={currentDate}
             onDayPress={handleDayPress}
           />

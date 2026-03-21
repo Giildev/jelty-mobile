@@ -73,8 +73,8 @@ export default function OnboardingStep4Screen() {
         setValue("cuisines", dietaryData.cuisines || []);
         setValue("ingredientsToAvoid", dietaryData.ingredientsToAvoid || []);
         setValue("ingredientsToInclude", dietaryData.ingredientsToInclude || []);
-        setValue("mealsPerDay", dietaryData.mealsPerDay || null);
-        setValue("waterIntake", dietaryData.waterIntake || null);
+        setValue("mealsPerDay", dietaryData.mealsPerDay ? Number(dietaryData.mealsPerDay) : null);
+        setValue("waterIntake", dietaryData.waterIntake ? Number(dietaryData.waterIntake) : null);
       }
     } catch (error) {
       console.error("Error loading step 4 data:", error);

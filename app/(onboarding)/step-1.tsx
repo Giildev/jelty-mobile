@@ -174,11 +174,19 @@ export default function OnboardingStep1Screen() {
       }
 
       if (profile?.birth_date) {
-        const date = new Date(profile.birth_date);
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear();
-        setValue("birth_date", `${day}/${month}/${year}`);
+        // Prevent JS date from shifting the day due to UTC zero time
+        const dateString = profile.birth_date.split("T")[0];
+        const [year, month, day] = dateString.split("-");
+        if (year && month && day) {
+          setValue("birth_date", `${day}/${month}/${year}`);
+        } else {
+          // fallback
+          const date = new Date(profile.birth_date);
+          const d = date.getDate().toString().padStart(2, "0");
+          const m = (date.getMonth() + 1).toString().padStart(2, "0");
+          const y = date.getFullYear();
+          setValue("birth_date", `${d}/${m}/${y}`);
+        }
       }
 
       if (profile?.gender) {
@@ -186,15 +194,15 @@ export default function OnboardingStep1Screen() {
       }
 
       if (profile?.height_cm) {
-        setValue("height_cm", profile.height_cm);
+        setValue("height_cm", Number(profile.height_cm));
       }
 
       if (profile?.weight_kg) {
-        setValue("weight_kg", profile.weight_kg);
+        setValue("weight_kg", Number(profile.weight_kg));
       }
 
       if (profile?.bodyfat_percentage) {
-        setValue("bodyfat_percentage", profile.bodyfat_percentage);
+        setValue("bodyfat_percentage", Number(profile.bodyfat_percentage));
       }
 
       if (profile?.activity_level) {
@@ -248,8 +256,8 @@ export default function OnboardingStep1Screen() {
     } catch (error) {
       console.error("❌ ERROR in loadUserData:", error);
       console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
+        message: (error as Error).message,
+        stack: (error as Error).stack,
       });
     } finally {
       // Always set loading to false after attempting to load data
@@ -591,6 +599,7 @@ export default function OnboardingStep1Screen() {
       {/* Country Picker Modal */}
       <CountryPicker
         show={showCountryPicker}
+        lang="en"
         pickerButtonOnPress={(item) => {
           setValue("country", item.name.en);
           setValue("country_code", item.dial_code);

@@ -1,25 +1,28 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getExerciseById } from "@/services/exerciseService";
-import type { ExerciseDetail } from "@/types/workout";
+import type { ExerciseDetail, ExerciseInstructions } from "@/types/workout";
+import { useDashboardStore } from "@/store/dashboardStore";
 
 /**
  * Hook to fetch exercise detail data with React Query
  *
  * OPTIMIZATION:
  * - Caches exercise data globally (shared across screens)
- * - Avoids redundant calls to getExerciseById()
+ * - Checks Dashboard Zustand store first for instant zero-latency loading
+ *   (matches by name since WorkoutCard passes name instead of ID currently)
  * - staleTime: 10 minutes (data stays fresh longer)
- * - Enables instant navigation with cached data
  *
  * Usage:
  * ```tsx
  * const { exerciseDetail, loading, error, refetch } = useExerciseDetail(exerciseId);
  * ```
  *
- * @param exerciseId - ID of the exercise to fetch
+ * @param exerciseId - ID (or name) of the exercise to fetch
  * @returns exerciseDetail, loading, error, refetch
  */
 export function useExerciseDetail(exerciseId: string | null | undefined) {
+  const cachedWorkout = useDashboardStore((s) => s.todayWorkout);
+
   const {
     data: exerciseDetail,
     isLoading,
@@ -34,7 +37,53 @@ export function useExerciseDetail(exerciseId: string | null | undefined) {
       if (!exerciseId) {
         throw new Error("Exercise ID is required");
       }
-      console.log("[useExerciseDetail] Fetching exercise data for:", exerciseId);
+
+      // 1. Check Dashboard Store for instant load (matching by name because WorkoutCard passes name)
+      if (cachedWorkout && !("isRestDay" in cachedWorkout && cachedWorkout.isRestDay === true)) {
+        for (const block of cachedWorkout.blocks || []) {
+          const foundEx = block.exercises?.find((ex: any) => ex.exercise?.name === exerciseId || ex.id === exerciseId);
+          if (foundEx?.exercise) {
+            console.log("[useExerciseDetail] Found exercise in Zustand cache:", exerciseId);
+            const exData = foundEx.exercise;
+            
+            // Calculate instruction summary
+            const setsCount = foundEx.sets?.length || 0;
+            const firstSet = foundEx.sets?.[0] || {};
+            
+            return {
+              id: exerciseId,
+              name: exData.name,
+              description: exData.description || "",
+              primaryMuscle: exData.primaryMuscle || "Full Body",
+              equipment: exData.equipment || "Bodyweight",
+              category: "main",
+              gallery: [],
+              instructions: {
+                sets: setsCount,
+                repsMin: firstSet.repsMin || 0,
+                repsMax: firstSet.repsMax || 0,
+                rir: firstSet.notes?.includes("RIR") ? parseInt(firstSet.notes.replace(/[^0-9]/g, "")) || 0 : 0,
+                restTimeSeconds: firstSet.restSeconds || 0,
+              } as ExerciseInstructions,
+              howToPerformSteps: (exData.steps || []).map((s: any) => ({
+                id: Math.random().toString(),
+                orderIndex: s.orderIndex,
+                instruction: s.instruction,
+              })),
+              tips: exData.tips || [],
+              sets: setsCount,
+              reps: firstSet.repsMax || 0,
+              rir: 0,
+              restTime: firstSet.restSeconds || 0,
+            } as ExerciseDetail;
+          }
+        }
+      }
+
+      // 2. Fallback to API API fetch if it's a UUID
+      // Note: If the ID is a name (from WorkoutCard) and not in cache, the backend will fail with 400 UUID expected.
+      // But we prevent that by caching the dashboard properly.
+      console.log("[useExerciseDetail] Fetching exercise data from API for:", exerciseId);
       const data = await getExerciseById(exerciseId);
 
       if (!data) {

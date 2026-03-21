@@ -96,26 +96,26 @@ export default function OnboardingStep2Screen() {
             setValue("timeframe", step2Data.goal.timeframe as GoalTimeframe);
           }
           if (step2Data.goal.target_weight_kg) {
-            setValue("target_weight_kg", step2Data.goal.target_weight_kg);
+            setValue("target_weight_kg", Number(step2Data.goal.target_weight_kg));
           }
           if (step2Data.goal.target_bodyfat_pct) {
-            setValue("target_bodyfat_pct", step2Data.goal.target_bodyfat_pct);
+            setValue("target_bodyfat_pct", Number(step2Data.goal.target_bodyfat_pct));
           }
         }
 
         // Set body goal fields
         if (step2Data.bodyGoal) {
-          if (step2Data.bodyGoal.chest_cm) setValue("chest_cm", step2Data.bodyGoal.chest_cm);
-          if (step2Data.bodyGoal.waist_cm) setValue("waist_cm", step2Data.bodyGoal.waist_cm);
-          if (step2Data.bodyGoal.hips_cm) setValue("hips_cm", step2Data.bodyGoal.hips_cm);
-          if (step2Data.bodyGoal.biceps_cm) setValue("biceps_cm", step2Data.bodyGoal.biceps_cm);
-          if (step2Data.bodyGoal.thighs_cm) setValue("thighs_cm", step2Data.bodyGoal.thighs_cm);
-          if (step2Data.bodyGoal.neck_cm) setValue("neck_cm", step2Data.bodyGoal.neck_cm);
+          if (step2Data.bodyGoal.chest_cm) setValue("chest_cm", Number(step2Data.bodyGoal.chest_cm));
+          if (step2Data.bodyGoal.waist_cm) setValue("waist_cm", Number(step2Data.bodyGoal.waist_cm));
+          if (step2Data.bodyGoal.hips_cm) setValue("hips_cm", Number(step2Data.bodyGoal.hips_cm));
+          if (step2Data.bodyGoal.biceps_cm) setValue("biceps_cm", Number(step2Data.bodyGoal.biceps_cm));
+          if (step2Data.bodyGoal.thighs_cm) setValue("thighs_cm", Number(step2Data.bodyGoal.thighs_cm));
+          if (step2Data.bodyGoal.neck_cm) setValue("neck_cm", Number(step2Data.bodyGoal.neck_cm));
           if (step2Data.bodyGoal.shoulders_cm)
-            setValue("shoulders_cm", step2Data.bodyGoal.shoulders_cm);
+            setValue("shoulders_cm", Number(step2Data.bodyGoal.shoulders_cm));
           if (step2Data.bodyGoal.forearms_cm)
-            setValue("forearms_cm", step2Data.bodyGoal.forearms_cm);
-          if (step2Data.bodyGoal.calves_cm) setValue("calves_cm", step2Data.bodyGoal.calves_cm);
+            setValue("forearms_cm", Number(step2Data.bodyGoal.forearms_cm));
+          if (step2Data.bodyGoal.calves_cm) setValue("calves_cm", Number(step2Data.bodyGoal.calves_cm));
         }
       }
     } catch (error) {

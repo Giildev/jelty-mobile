@@ -12,7 +12,10 @@ export async function getDailyMessage(): Promise<DbSystemDailyMessage | null> {
     const { data, error } = await supabase.rpc("get_daily_message").single();
 
     if (error) {
-      console.error("[getDailyMessage] Error fetching daily message:", error);
+      // PGRST116 means no rows found when using .single()
+      if (error.code !== "PGRST116") {
+        console.error("[getDailyMessage] Error fetching daily message:", error);
+      }
       return null;
     }
 
@@ -41,7 +44,9 @@ export async function getDailyMessageByDay(
       .single();
 
     if (error) {
-      console.error("[getDailyMessageByDay] Error:", error);
+      if (error.code !== "PGRST116") {
+        console.error("[getDailyMessageByDay] Error:", error);
+      }
       return null;
     }
 

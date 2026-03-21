@@ -22,6 +22,8 @@ import {
 } from "@/services/supabase/onboarding";
 import { getUserByClerkId } from "@/services/supabase/users";
 import { useUserStore } from "@/store/userStore";
+import { triggerOnboardingPipeline } from "@/services/api/onboarding";
+import { useInvalidateUserData } from "@/hooks/useUserData";
 
 interface SummarySection {
   title: string;
@@ -32,9 +34,12 @@ interface SummarySection {
 export default function OnboardingStep9Screen() {
   const { userId } = useAuth();
   const setOnboardingCompleted = useUserStore((state) => state.setOnboardingCompleted);
+  const setIsWaitingForPipeline = useUserStore((state) => state.setIsWaitingForPipeline);
+  const invalidateUserData = useInvalidateUserData();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sections, setSections] = useState<SummarySection[]>([]);
+  const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -60,8 +65,12 @@ export default function OnboardingStep9Screen() {
 
         // Step 1: Personal Information
         if (step1Data) {
-          const dbUser = step1Data.dbUser || step1Data.user;
+          const dbUser = step1Data.user;
           const profile = step1Data.profile;
+
+          if (dbUser) {
+            setSupabaseUserId(dbUser.id);
+          }
 
           if (dbUser && profile) {
             const items: { label: string; value: string }[] = [];
@@ -88,10 +97,17 @@ export default function OnboardingStep9Screen() {
             }
 
             if (profile.birth_date) {
-              const birthDate = new Date(profile.birth_date);
+              const dateString = profile.birth_date.split("T")[0];
+              const [year, month, day] = dateString.split("-");
+              let displayDate = profile.birth_date;
+              if (year && month && day) {
+                displayDate = `${day}/${month}/${year}`;
+              } else {
+                displayDate = new Date(profile.birth_date).toLocaleDateString();
+              }
               items.push({
                 label: "Birth Date",
-                value: birthDate.toLocaleDateString(),
+                value: displayDate,
               });
             }
 
@@ -468,14 +484,33 @@ export default function OnboardingStep9Screen() {
     console.log("[Step 9] Starting onboarding completion for user:", userId);
     setSaving(true);
     try {
-      const success = await markOnboardingComplete(userId);
+      // 1. Get Supabase ID if we don't have it yet
+      let dbId = supabaseUserId;
+      if (!dbId) {
+        const userData = await getUserByClerkId(userId);
+        dbId = userData?.user?.id || null;
+      }
 
+      if (!dbId) {
+        throw new Error("Could not determine database user ID");
+      }
+
+      // 2. Trigger the backend pipeline (this also calculates age and sets triggered flag)
+      console.log("[Step 9] Triggering pipeline for Supabase ID:", dbId);
+      const pipelineRes = await triggerOnboardingPipeline(dbId);
+      console.log("[Step 9] Pipeline trigger response:", pipelineRes);
+
+      // 3. Mark onboarding complete in Supabase (optional, but keep for consistency)
+      const success = await markOnboardingComplete(userId);
       console.log("[Step 9] markOnboardingComplete result:", success);
 
       if (success) {
         console.log("[Step 9] Navigating to /(tabs)");
-        // Actualizar cache global para evitar loop de redireccionamiento
+        // Invalidate React Query cache to ensure HomeScreen sees updated status
+        invalidateUserData(userId);
+        // Update global cache to avoid redirection loop
         setOnboardingCompleted(true);
+        setIsWaitingForPipeline(true);
         // Navigate to main app (tabs)
         router.replace("/(tabs)");
       } else {

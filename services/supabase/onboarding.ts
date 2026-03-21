@@ -1,27 +1,15 @@
 import { supabase, supabaseAdmin } from "./client";
 import type {
+  SupabaseUser,
+  SupabaseUserProfile,
+  CreateUserData,
   UpdateUserProfileData,
   UpdateUserGoalData,
   UpdateUserBodyGoalData,
+  FitnessGoalType,
+  GoalTimeframe,
+  HealthInfoData,
 } from "@/types/supabase";
-import {
-  encryptUserFields,
-  encryptGoalFields,
-  encryptBodyGoalFields,
-  decryptGoalFields,
-  decryptBodyGoalFields,
-  encryptHealthConditions,
-  decryptHealthConditions,
-  encryptMedications,
-  decryptMedications,
-  encryptInjuries,
-  decryptInjuries,
-  encryptAllergies,
-  decryptAllergies,
-  encryptIngredients,
-  decryptIngredients,
-} from "@/services/encryption/crypto";
-import type { HealthInfoData } from "@/types/supabase";
 
 /**
  * Onboarding Service
@@ -51,10 +39,9 @@ export async function saveOnboardingStep1(
   data: UpdateUserProfileData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
@@ -63,18 +50,14 @@ export async function saveOnboardingStep1(
       throw new Error("User not found");
     }
 
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
-    }
+    // Use data directly without encryption
+    const profileData = data;
 
-    // Encrypt sensitive data before saving
-    const encryptedData = encryptUserFields(data, user.encryption_salt, clerkUserId);
-
-    // Update profile with ENCRYPTED step 1 data
+    // Update profile with step 1 data
     const { error } = await supabaseAdmin
       .from("user_profile")
       .update({
-        ...encryptedData,
+        ...profileData,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", user.id);
@@ -157,7 +140,7 @@ export async function markOnboardingComplete(
     }
 
     console.log("[markOnboardingComplete] Found user with Supabase ID:", user.id);
-
+    
     const { error } = await supabaseAdmin
       .from("user_profile")
       .update({
@@ -265,10 +248,9 @@ export async function saveOnboardingStep2(
   bodyGoalData?: UpdateUserBodyGoalData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
@@ -277,12 +259,8 @@ export async function saveOnboardingStep2(
       throw new Error("User not found");
     }
 
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
-    }
-
-    // Encrypt goal data before saving
-    const encryptedGoalData = encryptGoalFields(goalData, user.encryption_salt, clerkUserId);
+    // Use data directly without encryption
+    const finalGoalData = goalData;
 
     // Check if goal already exists
     const { data: existingGoal } = await supabaseAdmin
@@ -297,7 +275,7 @@ export async function saveOnboardingStep2(
       const { error: goalError } = await supabaseAdmin
         .from("user_goal")
         .update({
-          ...encryptedGoalData,
+          ...finalGoalData,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingGoal.id);
@@ -310,7 +288,7 @@ export async function saveOnboardingStep2(
         .from("user_goal")
         .insert({
           user_id: user.id,
-          ...encryptedGoalData,
+          ...finalGoalData,
         });
 
       if (goalError) {
@@ -320,12 +298,7 @@ export async function saveOnboardingStep2(
 
     // If body goal data provided, save it
     if (bodyGoalData && Object.keys(bodyGoalData).length > 0) {
-      // Encrypt body goal data before saving
-      const encryptedBodyGoalData = encryptBodyGoalFields(
-        bodyGoalData,
-        user.encryption_salt,
-        clerkUserId
-      );
+      const finalBodyGoalData = bodyGoalData;
 
       // Check if body goal already exists
       const { data: existingBodyGoal } = await supabaseAdmin
@@ -340,7 +313,7 @@ export async function saveOnboardingStep2(
         const { error: bodyGoalError } = await supabaseAdmin
           .from("user_body_goal")
           .update({
-            ...encryptedBodyGoalData,
+            ...finalBodyGoalData,
             updated_at: new Date().toISOString(),
           })
           .eq("id", existingBodyGoal.id);
@@ -353,7 +326,7 @@ export async function saveOnboardingStep2(
           .from("user_body_goal")
           .insert({
             user_id: user.id,
-            ...encryptedBodyGoalData,
+            ...finalBodyGoalData,
           });
 
         if (bodyGoalError) {
@@ -387,10 +360,9 @@ export async function loadOnboardingStep2(clerkUserId: string): Promise<{
   bodyGoal: UpdateUserBodyGoalData | null;
 } | null> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
@@ -399,56 +371,43 @@ export async function loadOnboardingStep2(clerkUserId: string): Promise<{
       return null;
     }
 
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
-    }
-
-    // Load goal data
     const { data: goalData } = await supabaseAdmin
       .from("user_goal")
-      .select("*")
+      .select("goal_type, target_weight_kg, target_bodyfat_pct, timeframe")
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .single();
 
-    // Load body goal data
     const { data: bodyGoalData } = await supabaseAdmin
       .from("user_body_goal")
-      .select("*")
+      .select("chest_cm, waist_cm, hips_cm, biceps_cm, thighs_cm, neck_cm, shoulders_cm, forearms_cm, calves_cm")
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .single();
 
-    // Decrypt goal data if exists
-    const decryptedGoal = goalData
-      ? decryptGoalFields(goalData, user.encryption_salt, clerkUserId)
-      : null;
-
-    // Decrypt body goal data if exists
-    const decryptedBodyGoal = bodyGoalData
-      ? decryptBodyGoalFields(bodyGoalData, user.encryption_salt, clerkUserId)
-      : null;
+    const decryptedGoal = goalData;
+    const decryptedBodyGoal = bodyGoalData;
 
     return {
       goal: decryptedGoal
         ? {
-            goal_type: decryptedGoal.goal_type,
-            target_weight_kg: decryptedGoal.target_weight_kg,
-            target_bodyfat_pct: decryptedGoal.target_bodyfat_pct,
-            timeframe: decryptedGoal.timeframe,
+            goal_type: decryptedGoal.goal_type as FitnessGoalType,
+            target_weight_kg: decryptedGoal.target_weight_kg as number,
+            target_bodyfat_pct: decryptedGoal.target_bodyfat_pct as number,
+            timeframe: decryptedGoal.timeframe as GoalTimeframe,
           }
         : null,
       bodyGoal: decryptedBodyGoal
         ? {
-            chest_cm: decryptedBodyGoal.chest_cm,
-            waist_cm: decryptedBodyGoal.waist_cm,
-            hips_cm: decryptedBodyGoal.hips_cm,
-            biceps_cm: decryptedBodyGoal.biceps_cm,
-            thighs_cm: decryptedBodyGoal.thighs_cm,
-            neck_cm: decryptedBodyGoal.neck_cm,
-            shoulders_cm: decryptedBodyGoal.shoulders_cm,
-            forearms_cm: decryptedBodyGoal.forearms_cm,
-            calves_cm: decryptedBodyGoal.calves_cm,
+            chest_cm: decryptedBodyGoal.chest_cm as number,
+            waist_cm: decryptedBodyGoal.waist_cm as number,
+            hips_cm: decryptedBodyGoal.hips_cm as number,
+            biceps_cm: decryptedBodyGoal.biceps_cm as number,
+            thighs_cm: decryptedBodyGoal.thighs_cm as number,
+            neck_cm: decryptedBodyGoal.neck_cm as number,
+            shoulders_cm: decryptedBodyGoal.shoulders_cm as number,
+            forearms_cm: decryptedBodyGoal.forearms_cm as number,
+            calves_cm: decryptedBodyGoal.calves_cm as number,
           }
         : null,
     };
@@ -478,20 +437,15 @@ export async function saveOnboardingStep3(
   healthData: HealthInfoData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       throw new Error("User not found");
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // 1. Medical Conditions
@@ -502,18 +456,11 @@ export async function saveOnboardingStep3(
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new conditions if any
     if (healthData.medicalConditions && healthData.medicalConditions.length > 0) {
-      const encryptedConditions = encryptHealthConditions(
-        healthData.medicalConditions,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const conditionsToInsert = encryptedConditions.map((condition) => ({
+      const conditionsToInsert = healthData.medicalConditions.map((condition: string) => ({
         user_id: user.id,
-        name: condition.name,
-        details: condition.details,
+        name: condition,
+        details: null,
       }));
 
       const { error: conditionsError } = await supabaseAdmin
@@ -533,19 +480,12 @@ export async function saveOnboardingStep3(
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new medications if any
     if (healthData.medications && healthData.medications.length > 0) {
-      const encryptedMedications = encryptMedications(
-        healthData.medications,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const medicationsToInsert = encryptedMedications.map((medication) => ({
+      const medicationsToInsert = healthData.medications.map((medication: string) => ({
         user_id: user.id,
-        name: medication.name,
-        dosage: medication.dosage,
-        notes: medication.notes,
+        name: medication,
+        dosage: null,
+        notes: null,
       }));
 
       const { error: medicationsError } = await supabaseAdmin
@@ -565,18 +505,11 @@ export async function saveOnboardingStep3(
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new injuries if any
     if (healthData.injuries && healthData.injuries.length > 0) {
-      const encryptedInjuries = encryptInjuries(
-        healthData.injuries,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const injuriesToInsert = encryptedInjuries.map((injury) => ({
+      const injuriesToInsert = healthData.injuries.map((injury: string) => ({
         user_id: user.id,
-        name: injury.name,
-        details: injury.details,
+        name: injury,
+        details: null,
       }));
 
       const { error: injuriesError } = await supabaseAdmin
@@ -596,17 +529,10 @@ export async function saveOnboardingStep3(
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Insert new allergies if any
     if (healthData.allergies && healthData.allergies.length > 0) {
-      const encryptedAllergies = encryptAllergies(
-        healthData.allergies,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const allergiesToInsert = encryptedAllergies.map((allergy) => ({
+      const allergiesToInsert = healthData.allergies.map((allergy: string) => ({
         user_id: user.id,
-        name: allergy.name,
+        name: allergy,
       }));
 
       const { error: allergiesError } = await supabaseAdmin
@@ -640,20 +566,15 @@ export async function saveOnboardingStep3(
  */
 export async function loadOnboardingStep3(clerkUserId: string): Promise<HealthInfoData | null> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       return null;
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // Load medical conditions
@@ -684,20 +605,12 @@ export async function loadOnboardingStep3(clerkUserId: string): Promise<HealthIn
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    // Decrypt and return data
+    // Return health info
     return {
-      medicalConditions: conditions
-        ? decryptHealthConditions(conditions, user.encryption_salt, clerkUserId)
-        : [],
-      medications: medications
-        ? decryptMedications(medications, user.encryption_salt, clerkUserId)
-        : [],
-      injuries: injuries
-        ? decryptInjuries(injuries, user.encryption_salt, clerkUserId)
-        : [],
-      allergies: allergies
-        ? decryptAllergies(allergies, user.encryption_salt, clerkUserId)
-        : [],
+      medicalConditions: conditions ? conditions.map((c: any) => c.name) : [],
+      medications: medications ? medications.map((m: any) => m.name) : [],
+      injuries: injuries ? injuries.map((i: any) => i.name) : [],
+      allergies: allergies ? allergies.map((a: any) => a.name) : [],
     };
   } catch (error) {
     console.error("Error loading onboarding step 3:", error);
@@ -739,20 +652,15 @@ export async function saveOnboardingStep4(
   dietaryData: DietaryPreferencesData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       throw new Error("User not found");
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // 1. Dietary Patterns (user_restriction)
@@ -797,7 +705,6 @@ export async function saveOnboardingStep4(
       const { error: cuisinesError } = await supabaseAdmin
         .from("user_cuisine")
         .insert(cuisinesToInsert);
-
       if (cuisinesError) {
         throw new Error(`Failed to insert cuisines: ${cuisinesError.message}`);
       }
@@ -813,23 +720,17 @@ export async function saveOnboardingStep4(
 
     // Insert new ingredients to avoid if any
     if (dietaryData.ingredientsToAvoid && dietaryData.ingredientsToAvoid.length > 0) {
-      const encryptedAvoid = encryptIngredients(
-        dietaryData.ingredientsToAvoid,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const avoidToInsert = encryptedAvoid.map((ingredient) => ({
+      const ingredientsToInsert = dietaryData.ingredientsToAvoid.map((ingredient: string) => ({
         user_id: user.id,
-        name: ingredient.name, // ENCRYPTED
+        name: ingredient,
       }));
 
-      const { error: avoidError } = await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from("user_disliked_ingredient")
-        .insert(avoidToInsert);
+        .insert(ingredientsToInsert);
 
-      if (avoidError) {
-        throw new Error(`Failed to insert ingredients to avoid: ${avoidError.message}`);
+      if (error) {
+        throw new Error(`Failed to insert ingredients to avoid: ${error.message}`);
       }
     }
 
@@ -843,23 +744,17 @@ export async function saveOnboardingStep4(
 
     // Insert new ingredients to include if any
     if (dietaryData.ingredientsToInclude && dietaryData.ingredientsToInclude.length > 0) {
-      const encryptedInclude = encryptIngredients(
-        dietaryData.ingredientsToInclude,
-        user.encryption_salt,
-        clerkUserId
-      );
-
-      const includeToInsert = encryptedInclude.map((ingredient) => ({
+      const ingredientsToInsert = dietaryData.ingredientsToInclude.map((ingredient: string) => ({
         user_id: user.id,
-        name: ingredient.name, // ENCRYPTED
+        name: ingredient,
       }));
 
-      const { error: includeError } = await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from("user_favorite_ingredient")
-        .insert(includeToInsert);
+        .insert(ingredientsToInsert);
 
-      if (includeError) {
-        throw new Error(`Failed to insert ingredients to include: ${includeError.message}`);
+      if (error) {
+        throw new Error(`Failed to insert ingredients to include: ${error.message}`);
       }
     }
 
@@ -935,20 +830,15 @@ export async function loadOnboardingStep4(
   clerkUserId: string
 ): Promise<DietaryPreferencesData | null> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       return null;
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // Load dietary patterns (restrictions)
@@ -991,12 +881,8 @@ export async function loadOnboardingStep4(
     return {
       dietaryPatterns: restrictions ? restrictions.map((r) => r.name) : [],
       cuisines: cuisines ? cuisines.map((c) => c.name) : [],
-      ingredientsToAvoid: dislikedIngredients
-        ? decryptIngredients(dislikedIngredients, user.encryption_salt, clerkUserId)
-        : [],
-      ingredientsToInclude: favoriteIngredients
-        ? decryptIngredients(favoriteIngredients, user.encryption_salt, clerkUserId)
-        : [],
+      ingredientsToAvoid: dislikedIngredients ? dislikedIngredients.map((i: any) => i.name) : [],
+      ingredientsToInclude: favoriteIngredients ? favoriteIngredients.map((i: any) => i.name) : [],
       mealsPerDay: settings?.meals_per_day || null,
       waterIntake: settings?.water_intake || null,
     };
@@ -1034,20 +920,15 @@ export async function saveOnboardingStep5(
   exerciseData: ExercisePreferencesData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       throw new Error("User not found");
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // 1. Training Preference (experience_level, time_per_session, preferred_time_of_day)
@@ -1154,20 +1035,15 @@ export async function loadOnboardingStep5(
   clerkUserId: string
 ): Promise<ExercisePreferencesData | null> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       return null;
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // Load training preference
@@ -1234,20 +1110,15 @@ export async function saveOnboardingStep6(
   availabilityData: AvailabilityData
 ): Promise<boolean> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       throw new Error("User not found");
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // 1. Update Training Preference (time_per_session, preferred_time_of_day, additional_notes)
@@ -1260,13 +1131,7 @@ export async function saveOnboardingStep6(
       .single();
 
     // Encrypt additional notes if provided
-    const additionalNotes = availabilityData.additionalNotes
-      ? encryptInjuries(
-          [availabilityData.additionalNotes],
-          user.encryption_salt,
-          clerkUserId
-        )[0]?.name || null
-      : null;
+    const additionalNotes = availabilityData.additionalNotes || null;
 
     if (existingTrainingPref) {
       // Update existing training preference
@@ -1349,20 +1214,15 @@ export async function loadOnboardingStep6(
   clerkUserId: string
 ): Promise<AvailabilityData | null> {
   try {
-    // Get user with encryption salt
     const { data: user } = await supabaseAdmin
       .from("user_user")
-      .select("id, encryption_salt")
+      .select("id")
       .eq("clerk_user_id", clerkUserId)
       .is("deleted_at", null)
       .single();
 
     if (!user) {
       return null;
-    }
-
-    if (!user.encryption_salt) {
-      throw new Error("User encryption salt not found");
     }
 
     // Load training preference
@@ -1381,13 +1241,7 @@ export async function loadOnboardingStep6(
       .is("deleted_at", null);
 
     // Decrypt additional notes if present
-    const decryptedNotes = trainingPref?.additional_notes
-      ? decryptInjuries(
-          [{ name: trainingPref.additional_notes, details: null }],
-          user.encryption_salt,
-          clerkUserId
-        )[0] || null
-      : null;
+    const decryptedNotes = trainingPref?.additional_notes || null;
 
     // Return data
     return {
