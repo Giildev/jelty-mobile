@@ -32,7 +32,7 @@ export interface MealSlot {
       ingredientName: string;
       quantity: number;
       unit: string;
-      gramsEstimate: number;
+      gramsEquivalent: number;
     }>;
     steps: Array<{
       orderIndex: number;
@@ -147,7 +147,7 @@ export async function fetchTodayMealPlan(
               ingredientName: ing.ingredientName,
               quantity: parseFloat(ing.quantity) || 0,
               unit: ing.unit,
-              gramsEstimate: parseFloat(ing.gramsEstimate) || 0,
+              gramsEquivalent: parseFloat(ing.grams || ing.gramsEquivalent) || 0,
             })),
             steps: (recipe.steps || []).map((step: any) => ({
               orderIndex: step.orderIndex,

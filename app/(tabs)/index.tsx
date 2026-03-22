@@ -121,7 +121,7 @@ export default function HomeScreen() {
     setPipelineError(data.errorMessage || "An unknown error occurred");
   }, []);
 
-  // Poll progress every 10 seconds
+  // Poll progress every 10 seconds as requested
   const { progress, isPolling } = useOnboardingProgress({
     userId: dbUserId,
     enabled: shouldPoll,

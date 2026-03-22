@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, Animated } from "react-native";
 import { STAGE_LABELS } from "@/hooks/useOnboardingProgress";
 import type { OnboardingProgressResponse } from "@/services/api/onboarding";
 
@@ -36,6 +36,22 @@ export function PipelineProgress({ progress }: PipelineProgressProps) {
   const currentStage = progress?.stage ?? "nutritionist";
   const currentLabel = STAGE_LABELS[currentStage] ?? "Preparing your plan...";
 
+  // Animation for the progress bar
+  const animatedPercent = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(animatedPercent, {
+      toValue: percent,
+      duration: 1000, // 1 second smooth transition
+      useNativeDriver: false, // width/flex don't support native driver in some cases
+    }).start();
+  }, [percent]);
+
+  const widthInterpolation = animatedPercent.interpolate({
+    inputRange: [0, 100],
+    outputRange: ["0%", "100%"],
+  });
+
   return (
     <View className="flex-1 px-6 pt-10">
       {/* Featured Header */}
@@ -65,9 +81,9 @@ export function PipelineProgress({ progress }: PipelineProgressProps) {
 
         {/* Progress bar */}
         <View className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
-          <View
+          <Animated.View
             className="h-3 rounded-full bg-[#00E6CA]"
-            style={{ width: `${percent}%` }}
+            style={{ width: widthInterpolation }}
           />
         </View>
       </View>
