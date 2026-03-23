@@ -61,8 +61,9 @@ export function useMealDetail(mealId: string | null | undefined) {
             ingredients: (recipe.ingredients || []).map((ing: any) => ({
               id: Math.random().toString(),
               name: ing.ingredientName || "Ingredient",
-              quantity: parseFloat(ing.quantity) || 0,
+              quantity: parseFloat(ing.quantity || ing.gramsEquivalent) || 0,
               unit: ing.unit || "g",
+              icon: ing.iconEmoji || "🍽️",
             })),
             preparationSteps: (recipe.steps || []).map((step: any) => ({
               id: Math.random().toString(),

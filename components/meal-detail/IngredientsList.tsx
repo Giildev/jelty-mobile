@@ -24,7 +24,9 @@ function IngredientItem({ ingredient }: IngredientItemProps) {
 
       {/* Quantity */}
       <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">
-        {ingredient.quantity}
+        {ingredient.quantity % 1 === 0
+          ? ingredient.quantity
+          : ingredient.quantity.toFixed(1)}
         {ingredient.unit}
       </Text>
     </View>

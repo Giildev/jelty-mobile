@@ -33,6 +33,7 @@ export interface MealSlot {
       quantity: number;
       unit: string;
       gramsEquivalent: number;
+      iconEmoji?: string;
     }>;
     steps: Array<{
       orderIndex: number;
@@ -144,10 +145,11 @@ export async function fetchTodayMealPlan(
               fiberG: parseInt(recipe.fiberGPerServing) || 0,
             },
             ingredients: (recipe.ingredients || []).map((ing: any) => ({
-              ingredientName: ing.ingredientName,
-              quantity: parseFloat(ing.quantity) || 0,
-              unit: ing.unit,
+              ingredientName: ing.ingredient?.name || ing.ingredientName || "Ingredient",
+              quantity: parseFloat(ing.quantity || ing.grams) || 0,
+              unit: ing.unit || "g",
               gramsEquivalent: parseFloat(ing.grams || ing.gramsEquivalent) || 0,
+              iconEmoji: ing.ingredient?.iconEmoji,
             })),
             steps: (recipe.steps || []).map((step: any) => ({
               orderIndex: step.orderIndex,
@@ -246,8 +248,9 @@ export async function fetchRecipeById(recipeId: string): Promise<any> {
     ingredients: (recipe.ingredients || []).map((ing: any) => ({
       id: ing.id || Math.random().toString(),
       name: ing.ingredient?.name || ing.name || "Ingredient",
-      quantity: parseFloat(ing.quantity) || 0,
+      quantity: parseFloat(ing.quantity || ing.grams) || 0,
       unit: ing.unit || "g",
+      icon: ing.ingredient?.iconEmoji || "🍽️",
     })),
     preparationSteps: (recipe.steps || []).map((step: any) => ({
       id: step.id || Math.random().toString(),
