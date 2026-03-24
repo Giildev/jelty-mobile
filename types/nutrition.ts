@@ -4,6 +4,31 @@
 
 import { Ingredient } from "./grocery";
 
+export interface Micros {
+  iron_mg?: number;
+  zinc_mg?: number;
+  calcium_mg?: number;
+  vitaminC_mg?: number;
+  potassium_mg?: number;
+  selenium_mcg?: number;
+  vitaminA_mcg?: number;
+  vitaminD_mcg?: number;
+  copper_mg?: number;
+  folate_mcg?: number;
+  vitaminE_mg?: number;
+  magnesium_mg?: number;
+  manganese_mg?: number;
+  vitaminB1_mg?: number;
+  vitaminB2_mg?: number;
+  vitaminB3_mg?: number;
+  vitaminB5_mg?: number;
+  vitaminB6_mg?: number;
+  vitaminK_mcg?: number;
+  phosphorus_mg?: number;
+  vitaminB7_mcg?: number;
+  vitaminB12_mcg?: number;
+}
+
 export interface Macros {
   carbs: number; // grams
   protein: number; // grams
@@ -18,7 +43,7 @@ export interface Meal {
   macros: Macros;
   imageUrl?: string; // Optional for future use
   time?: string; // Optional meal time
-  ingredients?: Ingredient[]; // Optional list of ingredients
+  ingredients?: MealIngredient[]; // Optional list of ingredients
 }
 
 export type MealType =
@@ -80,6 +105,14 @@ export interface MealIngredient {
   quantity: number;
   unit: string; // "g", "ml", "tbsp", "cups", etc.
   icon?: string; // Emoji icon for visual representation
+  grams?: number;
+  microsPerGram?: Micros;
+  macrosPerGram?: {
+    energyKcal: number;
+    proteinG: number;
+    carbG: number;
+    fatG: number;
+  };
 }
 
 /**
@@ -98,6 +131,7 @@ export interface MealDetail extends Meal {
   description: string;
   type: MealType; // breakfast, lunch, dinner, etc.
   gallery: MediaItem[];
+  micros?: Micros;
   ingredients: MealIngredient[];
   preparationSteps: PreparationStep[];
   servings: number;

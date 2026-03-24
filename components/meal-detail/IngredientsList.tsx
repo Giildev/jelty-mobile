@@ -1,5 +1,7 @@
-import { View, Text } from "react-native";
+import { useState } from "react";
+import { View, Text, Pressable } from "react-native";
 import { MealIngredient } from "@/types/nutrition";
+import { IngredientNutritionModal } from "./IngredientNutritionModal";
 
 interface IngredientsListProps {
   ingredients: MealIngredient[];
@@ -7,11 +9,15 @@ interface IngredientsListProps {
 
 interface IngredientItemProps {
   ingredient: MealIngredient;
+  onPress: (ingredient: MealIngredient) => void;
 }
 
-function IngredientItem({ ingredient }: IngredientItemProps) {
+function IngredientItem({ ingredient, onPress }: IngredientItemProps) {
   return (
-    <View className="flex-row items-center border-b border-gray-100 py-3 dark:border-gray-800">
+    <Pressable 
+      onPress={() => onPress(ingredient)}
+      className="flex-row items-center border-b border-gray-100 py-4 dark:border-gray-800 active:opacity-70"
+    >
       {/* Icon */}
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
         <Text className="text-xl">{ingredient.icon || "🍽️"}</Text>
@@ -29,22 +35,34 @@ function IngredientItem({ ingredient }: IngredientItemProps) {
           : ingredient.quantity.toFixed(1)}
         {ingredient.unit}
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
 export function IngredientsList({ ingredients }: IngredientsListProps) {
+  const [selectedIngredient, setSelectedIngredient] = useState<MealIngredient | null>(null);
+
   return (
     <View className="px-4">
       <Text className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
         Ingredients
       </Text>
 
-      <View className="rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+      <View className="rounded-3xl border border-gray-100 bg-white px-5 shadow-premium-sm dark:border-gray-800 dark:bg-gray-800/80">
         {ingredients.map((ingredient, index) => (
-          <IngredientItem key={ingredient.id || index} ingredient={ingredient} />
+          <IngredientItem 
+            key={ingredient.id || index} 
+            ingredient={ingredient} 
+            onPress={setSelectedIngredient}
+          />
         ))}
       </View>
+
+      <IngredientNutritionModal 
+        visible={!!selectedIngredient}
+        onClose={() => setSelectedIngredient(null)}
+        ingredient={selectedIngredient}
+      />
     </View>
   );
 }

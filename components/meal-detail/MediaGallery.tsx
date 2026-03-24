@@ -61,15 +61,16 @@ export function MediaGallery({ gallery, category }: MediaGalleryProps) {
   };
 
   return (
-    <View className="relative">
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        className="bg-gray-100 dark:bg-gray-800"
-      >
+    <View className="relative bg-white dark:bg-gray-900">
+      {gallery && gallery.length > 0 ? (
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          className="bg-gray-100 dark:bg-gray-800 rounded-b-[40px] overflow-hidden"
+        >
         {gallery.map((item) => (
           <View
             key={item.id}
@@ -113,11 +114,20 @@ export function MediaGallery({ gallery, category }: MediaGalleryProps) {
             )}
           </View>
         ))}
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <View 
+          style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }} 
+          className="items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-b-[40px] shadow-sm"
+        >
+          <Ionicons name="restaurant-outline" size={64} color="#9CA3AF" />
+          <Text className="mt-4 text-gray-400 font-medium">No Image Available</Text>
+        </View>
+      )}
 
-      {/* Category Badge */}
+      {/* Category Badge - Positioned at bottom left overlapping the image edge nicely */}
       {category && (
-        <View className="absolute left-4 top-4">
+        <View className="absolute bottom-6 left-6 shadow-md">
           <MealTag type={category} />
         </View>
       )}

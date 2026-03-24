@@ -144,12 +144,18 @@ export async function fetchTodayMealPlan(
               fatG: parseInt(recipe.fatGPerServing) || 0,
               fiberG: parseInt(recipe.fiberGPerServing) || 0,
             },
+            energyKcalPerServing: recipe.energyKcalPerServing,
+            proteinGPerServing: recipe.proteinGPerServing,
+            carbGPerServing: recipe.carbGPerServing,
+            fatGPerServing: recipe.fatGPerServing,
+            microsPerServing: recipe.microsPerServing,
             ingredients: (recipe.ingredients || []).map((ing: any) => ({
               ingredientName: ing.ingredient?.name || ing.ingredientName || "Ingredient",
               quantity: parseFloat(ing.quantity || ing.grams) || 0,
               unit: ing.unit || "g",
               gramsEquivalent: parseFloat(ing.grams || ing.gramsEquivalent) || 0,
               iconEmoji: ing.ingredient?.iconEmoji,
+              ...ing
             })),
             steps: (recipe.steps || []).map((step: any) => ({
               orderIndex: step.orderIndex,
@@ -236,22 +242,43 @@ export async function fetchRecipeById(recipeId: string): Promise<any> {
     id: recipe.id,
     name: recipe.name,
     description: recipe.description || "",
-    calories: parseInt(recipe.energyKcalPerServing) || 0,
+    calories: parseFloat(recipe.energyKcalPerServing) || 0,
     macros: {
-      carbs: parseInt(recipe.carbGPerServing) || 0,
-      protein: parseInt(recipe.proteinGPerServing) || 0,
-      fat: parseInt(recipe.fatGPerServing) || 0,
+      carbs: parseFloat(recipe.carbGPerServing) || 0,
+      protein: parseFloat(recipe.proteinGPerServing) || 0,
+      fat: parseFloat(recipe.fatGPerServing) || 0,
     },
     imageUrl: undefined, // Will be handled by fallback in UI
     type: (recipe.mealType?.toLowerCase() || "lunch") as any,
     gallery: [], 
-    ingredients: (recipe.ingredients || []).map((ing: any) => ({
-      id: ing.id || Math.random().toString(),
-      name: ing.ingredient?.name || ing.name || "Ingredient",
-      quantity: parseFloat(ing.quantity || ing.grams) || 0,
-      unit: ing.unit || "g",
-      icon: ing.ingredient?.iconEmoji || "🍽️",
-    })),
+    micros: recipe.microsPerServing,
+    ingredients: (recipe.ingredients || []).map((ing: any) => {
+      const baseIng = ing.ingredient || {};
+      return {
+        id: ing.id || Math.random().toString(),
+        name: baseIng.name || ing.name || "Ingredient",
+        quantity: parseFloat(ing.quantity || ing.grams) || 0,
+        unit: ing.unit || "g",
+        icon: baseIng.iconEmoji || "🍽️",
+        grams: parseFloat(ing.grams) || 0,
+        microsPerGram: baseIng.microsPerGram || {
+          iron_mg: parseFloat(baseIng.ironMgPerGram) || 0,
+          zinc_mg: parseFloat(baseIng.zincMgPerGram) || 0,
+          calcium_mg: parseFloat(baseIng.calciumMgPerGram) || 0,
+          vitaminC_mg: parseFloat(baseIng.vitaminCMgPerGram) || 0,
+          potassium_mg: parseFloat(baseIng.potassiumMgPerGram) || 0,
+          selenium_mcg: parseFloat(baseIng.seleniumMcgPerGram) || 0,
+          vitaminA_mcg: parseFloat(baseIng.vitaminAMcgPerGram) || 0,
+          vitaminD_mcg: parseFloat(baseIng.vitaminDMcgPerGram) || 0,
+        },
+        macrosPerGram: {
+          energyKcal: parseFloat(baseIng.energyKcalPerGram) || 0,
+          proteinG: parseFloat(baseIng.proteinGPerGram) || 0,
+          carbG: parseFloat(baseIng.carbGPerGram) || 0,
+          fatG: parseFloat(baseIng.fatGPerGram) || 0,
+        }
+      };
+    }),
     preparationSteps: (recipe.steps || []).map((step: any) => ({
       id: step.id || Math.random().toString(),
       stepNumber: step.orderIndex,
