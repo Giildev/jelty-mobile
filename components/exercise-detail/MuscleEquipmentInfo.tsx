@@ -17,32 +17,27 @@ export function MuscleEquipmentInfo({
   const iconColor = colorScheme === "dark" ? "#60A5FA" : "#3B82F6";
 
   return (
-    <View className="px-4">
-      {/* Description */}
-      <Text className="mb-4 text-base leading-6 text-gray-700 dark:text-gray-300">
-        {description}
-      </Text>
-
+    <View className="px-6">
       {/* Badges */}
-      <View className="flex-row flex-wrap gap-3">
+      <View className="mb-6 flex-row flex-wrap gap-4">
         {/* Primary Muscle Badge */}
-        <View className="flex-row items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-2 dark:border-blue-800 dark:bg-blue-900/30">
-          <Ionicons name="fitness" size={18} color={iconColor} />
-          <Text className="ml-2 text-sm font-semibold text-blue-700 dark:text-blue-400">
+        <View className="flex-row items-center rounded-2xl border border-blue-100 bg-blue-50/50 px-5 py-3 dark:border-blue-900/30 dark:bg-blue-900/10">
+          <Ionicons name="fitness-outline" size={20} color={iconColor} />
+          <Text className="ml-2.5 text-sm font-bold tracking-tight text-blue-700 dark:text-blue-400">
             {primaryMuscle}
           </Text>
         </View>
 
         {/* Equipment Badge */}
-        <View className="flex-row items-center rounded-full border border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
+        <View className="flex-row items-center rounded-2xl border border-gray-100 bg-gray-50/50 px-5 py-3 dark:border-gray-800 dark:bg-gray-800/20">
           <Ionicons
             name={equipment.toLowerCase().includes("barbell") ||
                    equipment.toLowerCase().includes("dumbbell") ?
-                   "barbell" : "hardware-chip"}
-            size={18}
+                   "barbell-outline" : "hardware-chip-outline"}
+            size={20}
             color={iconColor}
           />
-          <Text className="ml-2 text-sm font-semibold text-gray-700 dark:text-gray-400">
+          <Text className="ml-2.5 text-sm font-bold tracking-tight text-gray-700 dark:text-gray-400">
             {equipment}
           </Text>
         </View>

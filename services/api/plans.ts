@@ -47,46 +47,43 @@ export interface TodayMealPlan {
   slots: MealSlot[];
 }
 
-export interface WorkoutSet {
-  setIndex: number;
-  repsMin: number | null;
-  repsMax: number | null;
-  duration: string | null;
-  restSeconds: number;
-  weight: number | null;
-  notes: string | null;
-}
-
 export interface WorkoutExercise {
-  orderIndex: number;
-  exercise: {
-    name: string;
-    description: string;
-    primaryMuscle: string;
-    equipment: string;
-    howToPerformSummary: string;
-    tips: string[];
-    steps: Array<{ orderIndex: number; instruction: string }>;
-  };
-  sets: WorkoutSet[];
+  exerciseId: string;
+  name: string;
+  description: string;
+  category: "warm-up" | "main" | "stretch";
+  primaryMuscle: string;
+  equipment: string;
+  numberOfSets: number;
+  repsPerSet: number | string;
+  weightMin: string;
+  weightMax: string;
+  rir: number;
+  restSeconds: number;
+  instructions: Array<{ stepNumber: number; instruction: string }>;
+  tips: string[];
 }
 
 export interface WorkoutBlock {
-  blockType: "warm-up" | "main" | "stretch" | "cooldown";
-  orderIndex: number;
+  blockType: "warm-up" | "main" | "stretch";
   title: string;
   totalEstimatedMinutes: number;
   exercises: WorkoutExercise[];
 }
 
+export interface WorkoutSummary {
+  totalExercises: number;
+  totalEstimatedMinutes: number;
+  focusAreas: string[];
+  difficultyLevel: string;
+}
+
 export interface TodayWorkout {
   isRestDay: false;
-  programName: string;
-  dayIndex: number;
-  difficultyLevel: string;
-  focusAreas: string[];
-  totalEstimatedMinutes: number;
-  blocks: WorkoutBlock[];
+  warmUp: WorkoutBlock;
+  main: WorkoutBlock;
+  stretch: WorkoutBlock;
+  summary: WorkoutSummary;
 }
 
 export interface RestDay {
@@ -188,43 +185,49 @@ export async function fetchTodayWorkout(
     };
   }
 
+  const mapExercise = (ex: any): WorkoutExercise => ({
+    exerciseId: ex.exerciseId,
+    name: ex.name,
+    description: ex.description,
+    category: ex.category,
+    primaryMuscle: ex.primaryMuscle,
+    equipment: ex.equipment,
+    numberOfSets: ex.numberOfSets,
+    repsPerSet: ex.repsPerSet,
+    weightMin: ex.weightMin,
+    weightMax: ex.weightMax,
+    rir: ex.rir,
+    restSeconds: ex.restSeconds,
+    instructions: ex.instructions || [],
+    tips: ex.tips || [],
+  });
+
   return {
     isRestDay: false,
-    programName: data.programName || "Daily Workout",
-    dayIndex: data.dayIndex || 1,
-    difficultyLevel: data.difficultyLevel,
-    focusAreas: data.focusAreas || [],
-    totalEstimatedMinutes: parseInt(data.totalEstimatedMinutes) || 0,
-    blocks: (data.blocks || []).map((block: any) => ({
-      blockType: block.blockType,
-      orderIndex: block.orderIndex,
-      title: block.title,
-      totalEstimatedMinutes: parseInt(block.totalEstimatedMinutes) || 0,
-      exercises: (block.exercises || []).map((ex: any) => ({
-        orderIndex: ex.orderIndex,
-        exercise: {
-          name: ex.exercise?.name,
-          description: ex.exercise?.description,
-          primaryMuscle: ex.exercise?.primaryMuscle,
-          equipment: ex.exercise?.equipment,
-          howToPerformSummary: ex.exercise?.howToPerformSummary,
-          tips: ex.exercise?.tips || [],
-          steps: (ex.exercise?.steps || []).map((s: any) => ({
-            orderIndex: s.orderIndex,
-            instruction: s.instruction,
-          })),
-        },
-        sets: (ex.sets || []).map((set: any) => ({
-          setIndex: set.setIndex,
-          repsMin: set.repsMin,
-          repsMax: set.repsMax,
-          duration: set.duration,
-          restSeconds: parseInt(set.restS) || 0,
-          weight: set.weight,
-          notes: set.notes,
-        })),
-      })),
-    })),
+    warmUp: {
+      blockType: "warm-up",
+      title: data.warmUp.title,
+      totalEstimatedMinutes: data.warmUp.totalEstimatedMinutes,
+      exercises: (data.warmUp.exercises || []).map(mapExercise),
+    },
+    main: {
+      blockType: "main",
+      title: data.main.title,
+      totalEstimatedMinutes: data.main.totalEstimatedMinutes,
+      exercises: (data.main.exercises || []).map(mapExercise),
+    },
+    stretch: {
+      blockType: "stretch",
+      title: data.stretch.title,
+      totalEstimatedMinutes: data.stretch.totalEstimatedMinutes,
+      exercises: (data.stretch.exercises || []).map(mapExercise),
+    },
+    summary: {
+      totalExercises: data.summary.totalExercises,
+      totalEstimatedMinutes: data.summary.totalEstimatedMinutes,
+      focusAreas: data.summary.focusAreas || [],
+      difficultyLevel: data.summary.difficultyLevel,
+    },
   };
 }
 

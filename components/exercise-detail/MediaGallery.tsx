@@ -11,16 +11,18 @@ import { Video, ResizeMode, AVPlaybackStatus } from "expo-av";
 import { ExerciseMediaItem, ExerciseType } from "@/types/workout";
 import { Ionicons } from "@expo/vector-icons";
 import { WorkoutTag } from "@/components/ui/WorkoutTag";
+import { getExerciseImageUrl } from "@/utils/mockDataHelpers";
 
 interface MediaGalleryProps {
   gallery: ExerciseMediaItem[];
   category?: ExerciseType;
+  exerciseName?: string;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const GALLERY_HEIGHT = 300;
+const GALLERY_HEIGHT = 400;
 
-export function MediaGallery({ gallery, category }: MediaGalleryProps) {
+export function MediaGallery({ gallery, category, exerciseName }: MediaGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRefs = useRef<{ [key: string]: Video | null }>({});
@@ -62,58 +64,74 @@ export function MediaGallery({ gallery, category }: MediaGalleryProps) {
 
   return (
     <View className="relative">
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        className="bg-gray-100 dark:bg-gray-800"
-      >
-        {gallery.map((item) => (
-          <View
-            key={item.id}
-            style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
-            className="relative"
-          >
-            {item.type === "image" ? (
-              <Image
-                source={{ uri: item.url }}
-                style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
-                resizeMode="cover"
-              />
-            ) : (
-              <Pressable
-                onPress={() => toggleVideoPlayback(item.id)}
-                className="relative"
-              >
-                <Video
-                  ref={(ref) => {
-                    videoRefs.current[item.id] = ref;
-                  }}
+      {gallery.length > 0 ? (
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          className="bg-gray-100 dark:bg-gray-800"
+        >
+          {gallery.map((item) => (
+            <View
+              key={item.id}
+              style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
+              className="relative"
+            >
+              {item.type === "image" ? (
+                <Image
                   source={{ uri: item.url }}
                   style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
-                  resizeMode={ResizeMode.COVER}
-                  useNativeControls={false}
-                  onPlaybackStatusUpdate={(status) =>
-                    handlePlaybackStatusUpdate(status, item.id)
-                  }
+                  resizeMode="cover"
                 />
-                {/* Video play/pause overlay */}
-                <View className="absolute inset-0 items-center justify-center bg-black/20">
-                  <View className="h-16 w-16 items-center justify-center rounded-full bg-black/50">
-                    <Ionicons
-                      name={isPlaying ? "pause" : "play"}
-                      size={32}
-                      color="white"
-                    />
+              ) : (
+                <Pressable
+                  onPress={() => toggleVideoPlayback(item.id)}
+                  className="relative flex-1"
+                >
+                  <Video
+                    ref={(ref) => {
+                      videoRefs.current[item.id] = ref;
+                    }}
+                    source={{ uri: item.url }}
+                    style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
+                    resizeMode={ResizeMode.COVER}
+                    useNativeControls={false}
+                    onPlaybackStatusUpdate={(status) =>
+                      handlePlaybackStatusUpdate(status, item.id)
+                    }
+                  />
+                  {/* Video play/pause overlay */}
+                  <View className="absolute inset-0 items-center justify-center bg-black/20">
+                    <View className="h-16 w-16 items-center justify-center rounded-full bg-black/50">
+                      <Ionicons
+                        name={isPlaying ? "pause" : "play"}
+                        size={32}
+                        color="white"
+                      />
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            )}
-          </View>
-        ))}
-      </ScrollView>
+                </Pressable>
+              )}
+            </View>
+          ))}
+        </ScrollView>
+      ) : (
+        <View style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }} className="bg-gray-100 dark:bg-gray-800">
+          {exerciseName && getExerciseImageUrl(exerciseName) ? (
+            <Image
+              source={{ uri: getExerciseImageUrl(exerciseName) }}
+              style={{ width: SCREEN_WIDTH, height: GALLERY_HEIGHT }}
+              resizeMode="cover"
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <Ionicons name="image-outline" size={48} color="#94A3B8" />
+            </View>
+          )}
+        </View>
+      )}
 
       {/* Category Badge */}
       {category && (

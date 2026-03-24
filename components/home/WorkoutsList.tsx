@@ -7,7 +7,11 @@ interface WorkoutsListProps {
 }
 
 export function WorkoutsList({ workout }: WorkoutsListProps) {
-  const exercises = workout?.blocks?.flatMap((block) => block.exercises) || [];
+  const exercises = [
+    ...(workout.warmUp?.exercises || []),
+    ...(workout.main?.exercises || []),
+    ...(workout.stretch?.exercises || []),
+  ];
 
   if (exercises.length === 0) {
     return (
@@ -28,7 +32,7 @@ export function WorkoutsList({ workout }: WorkoutsListProps) {
         Workout of the Day
       </Text>
       {exercises.map((exercise, index) => (
-        <WorkoutCard key={`${exercise.exercise.name}-${index}`} exercise={exercise} />
+        <WorkoutCard key={`${exercise.name}-${index}`} exercise={exercise} />
       ))}
     </View>
   );

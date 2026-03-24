@@ -84,35 +84,38 @@ export default function ExerciseDetailModal() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 140 }}
+        contentContainerStyle={{ paddingBottom: 160 }}
       >
-        {/* Media Gallery */}
-        <MediaGallery
-          gallery={exerciseDetail.gallery}
-          category={exerciseDetail.category}
-        />
-
-        {/* Exercise Name */}
-        <View className="px-4 py-6">
-          <Text className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-            {exerciseDetail.name}
-          </Text>
+        {/* Media Gallery & Title Combined for Premium Look */}
+        <View className="bg-white dark:bg-gray-900 pb-10 rounded-b-[48px] shadow-sm mb-2 z-10 border-b border-gray-100 dark:border-gray-800">
+          <MediaGallery
+            gallery={exerciseDetail.gallery}
+            category={exerciseDetail.category}
+            exerciseName={exerciseDetail.name}
+          />
+          
+          <View className="px-6 pt-8">
+            <Text className="mb-3 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              {exerciseDetail.name}
+            </Text>
+            <Text className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+              {exerciseDetail.description}
+            </Text>
+          </View>
         </View>
 
-        {/* Muscle & Equipment Info */}
-        <MuscleEquipmentInfo
-          primaryMuscle={exerciseDetail.primaryMuscle}
-          equipment={exerciseDetail.equipment}
-          description={exerciseDetail.description}
-        />
+        <View className="gap-y-10 py-6">
+          {/* Muscle & Equipment Info */}
+          <MuscleEquipmentInfo
+            primaryMuscle={exerciseDetail.primaryMuscle}
+            equipment={exerciseDetail.equipment}
+            description={exerciseDetail.description || ""}
+          />
 
-        {/* Exercise Stats (Sets, Reps, RIR, Rest) */}
-        <View className="mt-6">
+          {/* Exercise Stats (Sets, Reps, RIR, Rest) */}
           <ExerciseStats instructions={exerciseDetail.instructions} />
-        </View>
 
-        {/* How to Perform Steps */}
-        <View className="mt-6">
+          {/* How to Perform Steps */}
           <HowToPerformSteps
             steps={exerciseDetail.howToPerformSteps}
             tips={exerciseDetail.tips}
@@ -121,24 +124,24 @@ export default function ExerciseDetailModal() {
       </ScrollView>
 
       {/* Action Buttons (Fixed at bottom) */}
-      <View className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-800">
+      <View className="absolute bottom-0 left-0 right-0 rounded-t-[32px] border-t border-gray-100 bg-white px-6 py-6 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] dark:border-gray-800 dark:bg-gray-900">
         {/* Mark as Done */}
         <Pressable
           onPress={handleMarkAsDone}
-          className="mb-3 rounded-lg bg-blue-500 py-4 active:opacity-80 dark:bg-blue-600"
+          className="mb-4 rounded-2xl bg-blue-500 py-4 shadow-sm active:opacity-80 dark:bg-blue-600"
         >
-          <Text className="text-center text-base font-semibold text-white">
+          <Text className="text-center text-lg font-bold text-white">
             Mark as Done
           </Text>
         </Pressable>
 
-        <View className="flex-row gap-3">
+        <View className="flex-row gap-4">
           {/* Skip Exercise */}
           <Pressable
             onPress={handleSkipExercise}
-            className="flex-1 rounded-lg border border-gray-300 bg-white py-3 active:opacity-70 dark:border-gray-600 dark:bg-gray-700"
+            className="flex-1 rounded-2xl border border-gray-200 bg-gray-50 py-3.5 active:opacity-70 dark:border-gray-700 dark:bg-gray-800"
           >
-            <Text className="text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Text className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
               Skip Exercise
             </Text>
           </Pressable>
@@ -146,9 +149,9 @@ export default function ExerciseDetailModal() {
           {/* Swap Exercise */}
           <Pressable
             onPress={handleSwapExercise}
-            className="flex-1 rounded-lg border border-gray-300 bg-white py-3 active:opacity-70 dark:border-gray-600 dark:bg-gray-700"
+            className="flex-1 rounded-2xl border border-gray-200 bg-gray-50 py-3.5 active:opacity-70 dark:border-gray-700 dark:bg-gray-800"
           >
-            <Text className="text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Text className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
               Swap Exercise
             </Text>
           </Pressable>

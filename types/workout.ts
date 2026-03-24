@@ -5,13 +5,16 @@
 export interface Exercise {
   id: string;
   name: string;
-  description?: string; // Brief description of the exercise
-  sets: number;
-  reps: number;
-  rir: number; // Reps in Reserve
-  restTime: number; // Rest time in seconds
-  imageUrl?: string; // Optional for future use
-  muscleGroup?: string; // e.g., "Chest", "Shoulders", "Arms"
+  description?: string;
+  category: ExerciseType;
+  primaryMuscle: string;
+  equipment: string;
+  numberOfSets: number;
+  repsPerSet: number | string;
+  weightMin: string;
+  weightMax: string;
+  rir: number;
+  restSeconds: number;
 }
 
 export type ExerciseType = "warm-up" | "main" | "stretch";
@@ -100,12 +103,37 @@ export interface HowToPerformStep {
  * Detailed exercise information for the detail view
  */
 export interface ExerciseDetail extends Exercise {
-  description: string; // Detailed description of the exercise
-  primaryMuscle: string; // Primary muscle group targeted
-  equipment: string; // Equipment needed
-  category: ExerciseType; // warm-up, main, or stretch
-  gallery: ExerciseMediaItem[]; // Images/videos of the exercise
-  instructions: ExerciseInstructions; // Sets, reps, RIR, rest time summary
-  howToPerformSteps: HowToPerformStep[]; // Step-by-step instructions
-  tips?: string[]; // Optional form tips or safety notes
+  instructions: ExerciseInstructions;
+  howToPerformSteps: HowToPerformStep[];
+  tips?: string[];
+  gallery: ExerciseMediaItem[];
+}
+
+/**
+ * New API Response Structure
+ */
+export interface WorkoutBlockData {
+  blockType: ExerciseType;
+  title: string;
+  totalEstimatedMinutes: number;
+  exercises: Exercise[];
+}
+
+export interface WorkoutSummary {
+  totalExercises: number;
+  totalEstimatedMinutes: number;
+  focusAreas: string[];
+  difficultyLevel: string;
+}
+
+export interface TodayWorkoutData {
+  warmUp: WorkoutBlockData;
+  main: WorkoutBlockData;
+  stretch: WorkoutBlockData;
+  summary: WorkoutSummary;
+}
+
+export interface TodayWorkoutApiResponse {
+  success: boolean;
+  data: TodayWorkoutData;
 }

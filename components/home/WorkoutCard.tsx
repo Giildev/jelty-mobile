@@ -9,29 +9,15 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({ exercise }: WorkoutCardProps) {
   const router = useRouter();
-  const { exercise: exerciseData, sets } = exercise;
-  const imageUrl = getExerciseImageUrl(exerciseData.name); // Using name as fallback for id if not available
+  const { name, exerciseId, numberOfSets, repsPerSet, primaryMuscle, category } = exercise;
+  const imageUrl = getExerciseImageUrl(name);
 
   const handlePress = () => {
-    // Note: Detail screen might need update to handle the new ID structure
     router.push({
       pathname: "/exercise-detail",
-      params: { id: exerciseData.name }, 
+      params: { id: exerciseId || name },
     });
   };
-
-  // Get summary of sets/reps
-  const firstSet = sets[0];
-  const setsCount = sets.length;
-  
-  let repsLabel = "0";
-  if (firstSet?.duration) {
-    repsLabel = firstSet.duration;
-  } else if (firstSet?.repsMin) {
-    repsLabel = firstSet.repsMax && firstSet.repsMax !== firstSet.repsMin
-      ? `${firstSet.repsMin}-${firstSet.repsMax}`
-      : `${firstSet.repsMin}`;
-  }
 
   return (
     <Pressable
@@ -51,15 +37,46 @@ export function WorkoutCard({ exercise }: WorkoutCardProps) {
 
       {/* Exercise Info */}
       <View className="ml-3 flex-1">
-        <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
-          {exerciseData.name}
-        </Text>
+        <View className="flex-row items-start justify-between">
+          <View className="flex-1 pr-2" style={{ maxWidth: '75%' }}>
+            <Text 
+              className="font-roboto-bold text-sm text-gray-900 dark:text-white"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {name}
+            </Text>
+          </View>
+          {category && (
+            <View
+              className={`rounded-full px-2 py-0.5 ${
+                category === "warm-up"
+                  ? "bg-orange-100 dark:bg-orange-900/30"
+                  : category === "stretch"
+                  ? "bg-blue-100 dark:bg-blue-900/30"
+                  : "bg-green-100 dark:bg-green-900/30"
+              }`}
+            >
+              <Text
+                className={`text-[8px] font-bold uppercase ${
+                  category === "warm-up"
+                    ? "text-orange-600 dark:text-orange-400"
+                    : category === "stretch"
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-green-600 dark:text-green-400"
+                }`}
+              >
+                {category}
+              </Text>
+            </View>
+          )}
+        </View>
         <Text className="font-roboto-regular mt-0.5 text-xs text-gray-600 dark:text-gray-400">
-          {setsCount} sets | {repsLabel} {firstSet?.duration ? "" : "reps"}
+          {numberOfSets} sets | {repsPerSet} reps
         </Text>
-        {exerciseData.primaryMuscle && (
+        {primaryMuscle && (
           <Text className="font-roboto-regular text-[10px] text-gray-500 dark:text-gray-500">
-            {exerciseData.primaryMuscle}
+            {primaryMuscle}
           </Text>
         )}
       </View>

@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getExerciseById } from "@/services/exerciseService";
+import { WorkoutExercise } from "@/services/api/plans";
 import type { ExerciseDetail, ExerciseInstructions } from "@/types/workout";
 import { useDashboardStore } from "@/store/dashboardStore";
 
@@ -38,45 +39,50 @@ export function useExerciseDetail(exerciseId: string | null | undefined) {
         throw new Error("Exercise ID is required");
       }
 
-      // 1. Check Dashboard Store for instant load (matching by name because WorkoutCard passes name)
+      // 1. Check Dashboard Store for instant load
       if (cachedWorkout && !("isRestDay" in cachedWorkout && cachedWorkout.isRestDay === true)) {
-        for (const block of cachedWorkout.blocks || []) {
-          const foundEx = block.exercises?.find((ex: any) => ex.exercise?.name === exerciseId || ex.id === exerciseId);
-          if (foundEx?.exercise) {
-            console.log("[useExerciseDetail] Found exercise in Zustand cache:", exerciseId);
-            const exData = foundEx.exercise;
-            
-            // Calculate instruction summary
-            const setsCount = foundEx.sets?.length || 0;
-            const firstSet = foundEx.sets?.[0] || {};
-            
-            return {
-              id: exerciseId,
-              name: exData.name,
-              description: exData.description || "",
-              primaryMuscle: exData.primaryMuscle || "Full Body",
-              equipment: exData.equipment || "Bodyweight",
-              category: "main",
-              gallery: [],
-              instructions: {
-                sets: setsCount,
-                repsMin: firstSet.repsMin || 0,
-                repsMax: firstSet.repsMax || 0,
-                rir: firstSet.notes?.includes("RIR") ? parseInt(firstSet.notes.replace(/[^0-9]/g, "")) || 0 : 0,
-                restTimeSeconds: firstSet.restSeconds || 0,
-              } as ExerciseInstructions,
-              howToPerformSteps: (exData.steps || []).map((s: any) => ({
-                id: Math.random().toString(),
-                orderIndex: s.orderIndex,
-                instruction: s.instruction,
-              })),
-              tips: exData.tips || [],
-              sets: setsCount,
-              reps: firstSet.repsMax || 0,
-              rir: 0,
-              restTime: firstSet.restSeconds || 0,
-            } as ExerciseDetail;
-          }
+        const allExercises = [
+          ...(cachedWorkout.warmUp?.exercises || []),
+          ...(cachedWorkout.main?.exercises || []),
+          ...(cachedWorkout.stretch?.exercises || []),
+        ];
+
+        const foundEx = allExercises.find(
+          (ex: WorkoutExercise) =>
+            ex.exerciseId === exerciseId || ex.name === exerciseId
+        );
+
+        if (foundEx) {
+          console.log("[useExerciseDetail] Found exercise in Zustand cache:", exerciseId);
+
+          return {
+            id: foundEx.exerciseId || exerciseId,
+            name: foundEx.name,
+            description: foundEx.description || "",
+            primaryMuscle: foundEx.primaryMuscle || "Full Body",
+            equipment: foundEx.equipment || "Bodyweight",
+            category: foundEx.category || "main",
+            gallery: [],
+            instructions: {
+              sets: foundEx.numberOfSets || 0,
+              repsMin: typeof foundEx.repsPerSet === 'number' ? foundEx.repsPerSet : parseInt(String(foundEx.repsPerSet)) || 0,
+              repsMax: typeof foundEx.repsPerSet === 'number' ? foundEx.repsPerSet : parseInt(String(foundEx.repsPerSet)) || 0,
+              rir: foundEx.rir || 0,
+              restTimeSeconds: foundEx.restSeconds || 0,
+            } as ExerciseInstructions,
+            howToPerformSteps: (foundEx.instructions || []).map((s: any) => ({
+              id: Math.random().toString(),
+              orderIndex: s.stepNumber || s.orderIndex,
+              instruction: s.instruction,
+            })),
+            tips: foundEx.tips || [],
+            numberOfSets: foundEx.numberOfSets || 0,
+            repsPerSet: foundEx.repsPerSet || 0,
+            weightMin: foundEx.weightMin || "Bodyweight",
+            weightMax: foundEx.weightMax || "Bodyweight",
+            rir: foundEx.rir || 0,
+            restSeconds: foundEx.restSeconds || 0,
+          } as ExerciseDetail;
         }
       }
 

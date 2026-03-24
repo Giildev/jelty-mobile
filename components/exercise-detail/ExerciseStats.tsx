@@ -1,4 +1,5 @@
 import { View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { ExerciseInstructions } from "@/types/workout";
 
 interface ExerciseStatsProps {
@@ -11,15 +12,17 @@ interface StatCardProps {
   unit?: string;
 }
 
-function StatCard({ value, label, unit = "" }: StatCardProps) {
+function StatCard({ value, label, icon }: { value: number | string; label: string; icon: string }) {
   return (
-    <View className="flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-      <Text className="text-3xl font-bold text-gray-900 dark:text-white">
+    <View className="flex-1 rounded-3xl border border-gray-100 bg-white p-5 shadow-premium-sm dark:border-gray-800 dark:bg-gray-800">
+      <View className="mb-3 flex-row items-center justify-between">
+        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          {label}
+        </Text>
+        <Ionicons name={icon as any} size={16} color="#94A3B8" />
+      </View>
+      <Text className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
         {value}
-        {unit && <Text className="text-lg">{unit}</Text>}
-      </Text>
-      <Text className="mt-1 text-sm font-medium text-gray-600 dark:text-gray-400">
-        {label}
       </Text>
     </View>
   );
@@ -32,39 +35,31 @@ export function ExerciseStats({ instructions }: ExerciseStatsProps) {
   const repsDisplay =
     repsMin === repsMax ? repsMin : `${repsMin}-${repsMax}`;
 
-  // Format rest time (convert seconds to readable format)
+  // Format rest time
   const formatRestTime = (seconds: number): string => {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    }
+    if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    if (remainingSeconds === 0) {
-      return `${minutes}m`;
-    }
-    return `${minutes}m ${remainingSeconds}s`;
+    return remainingSeconds === 0 ? `${minutes}m` : `${minutes}m ${remainingSeconds}s`;
   };
 
   const restTimeDisplay = formatRestTime(restTimeSeconds);
 
   return (
-    <View className="px-4">
-      <Text className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-        Exercise Instructions
+    <View className="px-6">
+      <Text className="mb-5 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        Training Details
       </Text>
 
-      {/* Grid: 2x2 layout */}
-      <View className="gap-3">
-        {/* First Row */}
-        <View className="flex-row gap-3">
-          <StatCard value={sets} label="Sets" />
-          <StatCard value={repsDisplay} label="Reps" />
+      <View className="gap-y-4">
+        <View className="flex-row gap-4">
+          <StatCard value={sets} label="Sets" icon="layers-outline" />
+          <StatCard value={repsDisplay} label="Reps" icon="repeat-outline" />
         </View>
 
-        {/* Second Row */}
-        <View className="flex-row gap-3">
-          <StatCard value={rir} label="RIR" />
-          <StatCard value={restTimeDisplay} label="Rest" />
+        <View className="flex-row gap-4">
+          <StatCard value={rir} label="RIR" icon="pulse-outline" />
+          <StatCard value={restTimeDisplay} label="Rest" icon="timer-outline" />
         </View>
       </View>
     </View>
