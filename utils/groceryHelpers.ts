@@ -82,20 +82,10 @@ export function groupByCategory(items: GroceryItem[]): CategorySection[] {
  * Apply all filters and grouping to grocery items
  */
 export function getFilteredAndGroupedItems(
-  items: GroceryItem[],
-  viewMode: GroceryViewMode,
-  storageFilter: StorageType | "all"
+  items: GroceryItem[]
 ): CategorySection[] {
-  let filtered = items;
-
-  // Apply frequency filter
-  filtered = filterByFrequency(filtered, viewMode);
-
-  // Apply storage type filter
-  filtered = filterByStorageType(filtered, storageFilter);
-
   // Group by category
-  return groupByCategory(filtered);
+  return groupByCategory(items);
 }
 
 /**

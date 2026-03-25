@@ -22,14 +22,10 @@ import { fetchLatestGroceryList, toggleGroceryItem } from "@/services/api/grocer
 interface GroceryStoreState {
   // State
   items: GroceryItem[];
-  viewMode: GroceryViewMode;
-  storageFilter: StorageType | "all";
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  setViewMode: (mode: GroceryViewMode) => void;
-  setStorageFilter: (filter: StorageType | "all") => void;
   toggleItemCheck: (itemId: string) => void;
   updateItemQuantity: (itemId: string, quantity: number) => void;
   addCustomItem: (itemData: AddCustomItemFormData) => void;
@@ -48,19 +44,10 @@ export const useGroceryStore = create<GroceryStoreState>()(
     (set, get) => ({
       // Initial state
       items: [],
-      viewMode: "all",
-      storageFilter: "all",
       isLoading: false,
       error: null,
 
       // Actions
-      setViewMode: (mode: GroceryViewMode) => {
-        set({ viewMode: mode });
-      },
-
-      setStorageFilter: (filter: StorageType | "all") => {
-        set({ storageFilter: filter });
-      },
 
       toggleItemCheck: (itemId: string) => {
         set((state) => ({
@@ -142,8 +129,6 @@ export const useGroceryStore = create<GroceryStoreState>()(
       resetItems: () => {
         set({
           items: [],
-          viewMode: "all",
-          storageFilter: "all",
         });
       },
 

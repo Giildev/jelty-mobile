@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useUserData } from "@/hooks/useUserData";
 import { useUserStore } from "@/store/userStore";
 
@@ -23,6 +23,7 @@ interface UseProfileDataReturn {
  * - Usa useUserData (React Query) para caché automático
  * - Fix Issue #4: Removidas dependencias problemáticas que causaban re-renders infinitos
  * - Simplificado: useUserData maneja el caché, no necesitamos lógica manual
+ * - Fix Render Error: Movido setCachedProfile a useEffect para evitar actualización durante render
  *
  * @param clerkUserId - The Clerk user ID
  * @param clerkEmail - Email from Clerk (fallback)
@@ -44,7 +45,7 @@ export function useProfileData(
 
   // Transform data to BasicProfileData format
   const data = useMemo<BasicProfileData>(() => {
-    const profileData: BasicProfileData = {
+    return {
       firstName: userData?.profile?.first_name || "",
       lastName: userData?.profile?.last_name || "",
       email: clerkEmail || userData?.user?.email || "",
@@ -52,19 +53,20 @@ export function useProfileData(
         ? new Date(clerkCreatedAt).toISOString()
         : userData?.user?.created_at || null,
     };
+  }, [userData, clerkEmail, clerkCreatedAt]);
 
-    // Update Zustand cache for legacy compatibility (ProfileHeader, etc.)
-    if (userData && profileData.firstName) {
+  // Update Zustand cache for legacy compatibility (ProfileHeader, etc.) in useEffect
+  // to avoid "Cannot update a component while rendering a different component" error
+  useEffect(() => {
+    if (userData && data.firstName) {
       setCachedProfile({
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        email: profileData.email,
-        memberSince: profileData.createdAt,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        memberSince: data.createdAt,
       });
     }
-
-    return profileData;
-  }, [userData, clerkEmail, clerkCreatedAt, setCachedProfile]);
+  }, [data, userData, setCachedProfile]);
 
   return {
     data,

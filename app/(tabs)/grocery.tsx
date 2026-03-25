@@ -9,8 +9,6 @@ import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useGroceryStore } from "@/store/groceryStore";
-import { FrequencyToggle } from "@/components/grocery/FrequencyToggle";
-import { StorageTypeFilter } from "@/components/grocery/StorageTypeFilter";
 import { CategorySection } from "@/components/grocery/CategorySection";
 import { AddCustomItemModal } from "@/components/grocery/AddCustomItemModal";
 import { AddCustomItemFormData } from "@/types/grocery";
@@ -28,12 +26,8 @@ export default function GroceryScreen() {
   // Get state and actions from store
   const {
     items,
-    viewMode,
-    storageFilter,
     isLoading,
     error,
-    setViewMode,
-    setStorageFilter,
     toggleItem,
     fetchItems,
     updateItemQuantity,
@@ -59,8 +53,8 @@ export default function GroceryScreen() {
 
   // Get filtered and grouped items
   const categorySections = useMemo(
-    () => getFilteredAndGroupedItems(items, viewMode, storageFilter),
-    [items, viewMode, storageFilter]
+    () => getFilteredAndGroupedItems(items),
+    [items]
   );
 
   // Calculate statistics
@@ -90,19 +84,6 @@ export default function GroceryScreen() {
               {remainingItems} of {totalItems} items
             </Text>
           </View>
-        </View>
-
-        {/* Frequency Toggle */}
-        <View className="mb-4">
-          <FrequencyToggle value={viewMode} onChange={setViewMode} />
-        </View>
-
-        {/* Storage Type Filter */}
-        <View>
-          <StorageTypeFilter
-            value={storageFilter}
-            onChange={setStorageFilter}
-          />
         </View>
       </View>
 
@@ -146,11 +127,7 @@ export default function GroceryScreen() {
             No items found
           </Text>
           <Text className="text-center text-base text-gray-500 dark:text-gray-400">
-            {viewMode === "weekly"
-              ? "No weekly items in this category"
-              : viewMode === "monthly"
-              ? "No monthly items in this category"
-              : "Try adjusting your filters"}
+            No ingredients found in your plan.
           </Text>
         </View>
       )}
