@@ -1,6 +1,7 @@
 import apiClient from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 import { format } from "date-fns";
+import { MealDetail } from "@/types/nutrition";
 
 export interface MealSlot {
   id: string;
@@ -13,34 +14,7 @@ export interface MealSlot {
     | "morning_snack"
     | "afternoon_snack"
     | "snack";
-  recipe: {
-    id: string;
-    name: string;
-    description: string;
-    prepTimeMinutes: number;
-    cookTimeMinutes: number;
-    cuisineType: string;
-    difficultyLevel: "easy" | "medium" | "hard";
-    tags: string[];
-    nutritionPerServing: {
-      energyKcal: number;
-      proteinG: number;
-      carbG: number;
-      fatG: number;
-      fiberG: number;
-    };
-    ingredients: Array<{
-      ingredientName: string;
-      quantity: number;
-      unit: string;
-      gramsEquivalent: number;
-      iconEmoji?: string;
-    }>;
-    steps: Array<{
-      orderIndex: number;
-      instruction: string;
-    }>;
-  };
+  recipe: MealDetail;
 }
 
 export interface TodayMealPlan {
@@ -95,6 +69,64 @@ export interface RestDay {
 export type TodayWorkoutResponse = TodayWorkout | RestDay;
 
 /**
+ * Map a backend recipe object to the frontend MealDetail interface
+ */
+export function mapRecipeToMealDetail(recipe: any, mealType?: string): any {
+  if (!recipe) return null;
+
+  return {
+    id: recipe.id,
+    name: recipe.name,
+    description: recipe.description || "",
+    calories: parseInt(recipe.energyKcalPerServing) || 0,
+    macros: {
+      carbs: parseInt(recipe.carbGPerServing) || 0,
+      protein: parseInt(recipe.proteinGPerServing) || 0,
+      fat: parseInt(recipe.fatGPerServing) || 0,
+    },
+    imageUrl: undefined,
+    type: (mealType?.toLowerCase() || recipe.mealType?.toLowerCase() || "lunch") as any,
+    gallery: [],
+    micros: recipe.microsPerServing,
+    ingredients: (recipe.ingredients || []).map((ing: any) => {
+      const baseIng = ing.ingredient || {};
+      return {
+        id: ing.id || Math.random().toString(),
+        name: baseIng.name || ing.ingredientName || "Ingredient",
+        quantity: parseFloat(ing.quantity || ing.gramsEquivalent || ing.grams) || 0,
+        unit: ing.unit || baseIng.defaultUnit || "g",
+        icon: baseIng.iconEmoji || ing.iconEmoji || "🍽️",
+        grams: parseFloat(ing.grams) || 0,
+        microsPerGram: baseIng.microsPerGram || {
+          iron_mg: parseFloat(baseIng.ironMgPerGram) || 0,
+          zinc_mg: parseFloat(baseIng.zincMgPerGram) || 0,
+          calcium_mg: parseFloat(baseIng.calciumMgPerGram) || 0,
+          vitaminC_mg: parseFloat(baseIng.vitaminCMgPerGram) || 0,
+          potassium_mg: parseFloat(baseIng.potassiumMgPerGram) || 0,
+          selenium_mcg: parseFloat(baseIng.seleniumMcgPerGram) || 0,
+          vitaminA_mcg: parseFloat(baseIng.vitaminAMcgPerGram) || 0,
+          vitaminD_mcg: parseFloat(baseIng.vitaminDMcgPerGram) || 0,
+        },
+        macrosPerGram: {
+          energyKcal: parseFloat(baseIng.energyKcalPerGram) || 0,
+          proteinG: parseFloat(baseIng.proteinGPerGram) || 0,
+          carbG: parseFloat(baseIng.carbGPerGram) || 0,
+          fatG: parseFloat(baseIng.fatGPerGram) || 0,
+        }
+      };
+    }),
+    preparationSteps: (recipe.steps || []).map((step: any) => ({
+      id: step.id || Math.random().toString(),
+      stepNumber: step.orderIndex,
+      instruction: step.instruction,
+    })),
+    servings: parseInt(recipe.servings) || 1,
+    prepTime: parseInt(recipe.prepTimeMinutes) || 0,
+    cookTime: parseInt(recipe.cookTimeMinutes) || 0,
+  };
+}
+
+/**
  * Helper to map backend meal day to frontend TodayMealPlan
  */
 function mapMealPlanDay(plan: any): TodayMealPlan {
@@ -116,40 +148,7 @@ function mapMealPlanDay(plan: any): TodayMealPlan {
           slotIndex: slot.slotIndex,
           slotLabel: slot.slotLabel,
           mealType: slot.mealType,
-          recipe: {
-            id: recipe.id,
-            name: recipe.name,
-            description: recipe.description,
-            prepTimeMinutes: parseInt(recipe.prepTimeMinutes) || 0,
-            cookTimeMinutes: parseInt(recipe.cookTimeMinutes) || 0,
-            cuisineType: recipe.cuisineType,
-            difficultyLevel: recipe.difficultyLevel?.toLowerCase() || "medium",
-            tags: recipe.tags || [],
-            nutritionPerServing: {
-              energyKcal: parseInt(recipe.energyKcalPerServing) || 0,
-              proteinG: parseInt(recipe.proteinGPerServing) || 0,
-              carbG: parseInt(recipe.carbGPerServing) || 0,
-              fatG: parseInt(recipe.fatGPerServing) || 0,
-              fiberG: parseInt(recipe.fiberGPerServing) || 0,
-            },
-            energyKcalPerServing: recipe.energyKcalPerServing,
-            proteinGPerServing: recipe.proteinGPerServing,
-            carbGPerServing: recipe.carbGPerServing,
-            fatGPerServing: recipe.fatGPerServing,
-            microsPerServing: recipe.microsPerServing,
-            ingredients: (recipe.ingredients || []).map((ing: any) => ({
-              ingredientName: ing.ingredient?.name || ing.ingredientName || "Ingredient",
-              quantity: parseFloat(ing.quantity || ing.grams) || 0,
-              unit: ing.unit || "g",
-              gramsEquivalent: parseFloat(ing.grams || ing.gramsEquivalent) || 0,
-              iconEmoji: ing.ingredient?.iconEmoji,
-              ...ing
-            })),
-            steps: (recipe.steps || []).map((step: any) => ({
-              orderIndex: step.orderIndex,
-              instruction: step.instruction,
-            })),
-          },
+          recipe: mapRecipeToMealDetail(recipe, slot.mealType),
         };
       })
       .filter((s: any) => s !== null),

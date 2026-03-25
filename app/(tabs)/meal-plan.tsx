@@ -56,20 +56,21 @@ export default function MealPlanScreen() {
       if (!plan.slots) return;
       plan.slots.forEach((slot) => {
         meals.push({
-          id: slot.id,
+          id: slot.recipe.id,
+          slotId: slot.id,
           name: slot.recipe.name,
           description: slot.recipe.description,
-          calories: slot.recipe.nutritionPerServing.energyKcal,
+          calories: slot.recipe.calories,
           macros: {
-            carbs: slot.recipe.nutritionPerServing.carbG,
-            protein: slot.recipe.nutritionPerServing.proteinG,
-            fat: slot.recipe.nutritionPerServing.fatG,
+            carbs: slot.recipe.macros.carbs,
+            protein: slot.recipe.macros.protein,
+            fat: slot.recipe.macros.fat,
           },
           date: plan.date,
           // Extract time from slotLabel if it looks like HH:mm, otherwise fallback
           time: /^\d{2}:\d{2}$/.test(slot.slotLabel || "") ? slot.slotLabel! : "08:00",
-          type: slot.mealType as any,
-          ingredients: [], // Detail view fetches these
+          type: slot.recipe.type,
+          ingredients: slot.recipe.ingredients || [],
         });
       });
     });

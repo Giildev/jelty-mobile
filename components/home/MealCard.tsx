@@ -41,9 +41,9 @@ export function MealCard({ slot }: MealCardProps) {
           {recipe.name}
         </Text>
         <Text className="font-roboto-regular mt-0.5 text-xs text-gray-600 dark:text-gray-400">
-          C: {recipe.nutritionPerServing.carbG}g | P:{" "}
-          {recipe.nutritionPerServing.proteinG}g | F:{" "}
-          {recipe.nutritionPerServing.fatG}g
+          C: {recipe.macros.carbs}g | P:{" "}
+          {recipe.macros.protein}g | F:{" "}
+          {recipe.macros.fat}g
         </Text>
         <Text className="font-roboto-regular text-[10px] text-primary">
           {slot.slotLabel}
@@ -53,7 +53,7 @@ export function MealCard({ slot }: MealCardProps) {
       {/* Calories */}
       <View className="items-end">
         <Text className="font-roboto-bold text-sm text-gray-900 dark:text-white">
-          {recipe.nutritionPerServing.energyKcal} cal
+          {recipe.calories} cal
         </Text>
       </View>
     </Pressable>

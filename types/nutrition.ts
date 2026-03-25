@@ -52,7 +52,8 @@ export type MealType =
   | "lunch"
   | "afternoon_snack"
   | "dinner"
-  | "evening_snack";
+  | "evening_snack"
+  | "snack";
 
 export interface DailyMealPlan {
   date: string; // ISO date string
@@ -66,6 +67,7 @@ export interface ScheduledMeal extends Meal {
   date: string; // ISO date string "2025-11-10"
   time: string; // Time in HH:mm format "08:00", "13:00"
   type: MealType; // Type of meal (breakfast, lunch, etc.)
+  slotId?: string; // Original slot ID from backend
 }
 
 /**

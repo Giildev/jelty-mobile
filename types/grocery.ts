@@ -73,6 +73,7 @@ export interface GroceryItem extends Ingredient {
   isCustom: boolean; // User-added vs. from meal plan
   mealSources?: string[]; // IDs of meals that use this ingredient
   customQuantity?: number; // User-edited quantity (if different from calculated)
+  icon?: string; // Ingredient emoji
 }
 
 /**

@@ -117,7 +117,7 @@ export function WeekView({ meals, currentDate }: WeekViewProps) {
                   </View>
                 ) : (
                   dayMeals.map((meal) => (
-                    <MealMiniCard key={meal.id} meal={meal} />
+                    <MealMiniCard key={meal.slotId || meal.id} meal={meal} />
                   ))
                 )}
               </ScrollView>

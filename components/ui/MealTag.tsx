@@ -31,6 +31,8 @@ export function MealTag({ type }: MealTagProps) {
         return "Dinner";
       case "evening_snack":
         return "Night Snack";
+      case "snack":
+        return "Snack";
       default:
         return "Meal";
     }
@@ -42,6 +44,7 @@ export function MealTag({ type }: MealTagProps) {
       case "breakfast":
         return "tag-breakfast";
       case "morning_snack":
+      case "snack":
         return "tag-morning-snack";
       case "lunch":
         return "tag-lunch";

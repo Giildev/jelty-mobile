@@ -86,16 +86,21 @@ export function GroceryItem({
         </View>
 
         {/* Item Name */}
-        <Text
-          className={`flex-1 text-base ${
-            item.isChecked
-              ? "text-gray-400 line-through dark:text-gray-500"
-              : "text-gray-900 dark:text-white"
-          }`}
-          numberOfLines={2}
-        >
-          {item.name}
-        </Text>
+        <View className="flex-1 flex-row items-center">
+          {item.icon && (
+            <Text className="mr-2 text-lg">{item.icon}</Text>
+          )}
+          <Text
+            className={`flex-1 text-base ${
+              item.isChecked
+                ? "text-gray-400 line-through dark:text-gray-500"
+                : "text-gray-900 dark:text-white"
+            }`}
+            numberOfLines={2}
+          >
+            {item.name}
+          </Text>
+        </View>
       </View>
 
       {/* Quantity */}

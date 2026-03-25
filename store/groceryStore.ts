@@ -14,6 +14,7 @@ import {
   AddCustomItemFormData,
 } from "@/types/grocery";
 import { generateGroceryItemId } from "@/utils/groceryHelpers";
+import { fetchLatestGroceryList, toggleGroceryItem } from "@/services/api/grocery";
 
 /**
  * Grocery store state and actions
@@ -23,6 +24,8 @@ interface GroceryStoreState {
   items: GroceryItem[];
   viewMode: GroceryViewMode;
   storageFilter: StorageType | "all";
+  isLoading: boolean;
+  error: string | null;
 
   // Actions
   setViewMode: (mode: GroceryViewMode) => void;
@@ -33,6 +36,8 @@ interface GroceryStoreState {
   removeItem: (itemId: string) => void;
   resetItems: () => void;
   clearCheckedItems: () => void;
+  fetchItems: (userId: string) => Promise<void>;
+  toggleItem: (itemId: string, userId: string) => Promise<void>;
 }
 
 /**
@@ -45,6 +50,8 @@ export const useGroceryStore = create<GroceryStoreState>()(
       items: [],
       viewMode: "all",
       storageFilter: "all",
+      isLoading: false,
+      error: null,
 
       // Actions
       setViewMode: (mode: GroceryViewMode) => {
@@ -61,6 +68,37 @@ export const useGroceryStore = create<GroceryStoreState>()(
             item.id === itemId ? { ...item, isChecked: !item.isChecked } : item
           ),
         }));
+      },
+
+      toggleItem: async (itemId: string, userId: string) => {
+        // Optimistic update
+        const previousItems = get().items;
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === itemId ? { ...item, isChecked: !item.isChecked } : item
+          ),
+        }));
+
+        try {
+          await toggleGroceryItem(itemId, userId);
+        } catch (error) {
+          // Rollback on error
+          set({ items: previousItems });
+          console.error("Failed to toggle grocery item:", error);
+        }
+      },
+
+      fetchItems: async (userId: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const items = await fetchLatestGroceryList(userId);
+          set({ items, isLoading: false });
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : "Failed to fetch grocery list",
+            isLoading: false
+          });
+        }
       },
 
       updateItemQuantity: (itemId: string, quantity: number) => {

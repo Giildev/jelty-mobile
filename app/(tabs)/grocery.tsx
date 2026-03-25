@@ -4,7 +4,7 @@
  * Complete grocery list view with filtering, categorization, and item management
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +19,8 @@ import {
   getTotalItemCount,
   getCheckedItemCount,
 } from "@/utils/groceryHelpers";
+import { useUserStore } from "@/store/userStore";
+import { ActivityIndicator, RefreshControl } from "react-native";
 
 export default function GroceryScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -28,13 +30,32 @@ export default function GroceryScreen() {
     items,
     viewMode,
     storageFilter,
+    isLoading,
+    error,
     setViewMode,
     setStorageFilter,
-    toggleItemCheck,
+    toggleItem,
+    fetchItems,
     updateItemQuantity,
     addCustomItem,
     removeItem,
   } = useGroceryStore();
+
+  const { user } = useUserStore();
+  const dbUserId = user?.supabaseUserId || null;
+
+  // Fetch items on mount or when user changes
+  useEffect(() => {
+    if (dbUserId) {
+      fetchItems(dbUserId);
+    }
+  }, [dbUserId]);
+
+  const onRefresh = useCallback(() => {
+    if (dbUserId) {
+      fetchItems(dbUserId);
+    }
+  }, [dbUserId, fetchItems]);
 
   // Get filtered and grouped items
   const categorySections = useMemo(
@@ -91,17 +112,29 @@ export default function GroceryScreen() {
           className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerClassName="pb-24"
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={onRefresh}
+              tintColor="#3b82f6"
+            />
+          }
         >
           {categorySections.map((section) => (
             <CategorySection
               key={section.category}
               section={section}
-              onToggleCheck={toggleItemCheck}
+              onToggleCheck={(id) => dbUserId && toggleItem(id, dbUserId)}
               onUpdateQuantity={updateItemQuantity}
               onRemove={removeItem}
             />
           ))}
         </ScrollView>
+      ) : isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <Text className="mt-4 text-gray-500 dark:text-gray-400">Loading groceries...</Text>
+        </View>
       ) : (
         <View className="flex-1 items-center justify-center px-6">
           <Ionicons

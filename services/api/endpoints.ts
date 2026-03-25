@@ -29,4 +29,10 @@ export const API_ENDPOINTS = {
     recipeDetail: (id: string) => `/meal-plan/recipe/${id}`,
     exerciseDetail: (id: string) => `/workout/exercise/${id}`,
   },
+  // Grocery List
+  grocery: {
+    latest: "/grocery-list/latest",
+    regenerate: "/grocery-list/regenerate",
+    toggle: (id: string) => `/grocery-list/item/${id}/toggle`,
+  },
 } as const;
