@@ -40,7 +40,7 @@ export function DayView({ exercises, currentDate }: DayViewProps) {
         const formattedTime = format(timeDate, "h:mm a");
 
         return (
-          <View key={exercise.id} className="mb-4">
+          <View key={`${exercise.id}-${index}`} className="mb-4">
             {/* Time Label */}
             <Text className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
               {formattedTime}

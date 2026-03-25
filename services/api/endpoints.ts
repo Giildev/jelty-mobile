@@ -21,7 +21,11 @@ export const API_ENDPOINTS = {
   // Plans
   plans: {
     mealPlanToday: "/meal-plan/today",
+    mealPlanWeek: "/meal-plan/week",
+    mealPlanMonth: "/meal-plan/month",
     workoutToday: "/workout/today",
+    workoutWeek: "/workout/week",
+    workoutMonth: "/workout/month",
     recipeDetail: (id: string) => `/meal-plan/recipe/${id}`,
     exerciseDetail: (id: string) => `/workout/exercise/${id}`,
   },

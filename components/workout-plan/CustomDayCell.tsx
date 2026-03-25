@@ -70,9 +70,9 @@ export function CustomDayCell({
       {/* Exercise Indicators - Dots */}
       {exerciseCount > 0 && !isDisabled && (
         <View style={styles.dotsContainer}>
-          {dayExercises.slice(0, 4).map((exercise) => (
+          {dayExercises.slice(0, 4).map((exercise, idx) => (
             <View
-              key={exercise.id}
+              key={`${exercise.id}-${idx}`}
               style={[
                 styles.dot,
                 { backgroundColor: getExerciseColor(exercise.type) },

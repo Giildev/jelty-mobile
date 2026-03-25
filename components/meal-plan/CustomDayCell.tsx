@@ -72,7 +72,7 @@ export function CustomDayCell({
         <View style={styles.dotsContainer}>
           {dayMeals.slice(0, 4).map((meal, index) => (
             <View
-              key={meal.id}
+              key={`${meal.id}-${index}`}
               style={[
                 styles.dot,
                 { backgroundColor: getMealColor(meal.type) },

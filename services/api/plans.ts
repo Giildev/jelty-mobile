@@ -1,5 +1,6 @@
 import apiClient from "./client";
 import { API_ENDPOINTS } from "./endpoints";
+import { format } from "date-fns";
 
 export interface MealSlot {
   id: string;
@@ -94,25 +95,15 @@ export interface RestDay {
 export type TodayWorkoutResponse = TodayWorkout | RestDay;
 
 /**
- * Fetches today's meal plan with all slots, recipes, ingredients, and steps.
+ * Helper to map backend meal day to frontend TodayMealPlan
  */
-export async function fetchTodayMealPlan(
-  userId: string
-): Promise<TodayMealPlan> {
-  const response = await apiClient.get(API_ENDPOINTS.plans.mealPlanToday, {
-    params: { userId },
-  });
-
-  // Map backend structure to frontend interface
-  const backendData = response.data;
-  const plan = backendData.data;
-
-  if (!plan) {
-    return { date: new Date().toISOString(), slots: [] };
-  }
+function mapMealPlanDay(plan: any): TodayMealPlan {
+  // Use UTC-safe formatting to avoid day shift due to local timezone
+  const dateObj = plan.date instanceof Date ? plan.date : new Date(plan.date);
+  const formattedDate = dateObj.toISOString().split("T")[0];
 
   return {
-    date: plan.date,
+    date: formattedDate,
     slots: (plan.slots || [])
       .map((slot: any) => {
         const recipeLink = slot.recipes?.[0];
@@ -166,22 +157,13 @@ export async function fetchTodayMealPlan(
 }
 
 /**
- * Fetches today's workout. Returns isRestDay: true if today is a rest day.
+ * Helper to map backend workout day to TodayWorkoutResponse
  */
-export async function fetchTodayWorkout(
-  userId: string
-): Promise<TodayWorkoutResponse> {
-  const response = await apiClient.get(API_ENDPOINTS.plans.workoutToday, {
-    params: { userId },
-  });
-
-  const backendData = response.data;
-  const data = backendData.data;
-
-  if (!data || backendData.isRestDay) {
+function mapWorkoutDay(data: any): TodayWorkoutResponse {
+  if (!data || data.isRestDay) {
     return {
       isRestDay: true,
-      message: backendData.message || "No workout scheduled today. Enjoy your rest!",
+      message: data?.message || "No workout scheduled today. Enjoy your rest!",
     };
   }
 
@@ -189,15 +171,15 @@ export async function fetchTodayWorkout(
     exerciseId: ex.exerciseId,
     name: ex.name,
     description: ex.description,
-    category: ex.category,
-    primaryMuscle: ex.primaryMuscle,
-    equipment: ex.equipment,
-    numberOfSets: ex.numberOfSets,
-    repsPerSet: ex.repsPerSet,
-    weightMin: ex.weightMin,
-    weightMax: ex.weightMax,
-    rir: ex.rir,
-    restSeconds: ex.restSeconds,
+    category: ex.category || "main",
+    primaryMuscle: ex.primaryMuscle || "Full Body",
+    equipment: ex.equipment || "None",
+    numberOfSets: ex.numberOfSets || 0,
+    repsPerSet: ex.repsPerSet || 0,
+    weightMin: ex.weightMin || "0",
+    weightMax: ex.weightMax || "0",
+    rir: ex.rir || 0,
+    restSeconds: ex.restSeconds || 0,
     instructions: ex.instructions || [],
     tips: ex.tips || [],
   });
@@ -206,29 +188,135 @@ export async function fetchTodayWorkout(
     isRestDay: false,
     warmUp: {
       blockType: "warm-up",
-      title: data.warmUp.title,
-      totalEstimatedMinutes: data.warmUp.totalEstimatedMinutes,
-      exercises: (data.warmUp.exercises || []).map(mapExercise),
+      title: data.warmUp?.title || "Warm Up",
+      totalEstimatedMinutes: data.warmUp?.totalEstimatedMinutes || 0,
+      exercises: (data.warmUp?.exercises || []).map(mapExercise),
     },
     main: {
       blockType: "main",
-      title: data.main.title,
-      totalEstimatedMinutes: data.main.totalEstimatedMinutes,
-      exercises: (data.main.exercises || []).map(mapExercise),
+      title: data.main?.title || "Main Workout",
+      totalEstimatedMinutes: data.main?.totalEstimatedMinutes || 0,
+      exercises: (data.main?.exercises || []).map(mapExercise),
     },
     stretch: {
       blockType: "stretch",
-      title: data.stretch.title,
-      totalEstimatedMinutes: data.stretch.totalEstimatedMinutes,
-      exercises: (data.stretch.exercises || []).map(mapExercise),
+      title: data.stretch?.title || "Cool Down",
+      totalEstimatedMinutes: data.stretch?.totalEstimatedMinutes || 0,
+      exercises: (data.stretch?.exercises || []).map(mapExercise),
     },
     summary: {
-      totalExercises: data.summary.totalExercises,
-      totalEstimatedMinutes: data.summary.totalEstimatedMinutes,
-      focusAreas: data.summary.focusAreas || [],
-      difficultyLevel: data.summary.difficultyLevel,
+      totalExercises: data.summary?.totalExercises || 0,
+      totalEstimatedMinutes: data.summary?.totalEstimatedMinutes || 0,
+      focusAreas: data.summary?.focusAreas || [],
+      difficultyLevel: data.summary?.difficultyLevel || "Medium",
     },
   };
+}
+
+/**
+ * Fetches today's meal plan with all slots, recipes, ingredients, and steps.
+ */
+export async function fetchTodayMealPlan(
+  userId: string,
+  date?: string
+): Promise<TodayMealPlan> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.mealPlanToday, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const plan = backendData.data;
+
+  if (!plan) {
+    return { date: date || new Date().toISOString(), slots: [] };
+  }
+
+  return mapMealPlanDay(plan);
+}
+
+/**
+ * Fetches weekly meal plan.
+ */
+export async function fetchWeeklyMealPlan(
+  userId: string,
+  date?: string
+): Promise<TodayMealPlan[]> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.mealPlanWeek, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const plans = backendData.data || [];
+
+  return plans.map(mapMealPlanDay);
+}
+
+/**
+ * Fetches monthly meal plan.
+ */
+export async function fetchMonthlyMealPlan(
+  userId: string,
+  date?: string
+): Promise<TodayMealPlan[]> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.mealPlanMonth, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const plans = backendData.data || [];
+
+  return plans.map(mapMealPlanDay);
+}
+
+/**
+ * Fetches today's workout. Returns isRestDay: true if today is a rest day.
+ */
+export async function fetchTodayWorkout(
+  userId: string,
+  date?: string
+): Promise<TodayWorkoutResponse> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.workoutToday, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const data = backendData.data;
+
+  return mapWorkoutDay(data);
+}
+
+/**
+ * Fetches weekly workouts.
+ */
+export async function fetchWeeklyWorkouts(
+  userId: string,
+  date?: string
+): Promise<TodayWorkoutResponse[]> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.workoutWeek, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const workouts = backendData.data || [];
+
+  return workouts.map(mapWorkoutDay);
+}
+
+/**
+ * Fetches monthly workouts.
+ */
+export async function fetchMonthlyWorkouts(
+  userId: string,
+  date?: string
+): Promise<TodayWorkoutResponse[]> {
+  const response = await apiClient.get(API_ENDPOINTS.plans.workoutMonth, {
+    params: { userId, date },
+  });
+
+  const backendData = response.data;
+  const workouts = backendData.data || [];
+
+  return workouts.map(mapWorkoutDay);
 }
 
 /**

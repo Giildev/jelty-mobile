@@ -43,7 +43,7 @@ export function ExerciseMiniCard({
             {displayName}
           </Text>
           <Text className="text-[9px] text-gray-600 dark:text-gray-400">
-            {exercise.sets}x{exercise.reps}
+            {exercise.numberOfSets}x{exercise.repsPerSet}
           </Text>
         </View>
       </Pressable>
@@ -83,12 +83,12 @@ export function ExerciseMiniCard({
 
           {/* Sets x Reps */}
           <Text className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-            {exercise.sets} sets × {exercise.reps} reps
+            {exercise.numberOfSets} sets × {exercise.repsPerSet} reps
           </Text>
 
           {/* Exercise Details */}
           <Text className="text-[10px] text-gray-600 dark:text-gray-400">
-            RIR: {exercise.rir} • Rest: {exercise.restTime}s
+            RIR: {exercise.rir} • Rest: {exercise.restSeconds}s
           </Text>
         </View>
       </View>

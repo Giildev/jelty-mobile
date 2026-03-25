@@ -112,8 +112,8 @@ export function WeekView({ exercises, currentDate }: WeekViewProps) {
                     </Text>
                   </View>
                 ) : (
-                  dayExercises.map((exercise) => (
-                    <ExerciseMiniCard key={exercise.id} exercise={exercise} />
+                  dayExercises.map((exercise, idx) => (
+                    <ExerciseMiniCard key={`${exercise.id}-${idx}`} exercise={exercise} />
                   ))
                 )}
               </ScrollView>
