@@ -16,7 +16,7 @@ import { useDailyMessage } from "@/hooks/useDailyMessage";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { useTodayMealPlan, useTodayWorkout } from "@/hooks/useTodayPlans";
 import { triggerOnboardingPipeline } from "@/services/api/onboarding";
-import { useUserStore, type User } from "@/store/userStore";
+import { useUserStore } from "@/store/userStore";
 import { useDashboardStore } from "@/store/dashboardStore";
 import { useEffect } from "react";
 
@@ -60,9 +60,7 @@ export default function HomeScreen() {
 
     if (!userLoading && userData) {
       const isComplete = userData.profile?.onboarding_completed;
-      console.log("[HomeScreen] Checking onboarding status:", isComplete);
       if (isComplete === false) {
-        console.log("[HomeScreen] Onboarding not complete, redirecting to step-1");
         router.replace("/(onboarding)/step-1");
       }
     }
@@ -71,7 +69,6 @@ export default function HomeScreen() {
   // Sync store with userData if missing
   useEffect(() => {
     if (userData && clerkUserId && !storeUser?.supabaseUserId) {
-      console.log("[HomeScreen] Syncing user store with fetched userData:", userData.user.id);
       setUser({
         id: clerkUserId,
         supabaseUserId: userData.user.id,
@@ -81,8 +78,6 @@ export default function HomeScreen() {
         lastName: userData.profile.last_name || undefined,
         onboardingCompleted: Boolean(userData.profile?.onboarding_completed),
       });
-    } else {
-      console.log("[HomeScreen] Skip store sync. userData:", !!userData, "clerkUserId:", !!clerkUserId, "storeSupabaseId:", storeUser?.supabaseUserId);
     }
   }, [userData, storeUser?.supabaseUserId, setUser, clerkUserId]);
 
@@ -107,11 +102,8 @@ export default function HomeScreen() {
   const shouldPoll = Boolean(isOnboardingComplete && isWaitingForPipeline && !pipelineFailed);
   const pipelineComplete = !isWaitingForPipeline;
 
-  console.log(`[HomeScreen] dbUserId: ${dbUserId}, pipelineComplete: ${pipelineComplete}, shouldPoll: ${shouldPoll}, isOnboardingComplete: ${isOnboardingComplete}`);
-
   const handlePipelineComplete = useCallback(() => {
     setIsWaitingForPipeline(false);
-    // Invalidate queries so they refetch with fresh data
     queryClient.invalidateQueries({ queryKey: ["meal-plan", "today", dbUserId] });
     queryClient.invalidateQueries({ queryKey: ["workout", "today", dbUserId] });
   }, [queryClient, dbUserId, setIsWaitingForPipeline]);
@@ -137,10 +129,16 @@ export default function HomeScreen() {
     pipelineComplete
   );
 
-  const { data: workout, isLoading: isWorkoutLoading } = useTodayWorkout(
+  const { data: dailyWorkout, isLoading: isWorkoutLoading } = useTodayWorkout(
     dbUserId,
     pipelineComplete
   );
+
+  useEffect(() => {
+    if (dailyWorkout?.dayIndex) {
+      console.log(`[HomeScreen] Received workout for Day Index: ${dailyWorkout.dayIndex}`);
+    }
+  }, [dailyWorkout]);
 
   const setTodayMealPlan = useDashboardStore((s) => s.setTodayMealPlan);
   const setTodayWorkout = useDashboardStore((s) => s.setTodayWorkout);
@@ -150,8 +148,8 @@ export default function HomeScreen() {
   }, [mealPlan, setTodayMealPlan]);
 
   useEffect(() => {
-    if (workout) setTodayWorkout(workout);
-  }, [workout, setTodayWorkout]);
+    if (dailyWorkout) setTodayWorkout(dailyWorkout);
+  }, [dailyWorkout, setTodayWorkout]);
 
   // Pull-to-refresh
   const [refreshing, setRefreshing] = useState(false);
@@ -255,9 +253,9 @@ export default function HomeScreen() {
 
         {/* Workout section */}
         <View className="mt-4 mb-10">
-          {workout && !workout.isRestDay ? (
-            <WorkoutsList workout={workout} />
-          ) : workout?.isRestDay ? (
+          {dailyWorkout && !dailyWorkout.isRestDay ? (
+            <WorkoutsList workout={dailyWorkout} />
+          ) : dailyWorkout?.isRestDay ? (
             <View className="px-6">
               <Text className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
                 Workout of the Day

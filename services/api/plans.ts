@@ -55,6 +55,7 @@ export interface WorkoutSummary {
 
 export interface TodayWorkout {
   isRestDay: false;
+  dayIndex?: number;
   warmUp: WorkoutBlock;
   main: WorkoutBlock;
   stretch: WorkoutBlock;
@@ -64,6 +65,7 @@ export interface TodayWorkout {
 export interface RestDay {
   isRestDay: true;
   message: string;
+  dayIndex?: number;
 }
 
 export type TodayWorkoutResponse = TodayWorkout | RestDay;
@@ -217,7 +219,7 @@ function mapWorkoutDay(data: any): TodayWorkoutResponse {
  */
 export async function fetchTodayMealPlan(
   userId: string,
-  date?: string
+  date: string = format(new Date(), "yyyy-MM-dd")
 ): Promise<TodayMealPlan> {
   const response = await apiClient.get(API_ENDPOINTS.plans.mealPlanToday, {
     params: { userId, date },
@@ -272,8 +274,9 @@ export async function fetchMonthlyMealPlan(
  */
 export async function fetchTodayWorkout(
   userId: string,
-  date?: string
+  date: string = format(new Date(), "yyyy-MM-dd")
 ): Promise<TodayWorkoutResponse> {
+  console.log(`[api/plans] Fetching workout for user: ${userId}, date: ${date}`);
   const response = await apiClient.get(API_ENDPOINTS.plans.workoutToday, {
     params: { userId, date },
   });
