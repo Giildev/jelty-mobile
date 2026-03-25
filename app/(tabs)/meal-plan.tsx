@@ -68,7 +68,7 @@ export default function MealPlanScreen() {
           },
           date: plan.date,
           // Extract time from slotLabel if it looks like HH:mm, otherwise fallback
-          time: /^\d{2}:\d{2}$/.test(slot.slotLabel || "") ? slot.slotLabel! : "08:00",
+          time: (slot.slotLabel?.match(/\d{1,2}:\d{2}/)?.[0] || "08:00").padStart(5, '0'),
           type: slot.recipe.type,
           ingredients: slot.recipe.ingredients || [],
         });
